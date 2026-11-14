@@ -6,7 +6,7 @@ build({
   kind: 'DTD – Detail Technical Document',
   title: 'Arena Quiz Multiplayer',
   subtitle: 'Detalhamento técnico: estrutura de código, modelo de dados, API, máquina de estados, algoritmos, front-end e testes',
-  version: '1.1', date: '14/11/2026', status: 'Atualizado com o arsenal e os emojis do organizador',
+  version: '1.2', date: '14/11/2026', status: 'Atualizado com o escopo da partida',
   blocks: [
     ['h1', '1. Introdução'],
     ['p', 'Este documento é a referência detalhada de implementação do Arena Quiz Multiplayer (protótipo v9). Ele complementa o PRD (o que o produto faz) e o PTD (visão técnica). Os nomes de campos, rotas e funções correspondem ao código-fonte.'],
@@ -47,6 +47,7 @@ build({
       ['reactions', 'list', 'Reações recentes {id, name, emoji, t, host?} (até 40, últimos 15 s); itens do organizador têm host = true.'],
       ['broadcasts', 'list', 'Emojis do organizador para os celulares {id, emoji, t, host} (até 20, últimos 15 s).'],
       ['last_host_emoji', 'float', 'Último emoji do organizador (limite de 0,35 s).'],
+      ['bank', 'list[Question] | ausente', 'Quiz completo guardado durante a partida quando o escopo usa só parte dele; volta para questions no restart.'],
       ['turn_idx', 'int', 'Ponteiro do rodízio no modo por vez.'],
       ['auto_hold', 'bool', 'Avanço automático segurado pelo apresentador.'],
       ['host_seen / created', 'float', 'Último polling do apresentador / criação (epoch).']] }],
@@ -71,7 +72,9 @@ build({
       ['reactions_on', 'bool', 'true', 'sim', 'Reações com emoji.'],
       ['tension_music / tension_secs', 'bool / 3–30 s', 'true / 10', 'sim', 'Música de tensão.'],
       ['theme / theme_variant', '16 temas + auto / 0–2', 'auto / 0', 'sim', 'Tema visual e tom.'],
-      ['lang', 'pt | en | es', 'pt', 'não', 'Idioma do quiz padrão.']] }],
+      ['lang', 'pt | en | es', 'pt', 'não', 'Idioma do quiz padrão.'],
+      ['q_limit', '0–200 (0 = todas)', '0', 'não', 'Escopo: quantas perguntas do quiz usar na partida.'],
+      ['q_pick', 'first | random', 'first', 'não', 'Escopo: as N primeiras ou N sorteadas sem repetir.']] }],
     ['note', '* "Ao vivo" = pode ser alterado com o jogo em andamento (lista LIVE_SETTINGS). As demais só mudam no lobby. Valores fora do intervalo são ajustados para o limite (normalize_settings).'],
     ['h2', '3.3 Jogador (Player)'],
     ['table', { title: 'Campos do jogador', widths: [2, 2, 5], header: ['Campo', 'Tipo', 'Descrição'], rows: [
@@ -138,13 +141,13 @@ build({
       ['GET', '/api/templates/<id>', '?lang=', '{id, name, questions}']] }],
     ['h2', '4.3 Ações do apresentador'],
     ['table', { title: 'Ações de /api/host/<code>/<action>', widths: [2, 2, 5], header: ['Ação', 'Fase', 'Efeito'], rows: [
-      ['start', 'lobby', 'Inicia a 1ª pergunta (exige ≥ 1 jogador).'],
+      ['start', 'lobby', 'Separa as perguntas do escopo (_build_round) e inicia a 1ª (exige ≥ 1 jogador).'],
       ['next', 'reveal', 'Próxima pergunta ou pódio.'],
       ['close', 'open', 'Encerra a pergunta (remove pausa).'],
       ['pause / resume', 'open', 'Congela/retoma o relógio.'],
       ['pause / resume', 'reveal', 'Segura/continua o avanço automático.'],
       ['finish', 'open, reveal, finished', 'Vai ao pódio.'],
-      ['restart', 'qualquer', 'Zera pontos, poderes e chamadas; volta ao lobby.'],
+      ['restart', 'qualquer', 'Devolve o quiz completo (_restore_bank), zera pontos, poderes e chamadas; volta ao lobby.'],
       ['kick', 'qualquer', 'Remove o jogador (pid).'],
       ['set_turn', 'open (sem respostas)', 'Dá a vez a outro jogador e reinicia o tempo.'],
       ['approve / deny', 'qualquer', 'Aceita (cria o jogador) ou recusa um pedido (rid).'],
@@ -155,7 +158,8 @@ build({
     ['bullets', [
       '**host_view**: fase, configurações, placar completo, eventos, pedidos pendentes, ordem dos jogadores, reações recentes, quiz completo (só no lobby) e pergunta (com gabarito e distribuição só no resultado).',
       '**player_view**: dados do próprio jogador (pontos, poderes, desbloqueios, bloqueio, lacre, armadilha, chamadas restantes, inbox), alvos para ataque (sem pontuação), placar e posição só se `board_visible`, e a pergunta com status (none, voted, winner, late, wrong, blocked, spectator), eliminadas, efeitos e dica.',
-      '**board_visible** = fase finished, ou board_mode = live, ou (board_mode = reveal e fase reveal).']],
+      '**board_visible** = fase finished, ou board_mode = live, ou (board_mode = reveal e fase reveal).',
+      '**total / bank_total**: `total` = perguntas da partida (no lobby já considera o q_limit); `bank_total` = tamanho do quiz completo.']],
 
     ['h1', '5. Máquina de estados e sincronização'],
     ['img', '03_ciclo_partida.png', 'Máquina de estados da partida'],
@@ -248,6 +252,15 @@ build({
       ['Entrega', 'room.broadcasts → player_view.me.broadcasts (últimos 10 s); room.reactions → telão'],
       ['Celular', 'Emoji gigante com "🎤 Organizador"; ids vistos evitam repetir; avisos 🎤 para eventos ev_host_*']] }],
 
+    ['h2', '6.9 Escopo da partida'],
+    ['img', '18_escopo_partida.png', 'Escopo da partida'],
+    ['table', { title: 'Funções do escopo da partida (game.py)', widths: [2, 6], header: ['Função', 'Comportamento'], rows: [
+      ['game_total(room)', 'Fora do lobby: len(questions). No lobby: min(q_limit, len(questions)), ou len(questions) se q_limit = 0.'],
+      ['bank_size(room)', 'len(bank) se existir; senão len(questions).'],
+      ['_build_round(room)', 'Chamada no start. first: índices 0..N−1; random: random.sample(range(len), N). Se a partida usa o quiz inteiro na ordem, nada muda; senão bank = questions e questions = selecionadas.'],
+      ['_restore_bank(room)', 'Chamada no restart: questions = bank e remove bank.']] }],
+    ['code', '# exemplo: quiz com 120 perguntas, escopo de 90 sorteadas\nPOST /api/host/ABCD/settings  {"token": "...", "settings": {"q_limit": 90, "q_pick": "random"}}\nPOST /api/host/ABCD/start     {"token": "..."}\nGET  /api/state/ABCD?role=host&token=...   ->  {"total": 90, "bank_total": 120, ...}'],
+
     ['h1', '7. Salas públicas, interações e criação de quiz'],
     ['img', '09_sala_publica.png', 'Pedido de entrada'],
     ['table', { title: 'Regras das salas públicas', widths: [3, 5], header: ['Regra', 'Valor'], rows: [
@@ -336,8 +349,9 @@ build({
       ['Salas públicas', 'private_room_is_not_listed_and_rejects_requests, public_room_request_approve_and_deny, public_room_hidden_when_host_is_gone'],
       ['Por vez', 'turns_rotate_only_turn_player_answers, turns_block_skips_turn_and_powers_only_on_own_turn, turns_classic_scoring_and_host_set_turn, turn_timeout_resets_streak'],
       ['Interações e temas', 'nudge_limit_and_inbox, reactions_whitelist_rate_limit_and_toggle, theme_and_tension_settings'],
-      ['Arsenal do organizador', 'host_arsenal_all_players, host_shield_for_everyone_once_each, host_target_and_give_charges, host_arsenal_classic_mode, host_emoji_broadcast']] }],
-    ['p', 'Roteiros de navegador (Playwright): e2e.js (partida Arena), e2e2.js (criação de quiz), e2e3.js (Clássico e controles), e2e4.js (sala pública e avanço automático), e2e5.js (por vez), e2e6.js (interações e temas), e2e7.js (arsenal e emojis do organizador).'],
+      ['Arsenal do organizador', 'host_arsenal_all_players, host_shield_for_everyone_once_each, host_target_and_give_charges, host_arsenal_classic_mode, host_emoji_broadcast'],
+      ['Escopo da partida', 'scope_first_n_questions, scope_random_pick_and_restart_restores_bank, scope_limit_bigger_than_quiz_and_all, scope_cannot_change_during_game']] }],
+    ['p', 'Roteiros de navegador (Playwright): e2e.js (partida Arena), e2e2.js (criação de quiz), e2e3.js (Clássico e controles), e2e4.js (sala pública e avanço automático), e2e5.js (por vez), e2e6.js (interações e temas), e2e7.js (arsenal e emojis do organizador), e2e8.js (escopo da partida).'],
     ['note', 'Os diagramas deste documento são gerados a partir dos arquivos .mmd em docs/diagramas. Para atualizar, edite o .mmd e gere o PNG novamente; para regenerar os documentos, rode `node docs/gerador/prd.js`, `ptd.js` e `dtd.js`.']
   ]
 }, path.join(__dirname, '..', 'DTD_Arena_Quiz_Multiplayer.docx'));

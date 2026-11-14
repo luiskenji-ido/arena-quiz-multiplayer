@@ -104,6 +104,9 @@ def normalize_settings(raw, base=None):
     theme = raw.get('theme', s.get('theme', 'auto'))
     s['theme'] = theme if theme in THEMES else 'auto'
     s['theme_variant'] = num('theme_variant', 0, 2, 0)                     # 3 tons de cor por tema
+    s['q_limit'] = num('q_limit', 0, 200, 0)                               # escopo: quantas perguntas usar (0 = todas)
+    pick = raw.get('q_pick', s.get('q_pick', 'first'))
+    s['q_pick'] = pick if pick in ('first', 'random') else 'first'         # na sequência do quiz ou sorteadas
     return s
 
 
@@ -407,7 +410,42 @@ def public_info(room):
     s = room['settings']
     return {'id': room['pub_id'], 'name': s.get('room_name') or room.get('quiz_title'),
             'quiz_title': room.get('quiz_title', ''), 'mode': s['mode'], 'lang': s['lang'],
-            'players': len(room['players']), 'phase': room['phase'], 'total': len(room['questions'])}
+            'players': len(room['players']), 'phase': room['phase'], 'total': game_total(room)}
+
+
+# --------------------------------------------------------------------------
+# Escopo da partida: o quiz carregado é o "banco"; a partida usa só as N escolhidas
+# --------------------------------------------------------------------------
+def bank_size(room):
+    return len(room.get('bank') or room['questions'])
+
+
+def game_total(room):
+    """Perguntas desta partida: no lobby, as que serão usadas; depois, as separadas no início."""
+    if room['phase'] != 'lobby':
+        return len(room['questions'])
+    n, lim = len(room['questions']), room['settings'].get('q_limit', 0)
+    return min(lim, n) if lim else n
+
+
+def _build_round(room):
+    """Ao iniciar: guarda o banco completo e separa as perguntas da partida."""
+    bank = room['questions']
+    n = game_total(room)
+    if room['settings'].get('q_pick') == 'random':
+        idx = random.sample(range(len(bank)), n)          # sorteadas, em ordem aleatória
+    else:
+        idx = list(range(n))                              # as primeiras N, na sequência do quiz
+    if n == len(bank) and idx == list(range(n)):
+        return                                            # partida usa o quiz inteiro, na ordem
+    room['bank'] = bank
+    room['questions'] = [bank[i] for i in idx]
+
+
+def _restore_bank(room):
+    if room.get('bank'):
+        room['questions'] = room.pop('bank')
+    room.pop('bank', None)
 
 
 def event(room, key, **params):
@@ -521,6 +559,7 @@ def host_action(room, action, arg=None):
             raise GameError('bad_phase')
         if not room['players']:
             raise GameError('no_players')
+        _build_round(room)
         start_question(room)
     elif action == 'next':
         if ph != 'reveal':
@@ -563,6 +602,7 @@ def host_action(room, action, arg=None):
         room['phase'] = 'finished'
         room['q'] = None
     elif action == 'restart':
+        _restore_bank(room)                       # volta o quiz completo (novo sorteio na próxima partida)
         room['phase'] = 'lobby'
         room['qi'] = -1
         room['q'] = None
@@ -1024,7 +1064,7 @@ def public_events(room, limit=15):
 def host_view(room):
     v = {
         'role': 'host', 'code': room['code'], 'phase': room['phase'], 'settings': room['settings'],
-        'qi': room['qi'], 'total': len(room['questions']), 'board': _board(room),
+        'qi': room['qi'], 'total': game_total(room), 'bank_total': bank_size(room), 'board': _board(room),
         'events': public_events(room), 'now': time.time(), 'custom_quiz': room['custom_quiz'],
         'thresholds': room['settings'].get('thresholds', THRESHOLDS), 'quiz_title': room.get('quiz_title', ''),
         'board_visible': board_visible(room), 'auto_hold': room.get('auto_hold', False),
@@ -1044,7 +1084,7 @@ def player_view(room, pid):
     p = room['players'][pid]
     v = {
         'role': 'player', 'code': room['code'], 'phase': room['phase'], 'settings': room['settings'],
-        'qi': room['qi'], 'total': len(room['questions']), 'board': _board(room),
+        'qi': room['qi'], 'total': game_total(room), 'bank_total': bank_size(room), 'board': _board(room),
         'events': public_events(room), 'now': time.time(), 'thresholds': room['settings'].get('thresholds', THRESHOLDS),
         'quiz_title': room.get('quiz_title', ''), 'targets': _targets(room), 'board_visible': board_visible(room),
         'me': {

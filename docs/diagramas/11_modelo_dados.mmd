@@ -12,6 +12,8 @@ classDiagram
     host_seen: float
     events: list
     reactions: list
+    broadcasts: list
+    bank: list (quiz completo durante a partida)
   }
   class Settings {
     mode: arena|classic
@@ -25,6 +27,8 @@ classDiagram
     nudge_limit, reactions_on
     tension_music, tension_secs
     theme, theme_variant, lang
+    q_limit: 0=todas | 1..200
+    q_pick: first|random
   }
   class Player {
     id, token, name, color
@@ -48,6 +52,7 @@ classDiagram
     winner, win_points
     answers, used, elim
     mods, pending, turn
+    global, elim_all, gshield_used
   }
   class JoinRequest {
     id, secret, name, t

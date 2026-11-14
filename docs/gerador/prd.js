@@ -8,12 +8,13 @@ build({
   kind: 'PRD – Product Requirements Document',
   title: 'Arena Quiz Multiplayer',
   subtitle: 'Requisitos de produto da plataforma de quiz ao vivo para eventos, salas de aula e treinamentos',
-  version: '1.1', date: '14/11/2026', status: 'Versão inicial para validação',
+  version: '1.2', date: '14/11/2026', status: 'Atualizado com o escopo da partida',
   blocks: [
     ['h1', '1. Controle do documento'],
     ['table', { title: 'Histórico de versões', widths: [1, 2, 5], header: ['Versão', 'Data', 'Descrição'], rows: [
       ['1.0', '14/11/2026', 'Primeira versão consolidada a partir das entregas v1 a v9 do protótipo (Arena, Clássico, salas públicas, modo por vez, interações, temas e acessibilidade).'],
-      ['1.1', '14/11/2026', 'Arsenal e emojis do organizador (RF-39 a RF-43): efeitos para todos, poderes contra um participante, dar cargas e emojis enviados a todos os celulares.']] }],
+      ['1.1', '14/11/2026', 'Arsenal e emojis do organizador (RF-39 a RF-43): efeitos para todos, poderes contra um participante, dar cargas e emojis enviados a todos os celulares.'],
+      ['1.2', '14/11/2026', 'Escopo da partida (RF-44 a RF-46): o organizador define quantas perguntas do quiz usar (ex.: 90 de 120), na sequência ou sorteadas, com estimativa de duração.']] }],
     ['table', { title: 'Documentos relacionados', widths: [2, 5], header: ['Documento', 'Conteúdo'], rows: [
       ['PTD – Product Technical Document', 'Visão técnica da solução: arquitetura, componentes, segurança e implantação.'],
       ['DTD – Detail Technical Document', 'Detalhamento: modelo de dados, API, máquina de estados, algoritmos e códigos de erro.'],
@@ -106,7 +107,11 @@ build({
       RF('RF-22', 'Avanço automático com tempo configurável.', 'S', '3 a 60 s após o resultado; contagem visível; "Segurar/Continuar".'),
       RF('RF-23', 'Placar ao vivo, só após cada pergunta ou só no final.', 'S', 'Quando oculto, o servidor não envia posições aos celulares.'),
       RF('RF-24', 'Configurações durante o jogo.', 'S', 'Tempo, pontos, placar, poderes, interação e tema podem mudar com o jogo rolando.'),
-      RF('RF-25', 'Dar a vez a outro participante (modo Por vez).', 'C', 'Disponível antes de alguém responder.')] }],
+      RF('RF-25', 'Dar a vez a outro participante (modo Por vez).', 'C', 'Disponível antes de alguém responder.'),
+      RF('RF-44', 'Escopo da partida: usar só parte das perguntas do quiz.', 'M', 'Em Configurar Jogo (no lobby), controle deslizante e campo numérico de 1 até o total do quiz e botão "Todas"; ex.: 90 de 120. Telão e celulares mostram "Rodada 1/90".'),
+      RF('RF-45', 'Escolher como as perguntas são selecionadas.', 'S', '"Na sequência do quiz" (as N primeiras) ou "Sorteadas do quiz" (N sem repetir, em ordem aleatória). Reiniciar a partida devolve o quiz completo e permite novo sorteio.'),
+      RF('RF-46', 'Estimativa para caber no tempo do evento.', 'S', 'A tela mostra quantas perguntas cada jogador responde no modo Por vez e a duração estimada (perguntas × (tempo + resultado)). O lobby exibe "90 de 120 perguntas".')] }],
+    ['img', '18_escopo_partida.png', 'Escopo da partida'],
 
     ['h2', '5.5 Criação de quiz'],
     ['table', { title: 'Requisitos de criação de quiz', widths: [1, 5, 1, 4], header: ['ID', 'Requisito', 'Prior.', 'Critério de aceite'], rows: [

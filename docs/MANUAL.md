@@ -81,6 +81,16 @@ Durante o jogo aparece a barra de controles:
 * **Configurar Jogo** continua disponível: tempo, pontos, placar e poderes podem mudar com o jogo rolando;
   modo, idioma, cargas e quiz só no lobby.
 
+### 🔢 Escopo da partida (quantas perguntas usar)
+Em **Configurar Jogo → Escopo da partida** (no lobby, antes de iniciar):
+* Escolha quantas perguntas do quiz serão usadas, pelo controle deslizante ou digitando o número.
+  Exemplo: o quiz tem 120 perguntas, mas o tempo do evento só comporta 90. O botão **Todas** volta a usar o quiz inteiro.
+* **Na sequência do quiz**: usa as primeiras N perguntas, na ordem do arquivo.
+  **Sorteadas do quiz**: sorteia N perguntas sem repetir, em ordem aleatória.
+* A janela mostra a **duração estimada** (perguntas × tempo + resultado) e, no modo **Por vez**, quantas perguntas cada jogador responde.
+* O lobby mostra, por exemplo, "90 de 120 perguntas", e o telão e os celulares mostram "Rodada 1/90".
+* **Reiniciar partida** devolve o quiz completo. Com "Sorteadas", cada nova partida sorteia outras perguntas.
+
 ### 🧰 Arsenal e emojis do organizador
 Na parte de baixo da tela do apresentador (Arena e Clássico) fica uma barra flutuante:
 * **😀 Emojis para todos**: 20 emojis (👏 🔥 😂 HAHAHA 😮 😱 😡 🎉 👋 ⏰ 💪 🏆 🙌 ❤️ …). Aparecem grandes no celular de
@@ -182,7 +192,7 @@ templates/         index (entrada), host + play (Arena), host_classic + play_cla
 static/            common.js e i18n_extra.js (idiomas, manual), host_core.js (controles do apresentador),
                    fun.js (sons, chamar atenção, reações, temas, palco, acessibilidade), themes.css, showthemes.css, inclusion.css e kids.css,
                    quizkit.js (criação de quiz), style.css (Arena), corp.css (Clássico)
-tests/             test_game.py (pytest), e2e.js ... e2e7.js (Playwright), fixtures/
+tests/             test_game.py (pytest), e2e.js ... e2e8.js (Playwright), fixtures/
 ```
 
 ## Testes
@@ -196,5 +206,5 @@ Em `docs/`:
 * `PRD_Arena_Quiz_Multiplayer.docx` – requisitos de produto.
 * `PTD_Arena_Quiz_Multiplayer.docx` – visão técnica (arquitetura, segurança, implantação, testes).
 * `DTD_Arena_Quiz_Multiplayer.docx` – detalhamento (modelo de dados, API, algoritmos, erros, front-end).
-* `diagramas/` – 17 diagramas Mermaid (`.mmd`) e as imagens geradas (`.png`).
+* `diagramas/` – 18 diagramas Mermaid (`.mmd`) e as imagens geradas (`.png`).
 * `gerador/` – scripts que geram os documentos: `docs/gerador/gerar.sh`.

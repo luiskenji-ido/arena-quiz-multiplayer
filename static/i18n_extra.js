@@ -84,7 +84,7 @@
   helpHTML = function () {
     if (typeof ST !== 'undefined' && ST && ST.settings && ST.settings.mode === 'classic') {
       const li = k => `<li>${t(k)}</li>`;
-      return `<div class="panel border border-amber-500/30 text-sm text-slate-300 space-y-2"><h4 class="font-esports text-sm font-bold text-amber-300">${t('help_classic_title')}</h4><ul class="list-disc list-inside space-y-1">${['help_classic_1', 'help_classic_2', 'help_classic_3', 'help_classic_4', 'help_classic_5', 'help_classic_6'].map(li).join('')}</ul></div>`;
+      return `<div class="panel border border-amber-500/30 text-sm text-slate-300 space-y-2"><h4 class="font-esports text-sm font-bold text-amber-300">${t('help_classic_title')}</h4><ul class="list-disc list-inside space-y-1">${['help_classic_1', 'help_classic_2', 'help_classic_3', 'help_classic_4', 'help_classic_5', 'help_classic_6', 'help_classic_7'].map(li).join('')}</ul></div>`;
     }
     return baseHelp();
   };
@@ -373,6 +373,28 @@ function turnResultText(q) {
       help_s5_l4: "Cada acción del organizador aparece como aviso 🎤 en los móviles y en el feed de eventos.",
       help_classic_6: "El organizador tiene un <strong>🧰 Arsenal</strong> (50/50, puntos dobles, pista, +15 s, dado y carta para todos) y envía <strong>emojis</strong> que aparecen en todos los móviles."
     }
+  };
+  for (const l in X) Object.assign(I18N[l], X[l]);
+})();
+
+/* Escopo da partida: quantidade de perguntas */
+(function () {
+  const X = {
+    pt: { cfg_scope: "Escopo da partida", scope_all: "Todas", scope_first: "Na sequência do quiz", scope_random: "Sorteadas do quiz", scope_random_short: "sorteadas",
+          scope_badge: "{n} perguntas", scope_per_player: "({n} p/ jogador)", scope_info: "Serão usadas {n} de {total} perguntas do quiz · duração estimada ≈ {min} min",
+          quiz_n_of: "{n} de {total} perguntas",
+          help_s1_l6: "<strong>Escopo da partida:</strong> em Configurar Jogo, o organizador escolhe quantas perguntas do quiz usar (ex.: 90 de 120), na sequência ou sorteadas. A tela mostra quantas cada jogador responde no modo Por vez e a duração estimada.",
+          help_classic_7: "O organizador pode usar só parte do quiz (ex.: 90 de 120 perguntas), na sequência ou sorteadas, em <strong>Configurar Jogo → Escopo da partida</strong>." },
+    en: { cfg_scope: "Game scope", scope_all: "All", scope_first: "In quiz order", scope_random: "Randomly drawn", scope_random_short: "random",
+          scope_badge: "{n} questions", scope_per_player: "({n} per player)", scope_info: "{n} of {total} quiz questions will be used · estimated length ≈ {min} min",
+          quiz_n_of: "{n} of {total} questions",
+          help_s1_l6: "<strong>Game scope:</strong> in Game Settings, the organizer chooses how many quiz questions to use (e.g. 90 of 120), in order or randomly drawn. The screen shows how many each player answers in Turns mode and the estimated length.",
+          help_classic_7: "The organizer can use only part of the quiz (e.g. 90 of 120 questions), in order or randomly drawn, in <strong>Game Settings → Game scope</strong>." },
+    es: { cfg_scope: "Alcance de la partida", scope_all: "Todas", scope_first: "En el orden del quiz", scope_random: "Sorteadas del quiz", scope_random_short: "sorteadas",
+          scope_badge: "{n} preguntas", scope_per_player: "({n} por jugador)", scope_info: "Se usarán {n} de {total} preguntas del quiz · duración estimada ≈ {min} min",
+          quiz_n_of: "{n} de {total} preguntas",
+          help_s1_l6: "<strong>Alcance de la partida:</strong> en Configurar Juego, el organizador elige cuántas preguntas del quiz usar (ej.: 90 de 120), en orden o sorteadas. La pantalla muestra cuántas responde cada jugador en modo Por turno y la duración estimada.",
+          help_classic_7: "El organizador puede usar solo parte del quiz (ej.: 90 de 120 preguntas), en orden o sorteadas, en <strong>Configurar Juego → Alcance de la partida</strong>." }
   };
   for (const l in X) Object.assign(I18N[l], X[l]);
 })();

@@ -619,3 +619,59 @@ def test_host_emoji_broadcast(client):
     time.sleep(0.4)
     assert client.post(f'/api/host/{code}/hostemoji', json={'token': ht, 'emoji': 'xx'}).status_code == 400
     assert client.post(f'/api/host/{code}/hostemoji', json={'token': 'bad', 'emoji': '🏆'}).status_code == 403
+
+
+# ---------------- Escopo da partida (quantidade de perguntas) ----------------
+def _bank(n):
+    return [{'question': f'Q{i}?', 'options': ['a', 'b', 'c', 'd'], 'correct': 0} for i in range(n)]
+
+
+def _load(client, code, ht, n, **settings):
+    return host(client, code, ht, 'settings', settings=settings, quiz=_bank(n), quiz_title='Banco')
+
+
+def test_scope_first_n_questions(client):
+    code, ht, ps = mk(client, 2)
+    assert _load(client, code, ht, 120, q_limit=90).status_code == 200
+    s = state(client, code, ht=ht)
+    assert s['total'] == 90 and s['bank_total'] == 120 and len(s['quiz']) == 120   # lobby mostra o banco inteiro
+    host(client, code, ht, 'start')
+    s = state(client, code, ht=ht)
+    assert s['total'] == 90 and s['question']['question'] == 'Q0?'
+    assert state(client, code, ps[0])['total'] == 90
+    for i in range(89):                     # vai até a última pergunta e termina no pódio
+        host(client, code, ht, 'close'); host(client, code, ht, 'next')
+    assert state(client, code, ht=ht)['question']['question'] == 'Q89?'
+    host(client, code, ht, 'close'); host(client, code, ht, 'next')
+    assert state(client, code, ht=ht)['phase'] == 'finished'
+
+
+def test_scope_random_pick_and_restart_restores_bank(client):
+    code, ht, ps = mk(client, 1)
+    _load(client, code, ht, 30, q_limit=10, q_pick='random')
+    host(client, code, ht, 'start')
+    seen = []
+    for _ in range(10):
+        seen.append(state(client, code, ht=ht)['question']['question'])
+        host(client, code, ht, 'close'); host(client, code, ht, 'next')
+    assert len(set(seen)) == 10 and all(q.startswith('Q') for q in seen)   # sem repetir
+    host(client, code, ht, 'restart')
+    s = state(client, code, ht=ht)
+    assert s['phase'] == 'lobby' and s['bank_total'] == 30 and len(s['quiz']) == 30 and s['total'] == 10
+
+
+def test_scope_limit_bigger_than_quiz_and_all(client):
+    code, ht, ps = mk(client, 1)
+    _load(client, code, ht, 8, q_limit=50)
+    assert state(client, code, ht=ht)['total'] == 8
+    host(client, code, ht, 'settings', settings={'q_limit': 0})
+    assert state(client, code, ht=ht)['total'] == 8
+
+
+def test_scope_cannot_change_during_game(client):
+    code, ht, ps = mk(client, 1)
+    _load(client, code, ht, 20, q_limit=5)
+    host(client, code, ht, 'start')
+    host(client, code, ht, 'settings', settings={'q_limit': 15, 'timer': 40})
+    s = state(client, code, ht=ht)
+    assert s['total'] == 5 and s['settings']['q_limit'] == 5 and s['settings']['timer'] == 40

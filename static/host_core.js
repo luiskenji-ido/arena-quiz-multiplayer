@@ -121,6 +121,7 @@ function openConfig() {
         <i class="fa-solid ${m.icon} ${PW_STYLE[m.color].split(' ').pop()}"></i> ${t('pwr_' + m.key)}</span>
       <span class="flex items-center gap-1 text-slate-400"><input id="pwTh_${m.key}" type="number" min="0" max="50" value="${s.thresholds[m.key]}" class="w-12 bg-slate-950 border border-slate-700 rounded px-1 py-0.5 text-center text-white"> ${t('cfg_power_hits')}</span>
     </label>`).join('');
+  scopeInit(s);
   cfgMode(s.mode);
   document.getElementById('cfgModeBox').classList.toggle('hidden', !lobby);
   document.querySelectorAll('#cfgModal .lobbyOnly').forEach(e => e.classList.toggle('hidden', !lobby));
@@ -141,7 +142,7 @@ async function applySettings() {
     board_mode: board ? board.value : 'live', powers_on, thresholds,
     answer_order: order ? order.value : 'speed',
     nudge_limit: +sNudge.value, reactions_on: sReact.checked, tension_music: sTension.checked, tension_secs: +sTensionSecs.value,
-    theme: (document.getElementById('sThemeVal') || {}).value || 'auto', theme_variant: +((document.getElementById('sVariantVal') || {}).value || 0), visibility: vis ? vis.value : 'private', room_name: sRoomName.value, auto_next: sAuto.checked, auto_delay: +sAutoDelay.value } };
+    theme: (document.getElementById('sThemeVal') || {}).value || 'auto', theme_variant: +((document.getElementById('sVariantVal') || {}).value || 0), visibility: vis ? vis.value : 'private', room_name: sRoomName.value, auto_next: sAuto.checked, auto_delay: +sAutoDelay.value, ...scopeValue() } };
   const r = await api(`/api/host/${H.code}/settings`, body);
   const err = document.getElementById('setErr');
   if (!r.ok) { err.textContent = errText(r.data.error); err.classList.remove('hidden'); return; }
@@ -288,3 +289,45 @@ const _renderControlsOrig = renderControls;
 renderControls = function () { _renderControlsOrig(); mountHostDock(); renderArsenal(false); };
 const _onLangHost = onLangChange;
 onLangChange = function () { _onLangHost(); paintDock(); renderArsenal(true); };
+
+
+// ---------- Escopo da partida: quantas perguntas do quiz serão usadas ----------
+function scopeBank() { return (ST && (ST.bank_total || ST.total)) || 1; }
+function scopeInit(s) {
+  const bank = scopeBank(), lim = s.q_limit || 0;
+  const r = document.getElementById('sScopeRange'), n = document.getElementById('sScopeNum');
+  r.max = bank; n.max = bank;
+  r.value = n.value = lim && lim < bank ? lim : bank;
+  document.querySelectorAll('input[name=sPick]').forEach(x => { x.checked = x.value === (s.q_pick || 'first'); });
+  document.querySelectorAll('input[name=sOrder], input[name=sPick], #sTimer, #sAuto, #sAutoDelay').forEach(x => { x.onchange = () => scopeSync(); });
+  scopeSync();
+}
+function scopeSync(src) {
+  const bank = scopeBank(), r = document.getElementById('sScopeRange'), n = document.getElementById('sScopeNum');
+  if (!r) return;
+  if (src === 'all') r.value = n.value = bank;
+  else if (src === 'range') n.value = r.value;
+  else if (src === 'num') { const v = Math.max(1, Math.min(bank, +n.value || 1)); r.value = v; if (+n.value > bank) n.value = bank; }
+  const q = Math.max(1, Math.min(bank, +r.value || bank));
+  const players = Math.max(1, ((ST && ST.order) || []).length);
+  const turns = (document.querySelector('input[name=sOrder]:checked') || {}).value === 'turns';
+  // estimativa: tempo de cada pergunta + ~8 s de resultado (ou o tempo do avanço automático)
+  const quiz = (ST && ST.quiz) || [], timer = +document.getElementById('sTimer').value || 30;
+  const reveal = document.getElementById('sAuto').checked ? (+document.getElementById('sAutoDelay').value || 8) : 8;
+  const avg = quiz.length ? quiz.reduce((a, x) => a + (x.time || timer), 0) / quiz.length : timer;
+  const mins = Math.max(1, Math.round(q * (avg + reveal) / 60));
+  document.getElementById('scopeBadge').textContent = t('scope_badge', { n: q }) + (turns ? ' ' + t('scope_per_player', { n: Math.max(1, Math.round(q / players)) }) : '');
+  document.getElementById('scopeInfo').textContent = t('scope_info', { n: q, total: bank, min: mins });
+}
+function scopeValue() {
+  const r = document.getElementById('sScopeRange');
+  if (!r) return {};
+  const q = +r.value, bank = scopeBank();
+  const pick = (document.querySelector('input[name=sPick]:checked') || {}).value || 'first';
+  return { q_limit: q >= bank ? 0 : q, q_pick: pick };
+}
+function quizCountText() {
+  const bank = ST.bank_total || ST.total;
+  if (ST.total >= bank) return t('quiz_n', { n: ST.total }) + (ST.settings.q_pick === 'random' ? ' · ' + t('scope_random_short') : '');
+  return t('quiz_n_of', { n: ST.total, total: bank }) + (ST.settings.q_pick === 'random' ? ' · ' + t('scope_random_short') : '');
+}

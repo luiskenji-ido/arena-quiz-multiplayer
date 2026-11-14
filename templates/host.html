@@ -206,7 +206,7 @@ function render() {
     const s = ST.settings, on = POWER_META.filter(m => s.powers_on[m.key]).length;
     document.getElementById('sumSettings').innerHTML = `${s.visibility === 'public' ? '<i class="fa-solid fa-globe text-emerald-300"></i> ' + t('vis_public') : '<i class="fa-solid fa-lock text-slate-400"></i> ' + t('vis_private')}${s.room_name ? ' · ' + esc(s.room_name) : ''}<br>${t('cfg_order')}: ${turns ? t('order_turns') : t('order_speed')}<br>${s.timer}s · ${s.base_xp} XP × ${s.multiplier} · ${t('cfg_powers')}: ${on}/9 · ${t('cfg_board')}: ${t('board_' + s.board_mode)}${s.auto_next ? ' · ' + t('ctrl_auto') + ' ' + s.auto_delay + 's' : ''}`;
     document.getElementById('sumQuiz').textContent = ST.quiz_title || (ST.custom_quiz ? t('quiz_custom') : t('quiz_default'));
-    document.getElementById('sumQuizN').textContent = t('quiz_n', { n: ST.total });
+    document.getElementById('sumQuizN').textContent = quizCountText();
     document.getElementById('sumList').innerHTML = (ST.quiz || []).map((x, i) => `<li class="truncate"><span class="text-slate-500">${i + 1}.</span> ${esc(x.question)} <span class="text-emerald-400">→ ${x.poll ? t('poll_label') : esc(x.options[x.correct])}</span>${x.time ? ` <span class="text-amber-300">${x.time}s</span>` : ''}</li>`).join('');
   }
 

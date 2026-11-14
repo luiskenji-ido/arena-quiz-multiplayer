@@ -168,7 +168,7 @@ function render() {
     document.getElementById('nPlayers').textContent = ST.board.length;
     document.getElementById('lobQuiz').textContent = quizName();
     const s = ST.settings;
-    document.getElementById('lobInfo').textContent = `${s.visibility === 'public' ? '🌐 ' + t('vis_public') : '🔒 ' + t('vis_private')}${s.room_name ? ' · ' + s.room_name : ''} · ${s.answer_order === 'turns' ? t('order_turns') : t('order_speed')} · ${t('quiz_n', { n: ST.total })} · ${s.timer}s · ${t('cfg_board')}: ${t('board_' + s.board_mode)}${s.auto_next ? ' · ' + t('ctrl_auto') + ' ' + s.auto_delay + 's' : ''}`;
+    document.getElementById('lobInfo').textContent = `${s.visibility === 'public' ? '🌐 ' + t('vis_public') : '🔒 ' + t('vis_private')}${s.room_name ? ' · ' + s.room_name : ''} · ${s.answer_order === 'turns' ? t('order_turns') : t('order_speed')} · ${quizCountText()} · ${s.timer}s · ${t('cfg_board')}: ${t('board_' + s.board_mode)}${s.auto_next ? ' · ' + t('ctrl_auto') + ' ' + s.auto_delay + 's' : ''}`;
     const turns = s.answer_order === 'turns';
     document.getElementById('chips').innerHTML = ST.order.map((b, n) => `<button class="chip" title="${t('btn_kick')}" onclick="hostAction('kick','${b.id}')">${turns ? `<span class="text-accent mr-1">${n + 1}º</span>` : ''}${esc(b.name)}</button>`).join('');
     show('lobWait', ST.board.length === 0);

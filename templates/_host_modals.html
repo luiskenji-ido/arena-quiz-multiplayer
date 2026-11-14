@@ -31,6 +31,22 @@
           <span><b class="text-slate-100"><i class="fa-solid fa-list-ol"></i> <span data-i18n="order_turns"></span></b><br><span class="text-[11px] text-slate-400" data-i18n="order_turns_d"></span></span></label>
       </div>
     </div>
+    <div id="scopeBox" class="lobbyOnly space-y-2 rounded-xl border border-slate-700 bg-slate-900/70 p-3">
+      <div class="flex items-center justify-between gap-2 flex-wrap">
+        <div class="text-[11px] font-esports uppercase text-cyan-300"><i class="fa-solid fa-list-ol mr-1"></i><span data-i18n="cfg_scope"></span></div>
+        <span id="scopeBadge" class="text-[11px] font-esports text-cyan-300 border border-cyan-500/50 bg-cyan-500/10 rounded px-2 py-0.5"></span>
+      </div>
+      <div class="flex items-center gap-3">
+        <input id="sScopeRange" type="range" min="1" max="10" class="flex-1 accent-cyan-400" oninput="scopeSync('range')">
+        <input id="sScopeNum" type="number" min="1" max="200" class="w-20 bg-slate-950 border border-slate-700 rounded-lg px-2 py-1 text-white text-center" oninput="scopeSync('num')">
+        <button type="button" onclick="scopeSync('all')" class="text-[11px] px-2 py-1 rounded-lg bg-slate-800 border border-slate-600 text-slate-200" data-i18n="scope_all"></button>
+      </div>
+      <div id="scopeInfo" class="text-[11px] text-slate-400"></div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+        <label class="flex items-center gap-2 rounded-lg border border-slate-700 bg-slate-900 px-3 py-1.5"><input type="radio" name="sPick" value="first" class="accent-cyan-400"> <span data-i18n="scope_first"></span></label>
+        <label class="flex items-center gap-2 rounded-lg border border-slate-700 bg-slate-900 px-3 py-1.5"><input type="radio" name="sPick" value="random" class="accent-cyan-400"> <span data-i18n="scope_random"></span></label>
+      </div>
+    </div>
     <div class="space-y-2">
       <label class="flex items-center gap-2 text-xs text-slate-300"><input id="sAuto" type="checkbox" class="accent-cyan-400"> <i class="fa-solid fa-forward"></i> <span data-i18n="cfg_auto"></span></label>
       <label class="flex items-center gap-2 text-xs text-slate-400 pl-6"><span data-i18n="cfg_auto_delay"></span>

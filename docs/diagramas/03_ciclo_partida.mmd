@@ -1,6 +1,6 @@
 stateDiagram-v2
   [*] --> lobby: sala criada
-  lobby --> open: start
+  lobby --> open: start (separa as N perguntas do escopo)
   open --> pausada: pause
   pausada --> open: resume
   open --> reveal: tempo acabou
@@ -13,6 +13,6 @@ stateDiagram-v2
   reveal --> finished: última pergunta
   open --> finished: finish
   reveal --> finished: finish
-  finished --> lobby: restart
+  finished --> lobby: restart (devolve o quiz completo)
   lobby --> lobby: settings / quiz / kick
   finished --> [*]

@@ -45,6 +45,7 @@ A aplicação foi pensada para rodar em hospedagens simples, como o **PythonAnyw
 | **Modos de jogo** | **Arena**: só o 1º a acertar pontua, com 9 poderes táticos (50/50, Dobro, Dado D6, Dica, Carta, Armadilha, Bloqueio, Lacre e Roubo). **Clássico**: todos pontuam por velocidade, com bônus de sequência, gráfico de respostas e pódio. |
 | **Quem responde** | **O mais rápido** (todos ao mesmo tempo) ou **Por vez** (rodízio na ordem de entrada, com os outros acompanhando a jogada). |
 | **Controles do apresentador** | Pausar, retomar, encerrar, próxima, avanço automático (3 a 60 s), finalizar, reiniciar, placar ao vivo, só entre perguntas ou só no final. |
+| **Escopo da partida** | O organizador escolhe quantas perguntas do quiz usar (ex.: 90 de 120), na sequência ou sorteadas, com estimativa de duração e de perguntas por jogador. |
 | **🧰 Arsenal do organizador** | Efeitos para todos (50/50 geral, dobro, dica, +15 s, Dado da sorte, Carta surpresa), poderes contra um participante e envio de cargas. |
 | **Interação** | Emojis do organizador no celular de todos, reações dos participantes no telão, "chamar atenção" com som alto e música de tensão. |
 | **Salas** | Privadas (só com código/QR) ou públicas (pedido de entrada aprovado pelo organizador). Até 60 participantes por sala. |
@@ -93,7 +94,7 @@ Mais diagramas (sequência, estados, dados, implantação) estão em [`docs/diag
 | Estilo | **Tailwind CSS** (CDN), CSS próprio | Layout, temas e acessibilidade |
 | Ícones e fontes | **Font Awesome 6**, **Google Fonts** (Inter, Orbitron) | Ícones e tipografia |
 | Áudio | **Web Audio API** | Sons e música de tensão gerados em tempo real, sem arquivos de áudio |
-| Testes | **pytest**, **Playwright** | 41 testes de regras e 7 roteiros de navegador |
+| Testes | **pytest**, **Playwright** | 45 testes de regras e 8 roteiros de navegador |
 | Documentação | **Mermaid**, **docx** (Node.js) | Diagramas e geração dos documentos PRD, PTD e DTD |
 | Hospedagem | **PythonAnywhere** (ou qualquer servidor WSGI) | Publicação |
 
@@ -127,14 +128,14 @@ arena-quiz-multiplayer/
 │   └── themes.css, showthemes.css, inclusion.css, kids.css   # Temas
 ├── tests/
 │   ├── test_game.py          # Testes de regras (pytest)
-│   ├── e2e.js … e2e7.js      # Roteiros de navegador (Playwright)
+│   ├── e2e.js … e2e8.js      # Roteiros de navegador (Playwright)
 │   └── fixtures/             # Quizzes de exemplo (JSON e CSV)
 └── docs/
     ├── MANUAL.md             # Manual completo de uso
     ├── PRD_Arena_Quiz_Multiplayer.docx
     ├── PTD_Arena_Quiz_Multiplayer.docx
     ├── DTD_Arena_Quiz_Multiplayer.docx
-    ├── diagramas/            # 17 diagramas Mermaid (.mmd) e imagens (.png)
+    ├── diagramas/            # 18 diagramas Mermaid (.mmd) e imagens (.png)
     └── gerador/              # Scripts que geram os documentos .docx
 ```
 
@@ -288,7 +289,7 @@ node tests/e2e.js
 | **PTD** – Product Technical Document | Arquitetura, componentes, sincronização, segurança, implantação e testes | [PTD_Arena_Quiz_Multiplayer.docx](docs/PTD_Arena_Quiz_Multiplayer.docx) |
 | **DTD** – Detail Technical Document | Modelo de dados, API, máquina de estados, algoritmos, erros e front-end | [DTD_Arena_Quiz_Multiplayer.docx](docs/DTD_Arena_Quiz_Multiplayer.docx) |
 | **Manual** | Guia completo de uso de todas as funções | [MANUAL.md](docs/MANUAL.md) |
-| **Diagramas** | 17 diagramas Mermaid (`.mmd`) com imagens `.png` | [docs/diagramas](docs/diagramas) |
+| **Diagramas** | 18 diagramas Mermaid (`.mmd`) com imagens `.png` | [docs/diagramas](docs/diagramas) |
 
 > O GitHub não abre `.docx` no navegador: clique no arquivo e use **Download raw file**.
 
