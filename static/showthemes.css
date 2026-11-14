@@ -1,0 +1,187 @@
+/* =====================================================================
+   Temas de programa de auditório: Neon Rosa, Neon Azul, Palco de TV,
+   Show de Prêmios (azul) e Show de Prêmios (vermelho).
+   Tudo desenhado em CSS/SVG (sem imagens externas).
+   O <html> recebe data-theme="..." e a classe .show-theme (fun.js).
+   ===================================================================== */
+
+/* ---------- palco da pergunta (tela do apresentador) ---------- */
+.stage{position:relative;min-height:72vh;border-radius:1.6rem;padding:7.2rem 2rem 1.8rem;display:flex;flex-direction:column;justify-content:center;gap:1.3rem;overflow:hidden;color:#fff;font-family:'Poppins','Inter',sans-serif}
+.stage-top{display:flex;align-items:center;justify-content:space-between;gap:.8rem;flex-wrap:wrap;position:absolute;top:1.4rem;left:2rem;right:2rem;z-index:3}
+.stage-chips{display:flex;flex-wrap:wrap;gap:.5rem;align-items:center}
+.stage-chip{font-weight:800;font-size:.85rem;padding:.35rem .9rem;border-radius:999px;background:rgba(0,0,0,.35);border:1.5px solid rgba(255,255,255,.35);letter-spacing:.02em}
+.stage-timer{width:4.8rem;height:4.8rem;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:2.1rem;font-weight:900;background:rgba(0,0,0,.35);border:4px solid currentColor;flex:none}
+.stage-timer.low{animation:pulseGlow .8s infinite;color:#ff4d4d!important}
+.stage-q{position:relative;display:flex;justify-content:center;z-index:2}
+.stage-qbox{position:relative;width:100%;max-width:1000px;text-align:center;font-weight:800;font-size:clamp(1.25rem,2.5vw,2.3rem);line-height:1.25;padding:1.5rem 2.2rem;z-index:2}
+.stage-img{max-height:28vh;max-width:70%;margin:0 auto;border-radius:.8rem;position:relative;z-index:2;box-shadow:0 8px 24px rgba(0,0,0,.4)}
+.stage-optwrap{position:relative;margin:0 -2rem;padding:0 2rem;z-index:2}
+.stage-opts{display:grid;grid-template-columns:1fr 1fr;gap:1.1rem 1.8rem;max-width:1100px;margin:0 auto;position:relative;z-index:2}
+.stage-opts.one{grid-template-columns:1fr}
+.stage-opt{position:relative;display:flex;align-items:center;gap:.8rem;padding:1rem 1.4rem;font-weight:700;font-size:clamp(1rem,1.6vw,1.45rem);line-height:1.25;transition:opacity .3s,transform .3s,box-shadow .3s}
+.stage-let{font-weight:900;flex:none}
+.stage-cnt{margin-left:auto;font-weight:900;font-size:1.25rem;flex:none}
+.stage-opt.dim{opacity:.32}
+.stage-opt.right{transform:scale(1.03)}
+.stage-result{text-align:center;font-weight:800;font-size:clamp(1rem,1.8vw,1.5rem);position:relative;z-index:2}
+.stage-expl{text-align:center;opacity:.92;font-size:.98rem;max-width:900px;margin:0 auto;position:relative;z-index:2}
+.stage-mark{display:none}
+.stage-title,.stage-heading,.stage-num{display:none}
+
+/* ---------- base comum a todos os temas de auditório ---------- */
+html.show-dark body,html.show-dark body.corp,html.show-dark body.corp.purple{color:#fff;background-attachment:fixed}
+html.show-dark body:not(.corp) .panel{background:rgba(8,8,32,.72);backdrop-filter:blur(4px)}
+html.show-dark body.corp :is(.topbar,.card){background:rgba(10,10,38,.8);color:#fff;backdrop-filter:blur(4px)}
+html.show-dark body.corp [class*="text-gray-"]{color:#e5e7eb!important}
+html.show-dark body.corp input{background:#fff;color:#111}
+html.show-dark body.corp .srow{background:rgba(10,10,38,.82);color:#fff}
+html.show-dark body.corp .srow.first{background:linear-gradient(90deg,#fde047,#f59e0b);color:#1c1917}
+html.show-dark body.corp .chart .num{color:#fff}
+html.show-dark body.corp .cbtn.ghost{background:rgba(255,255,255,.14);color:#fff;box-shadow:0 3px 0 rgba(0,0,0,.35)}
+html.show-dark body.corp .bg-cbg{background:transparent}
+html.show-dark body.corp .podium .step{background:rgba(255,255,255,.92)}
+html.show-dark body.corp #ctlBar{background:rgba(10,10,38,.85)!important;border-color:rgba(255,255,255,.15)!important}
+
+/* ================= NEON ROSA (parede de tijolos + moldura neon) ================= */
+html[data-theme=neon_pink],html[data-theme=neon_pink] body,html[data-theme=neon_pink] body.corp{--c-accent:#c026d3;--neon1:#ff3df0;--neon2:#4fd1ff}
+html[data-theme=neon_pink] :is(body,body.corp,body.corp.purple){
+  background-color:#151233;
+  background-image:
+    radial-gradient(ellipse 70% 55% at 50% 40%,rgba(130,90,255,.28),transparent 70%),
+    radial-gradient(ellipse at center,transparent 45%,rgba(0,0,0,.7) 100%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='60'%3E%3Crect width='120' height='60' fill='%23151233'/%3E%3Crect x='2' y='2' width='56' height='26' rx='2' fill='%232a2460'/%3E%3Crect x='62' y='2' width='56' height='26' rx='2' fill='%23302968'/%3E%3Crect x='-28' y='32' width='56' height='26' rx='2' fill='%23272159'/%3E%3Crect x='32' y='32' width='56' height='26' rx='2' fill='%232c2563'/%3E%3Crect x='92' y='32' width='56' height='26' rx='2' fill='%23272159'/%3E%3C/svg%3E");
+  background-size:100% 100%,100% 100%,120px 60px;background-repeat:no-repeat,no-repeat,repeat}
+html[data-theme=neon_pink] .stage{border:3px solid var(--neon2);box-shadow:0 0 6px var(--neon2),0 0 22px var(--neon2),0 0 50px rgba(79,209,255,.45),inset 0 0 22px rgba(79,209,255,.35);margin:1.2rem .4rem}
+html[data-theme=neon_pink] .stage::before{content:'';position:absolute;right:7%;top:-1px;width:28%;height:0;border-top:4px solid var(--neon1);box-shadow:0 0 10px var(--neon1),0 0 22px var(--neon1)}
+html[data-theme=neon_pink] .stage::after{content:'';position:absolute;left:10%;bottom:-1px;width:40%;height:0;border-bottom:4px solid var(--neon1);box-shadow:0 0 10px var(--neon1),0 0 22px var(--neon1)}
+html[data-theme=neon_pink] .stage-mark{display:flex;position:absolute;left:1.2rem;top:1.1rem;width:5.2rem;height:5.2rem;border-radius:50%;border:4px solid var(--neon1);box-shadow:0 0 10px var(--neon1),0 0 26px var(--neon1),inset 0 0 12px var(--neon1);align-items:center;justify-content:center;font-family:'Monoton','Poppins',cursive;font-size:2.8rem;color:#fff;text-shadow:0 0 6px #fff,0 0 16px var(--neon1);z-index:3}
+html[data-theme=neon_pink] .stage-top{left:7.6rem}
+html[data-theme=neon_pink] .stage-qbox{text-shadow:0 0 6px rgba(255,255,255,.7),0 0 18px var(--neon1)}
+html[data-theme=neon_pink] :is(.stage-opt,body:not(.corp) .opt:not(.kopt),.tile){background:rgba(10,8,30,.55);border:2px solid var(--neon1);border-radius:14px;color:#fff;box-shadow:0 0 8px var(--neon1),inset 0 0 12px rgba(255,61,240,.3)}
+html[data-theme=neon_pink] :is(.stage-let,body:not(.corp) .opt .let,.tile .shape){color:var(--neon2);text-shadow:0 0 8px var(--neon2);background:transparent;border:none}
+html[data-theme=neon_pink] :is(.stage-opt.right,.opt.right,.tile.ok){border-color:#39ff88;box-shadow:0 0 10px #39ff88,0 0 28px #39ff88,inset 0 0 14px rgba(57,255,136,.4)}
+html[data-theme=neon_pink] :is(.stage-opt.wrong,.opt.wrong){border-color:#ff4d4d;box-shadow:0 0 10px #ff4d4d}
+html[data-theme=neon_pink] :is(.stage-opt.picked,.opt.mine,.tile.picked){border-color:#ffe600;box-shadow:0 0 10px #ffe600,0 0 24px #ffe600}
+html[data-theme=neon_pink] .stage-timer{color:var(--neon2);box-shadow:0 0 12px var(--neon2),inset 0 0 10px var(--neon2);text-shadow:0 0 8px var(--neon2)}
+html[data-theme=neon_pink] .stage-chip{border-color:var(--neon1);box-shadow:0 0 8px rgba(255,61,240,.6)}
+html[data-theme=neon_pink] body:not(.corp) :is(.neon-cyan,.neon-purple,.neon-gold,.neon-danger){border-color:var(--neon1);box-shadow:0 0 10px rgba(255,61,240,.55),inset 0 0 10px rgba(255,61,240,.15)}
+
+/* ================= NEON AZUL ================= */
+html[data-theme=neon_blue],html[data-theme=neon_blue] body,html[data-theme=neon_blue] body.corp{--c-accent:#1d4ed8;--neon1:#4fd1ff;--neon2:#a5f3fc}
+html[data-theme=neon_blue] :is(body,body.corp,body.corp.purple){
+  background-color:#081430;
+  background-image:
+    radial-gradient(ellipse 70% 55% at 50% 45%,rgba(56,189,248,.22),transparent 70%),
+    radial-gradient(ellipse at center,transparent 45%,rgba(0,0,0,.7) 100%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='60'%3E%3Crect width='120' height='60' fill='%23081430'/%3E%3Crect x='2' y='2' width='56' height='26' rx='2' fill='%2312285a'/%3E%3Crect x='62' y='2' width='56' height='26' rx='2' fill='%23153068'/%3E%3Crect x='-28' y='32' width='56' height='26' rx='2' fill='%23112553'/%3E%3Crect x='32' y='32' width='56' height='26' rx='2' fill='%23142c61'/%3E%3Crect x='92' y='32' width='56' height='26' rx='2' fill='%23112553'/%3E%3C/svg%3E");
+  background-size:100% 100%,100% 100%,120px 60px;background-repeat:no-repeat,no-repeat,repeat}
+html[data-theme=neon_blue] .stage{border:4px solid var(--neon1);border-radius:1.2rem;box-shadow:0 0 8px var(--neon1),0 0 26px var(--neon1),0 0 60px rgba(79,209,255,.4),inset 0 0 24px rgba(79,209,255,.35);margin:1.2rem 4.5rem 1.2rem .4rem;overflow:visible}
+html[data-theme=neon_blue] .stage-mark{display:flex;position:absolute;right:-4.2rem;top:50%;transform:translateY(-50%);font-family:'Poppins',sans-serif;font-weight:300;font-size:9rem;line-height:1;color:transparent;-webkit-text-stroke:4px var(--neon1);text-shadow:0 0 12px var(--neon1),0 0 30px var(--neon1);z-index:3}
+html[data-theme=neon_blue] .stage-qbox{text-shadow:0 0 8px var(--neon1)}
+html[data-theme=neon_blue] :is(.stage-opt,body:not(.corp) .opt:not(.kopt),.tile){background:rgba(4,12,35,.6);border:2px solid var(--neon1);border-radius:12px;color:#fff;box-shadow:0 0 8px var(--neon1),inset 0 0 12px rgba(79,209,255,.25)}
+html[data-theme=neon_blue] :is(.stage-let,body:not(.corp) .opt .let,.tile .shape){color:#fff;text-shadow:0 0 8px var(--neon1);background:transparent;border:none}
+html[data-theme=neon_blue] :is(.stage-opt.right,.opt.right,.tile.ok){border-color:#39ff88;box-shadow:0 0 10px #39ff88,0 0 28px #39ff88}
+html[data-theme=neon_blue] :is(.stage-opt.wrong,.opt.wrong){border-color:#ff4d4d;box-shadow:0 0 10px #ff4d4d}
+html[data-theme=neon_blue] :is(.stage-opt.picked,.opt.mine,.tile.picked){border-color:#fde047;box-shadow:0 0 10px #fde047,0 0 22px #fde047}
+html[data-theme=neon_blue] .stage-timer{color:var(--neon1);box-shadow:0 0 12px var(--neon1),inset 0 0 10px var(--neon1)}
+html[data-theme=neon_blue] body:not(.corp) :is(.neon-cyan,.neon-purple,.neon-gold,.neon-danger){border-color:var(--neon1);box-shadow:0 0 10px rgba(79,209,255,.55),inset 0 0 10px rgba(79,209,255,.15)}
+
+/* ================= PALCO DE TV ================= */
+html[data-theme=stage],html[data-theme=stage] body,html[data-theme=stage] body.corp{--c-accent:#6d28d9}
+html[data-theme=stage] :is(body,body.corp,body.corp.purple){
+  background-color:#1b1866;
+  background-image:
+    radial-gradient(circle,#fde68a 0 4px,rgba(253,230,138,.35) 5px,transparent 7px),
+    radial-gradient(ellipse 75% 20% at 50% 104%,#fb7185 0 58%,#be123c 59% 66%,transparent 67%),
+    conic-gradient(from 168deg at 18% -4%,transparent 0 6deg,rgba(255,255,255,.16) 6deg 20deg,transparent 20deg),
+    conic-gradient(from 172deg at 50% -4%,transparent 0 4deg,rgba(255,255,255,.14) 4deg 16deg,transparent 16deg),
+    conic-gradient(from 176deg at 82% -4%,transparent 0 6deg,rgba(255,255,255,.16) 6deg 20deg,transparent 20deg),
+    radial-gradient(ellipse 90% 70% at 50% 30%,var(--stbg),var(--stbg2) 70%);
+  background-size:34px 34px,100% 100%,100% 100%,100% 100%,100% 100%,100% 100%;
+  background-repeat:repeat-x,no-repeat,no-repeat,no-repeat,no-repeat,no-repeat;
+  background-position:0 89%,0 0,0 0,0 0,0 0,0 0}
+html[data-theme=stage] .stage{background:transparent}
+html[data-theme=stage] .stage::before{content:'';position:absolute;left:3%;right:3%;top:5%;height:160%;border-radius:50% 50% 0 0/35% 35% 0 0;border:14px solid var(--arch);z-index:0;box-shadow:0 0 30px var(--arch)}
+html[data-theme=stage] .stage::after{content:'';position:absolute;left:4.2%;right:4.2%;top:6.6%;height:160%;border-radius:50% 50% 0 0/35% 35% 0 0;border:6px dotted #fde68a;z-index:0;filter:drop-shadow(0 0 6px #fde68a)}
+html[data-theme=stage] .stage-qbox{background:linear-gradient(#0f172a,#1e293b);border:5px solid #a78bfa;border-radius:1rem;box-shadow:0 0 0 4px #1e1b4b,0 10px 30px rgba(0,0,0,.5),inset 0 0 30px rgba(34,197,94,.25)}
+html[data-theme=stage] :is(.stage-opt,body:not(.corp) .opt:not(.kopt),.tile){background:linear-gradient(180deg,#4ade80,#15803d);border:4px solid #a78bfa;border-radius:12px;color:#fff;text-shadow:0 2px 0 rgba(0,0,0,.35);box-shadow:0 6px 0 #4c1d95,0 0 18px rgba(74,222,128,.45)}
+html[data-theme=stage] :is(.stage-let,body:not(.corp) .opt .let,.tile .shape){background:#1e1b4b;color:#fde68a;border:none;border-radius:.5rem;padding:.1rem .5rem;text-shadow:none}
+html[data-theme=stage] :is(.stage-opt.right,.opt.right,.tile.ok){background:linear-gradient(180deg,#fde68a,#f59e0b);color:#1e1b4b;text-shadow:none;box-shadow:0 6px 0 #92400e,0 0 30px #fde68a}
+html[data-theme=stage] :is(.stage-opt.wrong,.opt.wrong){background:linear-gradient(180deg,#f87171,#991b1b)}
+html[data-theme=stage] :is(.stage-opt.picked,.opt.mine,.tile.picked){outline:4px solid #fde68a;outline-offset:2px}
+html[data-theme=stage] .stage-timer{color:#fde68a;background:#1e1b4b;box-shadow:0 0 16px #fde68a}
+html[data-theme=stage] .stage-chip{background:#1e1b4b;border-color:#a78bfa}
+
+/* ================= SHOW DE PRÊMIOS (AZUL) — cápsulas com linhas douradas ================= */
+html[data-theme=prize_blue],html[data-theme=prize_blue] body,html[data-theme=prize_blue] body.corp{--c-accent:#1554b8;--gold:#f2c94c}
+html[data-theme=prize_blue] :is(body,body.corp,body.corp.purple){
+  background-color:#0b2a6b;
+  background-image:
+    radial-gradient(ellipse 7% 34% at 30% 0%,rgba(255,255,255,.45),transparent 75%),
+    radial-gradient(ellipse 7% 34% at 50% 0%,rgba(255,255,255,.45),transparent 75%),
+    radial-gradient(ellipse 7% 34% at 70% 0%,rgba(255,255,255,.45),transparent 75%),
+    radial-gradient(ellipse 80% 70% at 50% 40%,var(--pb1),var(--pb2) 45%,var(--pb3) 100%);
+  background-size:100% 100%;background-repeat:no-repeat}
+html[data-theme=prize_blue] .stage{background:transparent;overflow:hidden}
+html[data-theme=prize_blue] .stage-q::before{content:'';position:absolute;left:-2rem;right:-2rem;top:50%;height:4px;margin-top:-2px;background:var(--gold);box-shadow:0 0 8px rgba(242,201,76,.6);z-index:1}
+html[data-theme=prize_blue] .stage-qbox{background:linear-gradient(180deg,var(--cap1),var(--cap2));border:4px solid var(--gold);border-radius:999px;box-shadow:0 0 16px rgba(242,201,76,.45),inset 0 2px 0 rgba(255,255,255,.35);padding:1.8rem 3rem}
+html[data-theme=prize_blue] .stage-optwrap.rows2{background:linear-gradient(transparent calc(25% - 2px),var(--gold) calc(25% - 2px),var(--gold) calc(25% + 2px),transparent calc(25% + 2px),transparent calc(75% - 2px),var(--gold) calc(75% - 2px),var(--gold) calc(75% + 2px),transparent calc(75% + 2px))}
+html[data-theme=prize_blue] .stage-optwrap.rows1{background:linear-gradient(transparent calc(50% - 2px),var(--gold) calc(50% - 2px),var(--gold) calc(50% + 2px),transparent calc(50% + 2px))}
+html[data-theme=prize_blue] .stage-optwrap.rows3{background:linear-gradient(transparent calc(16.6% - 2px),var(--gold) calc(16.6% - 2px),var(--gold) calc(16.6% + 2px),transparent calc(16.6% + 2px),transparent calc(50% - 2px),var(--gold) calc(50% - 2px),var(--gold) calc(50% + 2px),transparent calc(50% + 2px),transparent calc(83.3% - 2px),var(--gold) calc(83.3% - 2px),var(--gold) calc(83.3% + 2px),transparent calc(83.3% + 2px))}
+html[data-theme=prize_blue] :is(.stage-opt,body:not(.corp) .opt:not(.kopt),.tile){background:linear-gradient(180deg,var(--cap1),var(--cap2));border:3px solid var(--gold);border-radius:999px;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.35);box-shadow:0 0 12px rgba(242,201,76,.35)}
+html[data-theme=prize_blue] :is(.stage-let,body:not(.corp) .opt .let,.tile .shape){color:var(--letc);background:transparent;border:none;text-shadow:none}
+html[data-theme=prize_blue] :is(.stage-opt.right,.opt.right,.tile.ok){background:linear-gradient(180deg,#4ade80,#16a34a);box-shadow:0 0 22px #86efac}
+html[data-theme=prize_blue] :is(.stage-opt.wrong,.opt.wrong){background:linear-gradient(180deg,#f87171,#b91c1c)}
+html[data-theme=prize_blue] :is(.stage-opt.picked,.opt.mine,.tile.picked){background:linear-gradient(180deg,#fde68a,#f59e0b);color:#1e3a8a;text-shadow:none}
+html[data-theme=prize_blue] .stage-timer{color:#1e3a8a;background:var(--gold);border-color:#fff}
+html[data-theme=prize_blue] .stage-chip{background:rgba(11,42,107,.6);border-color:var(--gold)}
+html[data-theme=prize_blue] body:not(.corp) :is(.neon-cyan,.neon-purple,.neon-gold,.neon-danger){border-color:var(--gold);box-shadow:0 0 14px rgba(242,201,76,.35)}
+
+/* ================= SHOW DE PRÊMIOS (VERMELHO) — caixas vermelhas numeradas ================= */
+html[data-theme=prize_red],html[data-theme=prize_red] body,html[data-theme=prize_red] body.corp{--c-accent:#d90016}
+html[data-theme=prize_red] :is(body,body.corp,body.corp.purple){
+  background-color:#1c1f5e;
+  background-image:
+    radial-gradient(ellipse 40% 50% at 85% 20%,rgba(99,102,241,.35),transparent 70%),
+    linear-gradient(135deg,#2b2f8f 0%,#1c1f5e 60%,#14163f 100%);
+  background-size:100% 100%;background-repeat:no-repeat}
+html[data-theme=prize_red] .stage{background:transparent}
+html[data-theme=prize_red] .stage-q{justify-content:flex-start}
+html[data-theme=prize_red] .stage-qbox{max-width:900px}
+html[data-theme=prize_red] .stage-qbox{background:linear-gradient(180deg,var(--red1),var(--red2));border:2px solid rgba(255,255,255,.85);border-radius:.9rem;text-align:left;text-transform:uppercase;letter-spacing:.01em;box-shadow:0 10px 26px rgba(0,0,0,.45)}
+html[data-theme=prize_red] .stage-opts{grid-template-columns:1fr;max-width:820px;margin:0;gap:.75rem}
+html[data-theme=prize_red] :is(.stage-opt,body:not(.corp) .opt:not(.kopt),.tile){background:linear-gradient(180deg,var(--red1),var(--red2));border:1.5px solid rgba(255,255,255,.75);border-radius:.7rem;color:#fff;box-shadow:0 6px 16px rgba(0,0,0,.35)}
+html[data-theme=prize_red] :is(.stage-let,body:not(.corp) .opt .let,.tile .shape){width:2.2rem;height:2.2rem;border-radius:50%;background:#fff;color:#1d4ed8;display:inline-flex;align-items:center;justify-content:center;font-weight:900;border:none;text-shadow:none;font-size:1.1rem}
+html[data-theme=prize_red] :is(.stage-opt.right,.opt.right,.tile.ok){background:linear-gradient(180deg,#15803d,#22c55e)}
+html[data-theme=prize_red] :is(.stage-opt.wrong,.opt.wrong){background:linear-gradient(180deg,#450a0a,#7f1d1d)}
+html[data-theme=prize_red] :is(.stage-opt.picked,.opt.mine,.tile.picked){outline:3px solid #facc15;outline-offset:2px}
+html[data-theme=prize_red] .stage-timer{color:#1c1f5e;background:#facc15;border-color:#fff}
+html[data-theme=prize_red] .stage-chip{background:#facc15;color:#1c1f5e;border-color:#facc15;font-weight:900;text-transform:uppercase}
+html[data-theme=prize_red] body:not(.corp) :is(.neon-cyan,.neon-purple,.neon-gold,.neon-danger){border-color:rgba(255,255,255,.35);box-shadow:0 8px 24px rgba(0,0,0,.35)}
+
+/* celular: cápsulas um pouco mais compactas */
+@media (max-width:640px){
+  .stage{padding:1.4rem 1rem}
+  html.show-dark .tile{min-height:5.5rem}
+}
+html.show-theme body:not(.corp) .opt:not(.kopt){align-items:center}
+html[data-theme=prize_red] .stage-mark{display:flex;position:absolute;right:4%;top:52%;transform:translateY(-50%);width:min(24vw,300px);height:min(24vw,300px);border-radius:50%;align-items:center;justify-content:center;background:radial-gradient(circle at 35% 30%,#fde047,#f59e0b 70%);border:8px solid #fff;color:#b91c1c;font-weight:900;font-size:min(16vw,200px);box-shadow:0 20px 50px rgba(0,0,0,.45);z-index:1}
+@media (max-width:1100px){html[data-theme=prize_red] .stage-mark{display:none}}
+html.show-dark .react-btn,html[data-theme=gamer] .react-btn,html[data-theme=inclusive] .react-btn{color:#fff}
+
+/* ======================= Variações de cor (3 tons por tema) ======================= */
+html[data-theme=neon_pink][data-variant="1"]{--neon1:#ff2e88}
+html[data-theme=neon_pink][data-variant="2"]{--neon1:#f9a8d4}
+html[data-theme=neon_blue][data-variant="1"]{--neon1:#3b82f6}
+html[data-theme=neon_blue][data-variant="2"]{--neon1:#818cf8}
+html[data-theme=stage]{--arch:#2563eb;--stbg:#3b2fb8;--stbg2:#1b1866}
+html[data-theme=stage][data-variant="1"]{--arch:#7c3aed;--stbg:#5b21b6;--stbg2:#2e1065}
+html[data-theme=stage][data-variant="2"]{--arch:#dc2626;--stbg:#7f1d1d;--stbg2:#3b0a0a}
+html[data-theme=prize_blue]{--cap1:#3cbdf0;--cap2:#1e9ad6;--pb1:#2f80ed;--pb2:#1554b8;--pb3:#0b2a6b}
+html[data-theme=prize_blue][data-variant="1"]{--cap1:#3b82f6;--cap2:#1d4ed8;--pb1:#2563eb;--pb2:#1e3a8a;--pb3:#0b1640}
+html[data-theme=prize_blue][data-variant="2"]{--cap1:#1e40af;--cap2:#172554;--pb1:#1e3a8a;--pb2:#0f1d4d;--pb3:#050b24}
+html[data-theme=prize_red]{--red1:#a3000f;--red2:#e0001a}
+html[data-theme=prize_red][data-variant="1"]{--red1:#5f0a0a;--red2:#991b1b}
+html[data-theme=prize_red][data-variant="2"]{--red1:#dc2626;--red2:#f87171}
+html[data-theme=prize_blue]{--letc:#1e3a8a}
+html[data-theme=prize_blue]:is([data-variant="1"],[data-variant="2"]){--letc:#fde68a}

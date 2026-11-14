@@ -1,0 +1,17 @@
+flowchart TB
+  subgraph Formas["Carregar Quiz (painel do organizador)"]
+    T["Templates prontos<br/>corporativos e diversão"]
+    U["Arquivo .json ou .csv"]
+    Q["Texto rápido<br/>* marca a correta"]
+    E["Editor visual<br/>rascunhos no navegador"]
+    IA["IA / JSON colado<br/>prompt pronto"]
+  end
+  T --> VAL["qkValidate (navegador)"]
+  U --> CSV["parseCSV / JSON.parse"] --> VAL
+  Q --> TXT["textToQuiz"] --> VAL
+  E --> VAL
+  IA --> VAL
+  VAL -->|"sem erros"| API["POST /api/host/CODE/settings {quiz, quiz_title}"]
+  API --> NQ["normalize_quiz (servidor)<br/>valida, limita a 200 perguntas"]
+  NQ --> SALA[("Sala atualizada")]
+  E -. "Exportar JSON" .-> ARQ["arquivo .json"]

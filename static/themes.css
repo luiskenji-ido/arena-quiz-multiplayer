@@ -1,0 +1,141 @@
+/* ===================== Efeitos: chamar atenção, reações, seletor de tema ===================== */
+.nudge-flash{position:fixed;inset:0;z-index:200;display:flex;align-items:center;justify-content:center;background:rgba(239,68,68,.55);animation:nudgeFlash .25s steps(2) 6;pointer-events:none}
+.nudge-box{background:#fff;color:#111;border-radius:1.2rem;padding:1.5rem 2rem;text-align:center;box-shadow:0 10px 40px rgba(0,0,0,.4);animation:popIn .25s ease-out}
+@keyframes nudgeFlash{0%{background:rgba(239,68,68,.65)}100%{background:rgba(250,204,21,.55)}}
+.shake{animation:shakeIt .12s linear 12}
+@keyframes shakeIt{0%,100%{transform:translate(0,0)}25%{transform:translate(-8px,3px)}50%{transform:translate(7px,-4px)}75%{transform:translate(-5px,-2px)}}
+.react-layer{position:fixed;inset:0;pointer-events:none;z-index:45;overflow:hidden}
+.react-float{position:absolute;bottom:-90px;display:flex;flex-direction:column;align-items:center;animation:floatReact 4s ease-in forwards}
+.react-emoji{font-size:3.6rem;filter:drop-shadow(0 4px 8px rgba(0,0,0,.35))}
+.react-text{font-size:1.8rem;font-weight:900;color:#fde047;background:#7c3aed;border-radius:.8rem;padding:.2rem .7rem;transform:rotate(-6deg);box-shadow:0 4px 12px rgba(0,0,0,.3)}
+.react-name{font-size:.75rem;font-weight:800;color:#fff;background:rgba(0,0,0,.55);border-radius:999px;padding:.1rem .55rem;margin-top:.2rem;white-space:nowrap}
+@keyframes floatReact{0%{transform:translateY(0) scale(.6);opacity:0}10%{opacity:1;transform:translateY(-10vh) scale(1.1)}100%{transform:translateY(-105vh) translateX(30px) scale(1);opacity:0}}
+.react-btn{min-width:2.6rem;height:2.6rem;border-radius:.8rem;font-size:1.45rem;display:inline-flex;align-items:center;justify-content:center;background:rgba(148,163,184,.15);border:1px solid rgba(148,163,184,.35);transition:transform .1s}
+.react-btn:active{transform:scale(.85)}
+
+/* ===================== Temas ===================== */
+/* Corporativo e Inclusivo: variáveis que trocam as cores fixas das telas Arena.
+   Gamer é o visual original. Os temas de auditório ficam em showthemes.css. */
+html[data-theme=corporate]{--bg:#f3f5f9;--bgimg:none;--panel:#ffffff;--panel2:#f1f4f9;--fg:#0f172a;--muted:#475569;--muted2:#64748b;--line:#dbe2ec;--a1:#1e3a8a;--a2:#0369a1;--a3:#b45309;--ok:#15803d;--bad:#b91c1c;--a4:#7c3aed;--font:'Montserrat',sans-serif;--display:'Montserrat',sans-serif;--radius:.6rem;--glow:0 2px 10px rgba(15,23,42,.08)}
+html[data-theme=inclusive]{--bg:#000000;--bgimg:none;--panel:#000000;--panel2:#111111;--fg:#ffffff;--muted:#f5f5f5;--muted2:#e5e5e5;--line:#ffffff;--a1:#ffd400;--a2:#7dd3fc;--a3:#ffd400;--ok:#4ade80;--bad:#ff6b6b;--a4:#ffd400;--font:'Atkinson Hyperlegible',sans-serif;--display:'Atkinson Hyperlegible',sans-serif;--radius:.5rem;--glow:none}
+
+/* --- aplicação nas telas Arena (body sem .corp) --- */
+html:is([data-theme=corporate],[data-theme=inclusive],[data-theme=kids_incl],[data-theme=minds],[data-theme=kids]) body:not(.corp){background:var(--bg);background-image:var(--bgimg);background-size:36px 36px,36px 36px,auto;color:var(--fg);font-family:var(--font)}
+html:is([data-theme=corporate],[data-theme=inclusive],[data-theme=kids_incl],[data-theme=minds],[data-theme=kids]) body:not(.corp) .font-esports,
+html:is([data-theme=corporate],[data-theme=inclusive],[data-theme=kids_incl],[data-theme=minds],[data-theme=kids]) body:not(.corp) .font-sans{font-family:var(--display)!important}
+html:is([data-theme=corporate],[data-theme=inclusive],[data-theme=kids_incl],[data-theme=minds],[data-theme=kids]) body:not(.corp) .panel{background:var(--panel);color:var(--fg);border-radius:var(--radius);box-shadow:var(--glow)}
+html:is([data-theme=corporate],[data-theme=inclusive],[data-theme=kids_incl],[data-theme=minds],[data-theme=kids]) body:not(.corp) :is(.neon-cyan,.neon-purple,.neon-gold,.neon-danger){border:1px solid var(--line);box-shadow:var(--glow)}
+html:is([data-theme=corporate],[data-theme=inclusive],[data-theme=kids_incl],[data-theme=minds],[data-theme=kids]) body:not(.corp) :is(.text-white,[class*="text-slate-100"],[class*="text-slate-200"]){color:var(--fg)!important}
+html:is([data-theme=corporate],[data-theme=inclusive],[data-theme=kids_incl],[data-theme=minds],[data-theme=kids]) body:not(.corp) :is([class*="text-slate-300"],[class*="text-slate-400"]){color:var(--muted)!important}
+html:is([data-theme=corporate],[data-theme=inclusive],[data-theme=kids_incl],[data-theme=minds],[data-theme=kids]) body:not(.corp) [class*="text-slate-500"]{color:var(--muted2)!important}
+html:is([data-theme=corporate],[data-theme=inclusive],[data-theme=kids_incl],[data-theme=minds],[data-theme=kids]) body:not(.corp) :is([class*="bg-slate-9"],[class*="bg-slate-8"],[class*="bg-[#0b101c]"]){background-color:var(--panel2)!important}
+html:is([data-theme=corporate],[data-theme=inclusive],[data-theme=kids_incl],[data-theme=minds],[data-theme=kids]) body:not(.corp) :is([class*="border-slate-"]){border-color:var(--line)!important}
+html:is([data-theme=corporate],[data-theme=inclusive],[data-theme=kids_incl],[data-theme=minds],[data-theme=kids]) body:not(.corp) :is([class*="text-cyan-"],[class*="text-sky-"],[class*="text-blue-"]){color:var(--a1)!important}
+html:is([data-theme=corporate],[data-theme=inclusive],[data-theme=kids_incl],[data-theme=minds],[data-theme=kids]) body:not(.corp) :is([class*="text-purple-"],[class*="text-indigo-"],[class*="text-violet-"]){color:var(--a2)!important}
+html:is([data-theme=corporate],[data-theme=inclusive],[data-theme=kids_incl],[data-theme=minds],[data-theme=kids]) body:not(.corp) :is([class*="text-amber-"],[class*="text-yellow-"],[class*="text-orange-"]){color:var(--a3)!important}
+html:is([data-theme=corporate],[data-theme=inclusive],[data-theme=kids_incl],[data-theme=minds],[data-theme=kids]) body:not(.corp) :is([class*="text-emerald-"],[class*="text-green-"]){color:var(--ok)!important}
+html:is([data-theme=corporate],[data-theme=inclusive],[data-theme=kids_incl],[data-theme=minds],[data-theme=kids]) body:not(.corp) :is([class*="text-rose-"],[class*="text-red-"]){color:var(--bad)!important}
+html:is([data-theme=corporate],[data-theme=inclusive],[data-theme=kids_incl],[data-theme=minds],[data-theme=kids]) body:not(.corp) [class*="text-pink-"]{color:var(--a4)!important}
+/* botões de cor sólida mantêm texto escuro/claro legível */
+html:is([data-theme=corporate],[data-theme=inclusive],[data-theme=kids_incl],[data-theme=minds],[data-theme=kids]) body:not(.corp) :is(.bg-cyan-500,.bg-emerald-500,.bg-amber-400,.bg-purple-500){color:#fff!important;background-color:var(--a1)!important}
+html:is([data-theme=corporate],[data-theme=inclusive],[data-theme=kids_incl],[data-theme=minds],[data-theme=kids]) body:not(.corp) .bg-emerald-500{background-color:var(--ok)!important}
+html:is([data-theme=corporate],[data-theme=inclusive],[data-theme=kids_incl],[data-theme=minds],[data-theme=kids]) body:not(.corp) :is(.bg-cyan-500,.bg-emerald-500,.bg-amber-400,.bg-purple-500) *{color:#fff!important}
+html:is([data-theme=corporate],[data-theme=inclusive],[data-theme=kids_incl],[data-theme=minds],[data-theme=kids]) body:not(.corp) .opt:not(.kopt){background:var(--panel2);border-color:var(--line);color:var(--fg);border-radius:var(--radius)}
+html:is([data-theme=corporate],[data-theme=inclusive],[data-theme=kids_incl],[data-theme=minds],[data-theme=kids]) body:not(.corp) .opt:not(.kopt) .let{background:var(--panel);border-color:var(--line);color:var(--a1)}
+html:is([data-theme=corporate],[data-theme=inclusive],[data-theme=kids_incl],[data-theme=minds],[data-theme=kids]) body:not(.corp) .opt.right:not(.kopt){border-color:var(--ok);box-shadow:0 0 0 2px var(--ok)}
+html:is([data-theme=corporate],[data-theme=inclusive],[data-theme=kids_incl],[data-theme=minds],[data-theme=kids]) body:not(.corp) .opt.wrong:not(.kopt){border-color:var(--bad);box-shadow:0 0 0 2px var(--bad)}
+html:is([data-theme=corporate],[data-theme=inclusive],[data-theme=kids_incl],[data-theme=minds],[data-theme=kids]) body:not(.corp) .opt.mine:not(.kopt){border-color:var(--a1);box-shadow:0 0 0 2px var(--a1)}
+html:is([data-theme=corporate],[data-theme=inclusive],[data-theme=kids_incl],[data-theme=minds],[data-theme=kids]) body:not(.corp) .pw{background:var(--panel2)!important;border-color:var(--line)!important;color:var(--fg)!important;border-radius:var(--radius)}
+html:is([data-theme=corporate],[data-theme=inclusive],[data-theme=kids_incl],[data-theme=minds],[data-theme=kids]) body:not(.corp) .pw i{color:var(--a1)}
+html:is([data-theme=corporate],[data-theme=inclusive],[data-theme=kids_incl],[data-theme=minds],[data-theme=kids]) body:not(.corp) :is(input,select,textarea){color:var(--fg)!important}
+html:is([data-theme=corporate],[data-theme=inclusive],[data-theme=kids_incl],[data-theme=minds],[data-theme=kids]) body:not(.corp) .modal{background:rgba(15,23,42,.45)}
+html:is([data-theme=corporate],[data-theme=inclusive],[data-theme=kids_incl],[data-theme=minds],[data-theme=kids]) body:not(.corp) .react-btn{background:var(--panel2);border-color:var(--line)}
+
+/* --- aplicação nas telas Clássicas (body.corp): troca a cor de destaque e o fundo --- */
+html[data-theme] body.corp{--c-accent:#46178f;--c-bg:#f2f2f2}
+html[data-theme=gamer] body.corp{--c-accent:#7c3aed;--c-bg:#0b1020}
+html[data-theme=gamer] body.corp:not(.purple){color:#e2e8f0}
+html[data-theme=corporate] body.corp{--c-accent:#46178f;--c-bg:#f2f2f2}
+html[data-theme=inclusive] body.corp{--c-accent:#000000;--c-bg:#ffffff}
+html[data-theme=inclusive] body.corp{font-family:var(--font)}
+
+/* --- acessibilidade extra no tema Inclusivo --- */
+html[data-theme=inclusive]{font-size:112%}
+html[data-theme=inclusive] *{animation-duration:.001s!important;animation-iteration-count:1!important;transition:none!important}
+html[data-theme=inclusive] .react-float{animation-duration:4s!important}
+html[data-theme=inclusive] :is(button,a,input,select,textarea):focus-visible{outline:4px solid #ffd400!important;outline-offset:2px}
+html[data-theme=inclusive] body:not(.corp) .opt:not(.kopt){border-width:2px}
+html[data-theme=inclusive] .tile .txt{font-size:1.3rem}
+body.corp #soundToggle{bottom:7.5rem}
+
+/* ======================= Variações dos temas básicos ======================= */
+html[data-theme=corporate][data-variant="1"]{--a1:#0f766e;--a2:#0e7490}
+html[data-theme=corporate][data-variant="2"]{--a1:#334155;--a2:#475569}
+html[data-theme=corporate][data-variant="1"] body.corp{--c-accent:#0f766e}
+html[data-theme=corporate][data-variant="2"] body.corp{--c-accent:#334155}
+html[data-theme=inclusive][data-variant="1"]{--a1:#ffffff;--a3:#ffffff;--a4:#ffffff}
+html[data-theme=inclusive][data-variant="2"]{--bg:#ffffff;--panel:#ffffff;--panel2:#f5f5f5;--fg:#000000;--muted:#111111;--muted2:#262626;--line:#000000;--a1:#000000;--a2:#1d4ed8;--a3:#7c2d12;--ok:#166534;--bad:#991b1b;--a4:#000000}
+html[data-theme=inclusive][data-variant="2"] body.corp{--c-accent:#000000;--c-bg:#ffffff}
+html[data-theme=inclusive][data-variant="0"] body.corp{--c-accent:#000000;--c-bg:#ffd400}
+/* Gamer: troca o neon ciano por roxo (tom 2) ou verde (tom 3) */
+html[data-theme=gamer][data-variant="1"]{--gm:#c084fc;--gm2:#a855f7}
+html[data-theme=gamer][data-variant="2"]{--gm:#4ade80;--gm2:#22c55e}
+html[data-theme=gamer]:is([data-variant="1"],[data-variant="2"]) body:not(.corp) [class*="text-cyan-"]{color:var(--gm)!important}
+html[data-theme=gamer]:is([data-variant="1"],[data-variant="2"]) body:not(.corp) .bg-cyan-500{background-color:var(--gm2)!important}
+html[data-theme=gamer]:is([data-variant="1"],[data-variant="2"]) body:not(.corp) :is(.neon-cyan,[class*="border-cyan-"]){border-color:var(--gm)!important;box-shadow:0 0 20px color-mix(in srgb,var(--gm) 25%,transparent)}
+html[data-theme=gamer]:is([data-variant="1"],[data-variant="2"]) body:not(.corp) .opt:hover:not(:disabled){border-color:var(--gm)}
+html[data-theme=gamer]:is([data-variant="1"],[data-variant="2"]) body:not(.corp) .opt .let{color:var(--gm)}
+html[data-theme=gamer][data-variant="1"] body.corp{--c-accent:#7c3aed}
+html[data-theme=gamer][data-variant="2"] body.corp{--c-accent:#15803d}
+
+/* ======================= Modo acessível (♿, por aparelho) ======================= */
+html.a11y{font-size:118%}
+html.a11y body{font-family:'Atkinson Hyperlegible','Inter',sans-serif!important;letter-spacing:.01em}
+html.a11y *:not(.react-float){animation-duration:.001s!important;animation-iteration-count:1!important;transition:none!important}
+html.a11y :is(button,a,input,select,textarea,[tabindex]):focus-visible{outline:4px solid #ffd400!important;outline-offset:3px}
+html.a11y :is(.stage-qbox,.stage-opt,.opt,.tile){text-shadow:0 1px 2px rgba(0,0,0,.55)}
+html.a11y.show-light :is(.stage-qbox,.stage-opt,.opt,.tile){text-shadow:none}
+html.a11y :is(.stage-opt.dim,.opt.elim,.tile.dim){opacity:.6}
+html.a11y :is(.stage-opt,.opt,.tile){border-width:3px!important}
+html.a11y :is(.react-btn,.pw,.cbtn,.btn){min-height:44px}
+html.a11y .stage-qbox{font-size:clamp(1.4rem,2.9vw,2.6rem)}
+html.a11y .stage-opt{font-size:clamp(1.1rem,1.9vw,1.6rem)}
+/* sinais que não dependem só da cor (sempre ativos) */
+:is(.stage-opt.right,.opt.right)::after{content:'✓';margin-left:auto;padding-left:.6rem;font-weight:900;font-size:1.3em}
+:is(.stage-opt.wrong,.opt.wrong)::after{content:'✗';margin-left:auto;padding-left:.6rem;font-weight:900;font-size:1.3em}
+.stage-opt.right .stage-cnt,.stage-opt.wrong .stage-cnt{margin-left:auto}
+.stage-opt.right .stage-cnt~*,.stage-opt.wrong .stage-cnt~*{margin-left:0}
+.theme-card{display:flex;flex-direction:column;gap:.5rem;align-items:flex-start;border:2px solid #334155;background:#0f172a;color:#e2e8f0;border-radius:.7rem;padding:.6rem .7rem;cursor:pointer;min-width:0;overflow:hidden}
+.theme-card > span:last-child{flex-wrap:wrap;padding:3px}
+.theme-card.sel{border-color:#c084fc;box-shadow:0 0 12px rgba(192,132,252,.5)}
+.theme-dot{width:1.4rem;height:1.4rem;flex:none;border-radius:50%;border:2px solid rgba(255,255,255,.45);cursor:pointer;transition:transform .1s}
+.theme-dot:hover{transform:scale(1.12)}
+.theme-dot.on{border-color:#fff;box-shadow:0 0 0 2px #a855f7;transform:scale(1.1)}
+.stage-opt:is(.right,.wrong)::after{margin-left:.6rem}
+.stage-opt:is(.right,.wrong):not(:has(.stage-cnt))::after{margin-left:auto}
+
+/* ======================= Maximizar janelas ======================= */
+.modal .panel.maxi{max-width:none!important;width:100vw!important;height:100vh!important;max-height:none!important;border-radius:0!important}
+.modal:has(.panel.maxi){padding:0}
+.maxbtn{width:2.25rem;height:2.25rem;border-radius:.75rem;background:#1e293b;color:#cbd5e1;flex:none}
+.maxbtn:hover{color:#fff}
+
+/* ======================= Barra do organizador (Arsenal + emojis) ======================= */
+.host-dock{position:fixed;left:50%;bottom:12px;transform:translateX(-50%);z-index:65;display:flex;align-items:center;gap:.4rem;max-width:calc(100vw - 15rem);padding:.35rem .45rem;border-radius:999px;background:rgba(15,23,42,.92);border:1px solid rgba(250,204,21,.45);box-shadow:0 8px 24px rgba(0,0,0,.35);backdrop-filter:blur(6px)}
+.host-dock .hd-main{flex:none;display:flex;align-items:center;gap:.35rem;padding:.45rem .85rem;border-radius:999px;background:#f59e0b;color:#1c1917;font-weight:800;font-size:.8rem}
+.host-dock .hd-label{flex:none;font-size:.62rem;font-weight:800;text-transform:uppercase;color:#fde68a;letter-spacing:.05em;padding-left:.2rem}
+.host-dock .hd-emojis{display:flex;gap:.2rem;overflow-x:auto;scrollbar-width:none}
+.host-dock .hd-emojis::-webkit-scrollbar{display:none}
+.host-dock .hd-emo{flex:none;width:2.25rem;height:2.25rem;border-radius:.7rem;font-size:1.3rem;display:flex;align-items:center;justify-content:center;color:#fff;transition:transform .1s}
+.host-dock .hd-emo:hover{background:rgba(255,255,255,.12);transform:scale(1.15)}
+.host-dock .hd-emo.hd-sent{transform:scale(1.4)}
+.host-dock .hd-tg{flex:none;padding:.35rem .6rem;border-radius:999px;background:rgba(255,255,255,.1);color:#fff;font-size:.8rem}
+@media (max-width:760px){.host-dock{max-width:calc(100vw - 1rem);bottom:62px}.host-dock .hd-label{display:none}}
+/* emoji do organizador chegando no celular */
+.bc-flash{position:fixed;inset:0;z-index:190;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none}
+.bc-emoji{font-size:min(36vw,9rem);line-height:1;filter:drop-shadow(0 8px 18px rgba(0,0,0,.35));animation:bcPop 1.9s ease-out forwards}
+.bc-emoji.txt{font-size:min(14vw,4rem);font-weight:900;color:#fde047;background:#7c3aed;border-radius:1rem;padding:.3rem 1rem}
+.bc-cap{margin-top:.6rem;font-weight:800;font-size:.9rem;color:#fff;background:rgba(0,0,0,.55);border-radius:999px;padding:.2rem .8rem;animation:bcPop 1.9s ease-out forwards}
+@keyframes bcPop{0%{transform:scale(.3);opacity:0}15%{transform:scale(1.15);opacity:1}30%{transform:scale(1)}80%{opacity:1}100%{transform:translateY(-30px) scale(.95);opacity:0}}
+.react-float.host .react-name{background:#f59e0b;color:#1c1917}
+.hd-ha{font-size:9px;font-weight:900;letter-spacing:-.02em;line-height:1}

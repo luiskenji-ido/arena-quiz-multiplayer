@@ -1,0 +1,176 @@
+{
+ "pt": [
+  {
+   "block": "Conhecimentos Gerais",
+   "topic": "Tecnologia",
+   "question": "O que significa a sigla 'WWW' na internet?",
+   "options": [
+    "World Wide Web",
+    "Web World Wide",
+    "World Web Wide",
+    "Wide World Web"
+   ],
+   "correct": 0,
+   "reference": "Fundamentos da Web",
+   "explanation": "WWW significa World Wide Web, o sistema de documentos em hipermídia interligados executados na internet."
+  },
+  {
+   "block": "Conhecimentos Gerais",
+   "topic": "História",
+   "question": "Em que ano o homem pisou na Lua pela primeira vez?",
+   "options": [
+    "1965",
+    "1969",
+    "1972",
+    "1959"
+   ],
+   "correct": 1,
+   "reference": "História Espacial",
+   "explanation": "Neil Armstrong pisou na Lua em 20 de julho de 1969 na missão Apollo 11."
+  },
+  {
+   "block": "Conhecimentos Gerais",
+   "topic": "Ciência",
+   "question": "Qual é o elemento químico mais abundante no universo?",
+   "options": [
+    "Oxigênio",
+    "Carbono",
+    "Hidrogênio",
+    "Hélio"
+   ],
+   "correct": 2,
+   "reference": "Tabela Periódica",
+   "explanation": "O hidrogênio é o elemento mais leve e mais abundante, compondo a maior parte das estrelas."
+  },
+  {
+   "block": "Conhecimentos Gerais",
+   "topic": "Geografia",
+   "question": "Qual é o maior continente em extensão territorial?",
+   "options": [
+    "África",
+    "América",
+    "Europa",
+    "Ásia"
+   ],
+   "correct": 3,
+   "reference": "Geografia Global",
+   "explanation": "A Ásia é o maior continente do mundo, tanto em área terrestre quanto em população."
+  }
+ ],
+ "en": [
+  {
+   "block": "General Knowledge",
+   "topic": "Technology",
+   "question": "What does the acronym 'WWW' stand for on the internet?",
+   "options": [
+    "World Wide Web",
+    "Web World Wide",
+    "World Web Wide",
+    "Wide World Web"
+   ],
+   "correct": 0,
+   "reference": "Web Fundamentals",
+   "explanation": "WWW stands for World Wide Web, the interconnected hypermedia document system running on the internet."
+  },
+  {
+   "block": "General Knowledge",
+   "topic": "History",
+   "question": "In what year did humans first walk on the Moon?",
+   "options": [
+    "1965",
+    "1969",
+    "1972",
+    "1959"
+   ],
+   "correct": 1,
+   "reference": "Space History",
+   "explanation": "Neil Armstrong walked on the Moon on July 20, 1969, during the Apollo 11 mission."
+  },
+  {
+   "block": "General Knowledge",
+   "topic": "Science",
+   "question": "What is the most abundant chemical element in the universe?",
+   "options": [
+    "Oxygen",
+    "Carbon",
+    "Hydrogen",
+    "Helium"
+   ],
+   "correct": 2,
+   "reference": "Periodic Table",
+   "explanation": "Hydrogen is the lightest and most abundant chemical element, making up most of the stars."
+  },
+  {
+   "block": "General Knowledge",
+   "topic": "Geography",
+   "question": "Which is the largest continent by land area?",
+   "options": [
+    "Africa",
+    "America",
+    "Europe",
+    "Asia"
+   ],
+   "correct": 3,
+   "reference": "Global Geography",
+   "explanation": "Asia is the largest continent in the world in both land area and population."
+  }
+ ],
+ "es": [
+  {
+   "block": "Cultura General",
+   "topic": "Tecnología",
+   "question": "¿Qué significa la sigla 'WWW' en internet?",
+   "options": [
+    "World Wide Web",
+    "Web World Wide",
+    "World Web Wide",
+    "Wide World Web"
+   ],
+   "correct": 0,
+   "reference": "Fundamentos Web",
+   "explanation": "WWW significa World Wide Web, el sistema de documentos de hipermedia interconectados en internet."
+  },
+  {
+   "block": "Cultura General",
+   "topic": "Historia",
+   "question": "¿En qué año pisó el hombre la Luna por primera vez?",
+   "options": [
+    "1965",
+    "1969",
+    "1972",
+    "1959"
+   ],
+   "correct": 1,
+   "reference": "Historia Espacial",
+   "explanation": "Neil Armstrong pisó la Luna el 20 de julio de 1969 en la misión Apolo 11."
+  },
+  {
+   "block": "Cultura General",
+   "topic": "Ciencia",
+   "question": "¿Cuál es el elemento químico más abundante en el universo?",
+   "options": [
+    "Oxígeno",
+    "Carbono",
+    "Hidrógeno",
+    "Helio"
+   ],
+   "correct": 2,
+   "reference": "Tabla Periódica",
+   "explanation": "El hidrógeno es el elemento más ligero y abundante, componiendo la mayor parte de las estrellas."
+  },
+  {
+   "block": "Cultura General",
+   "topic": "Geografía",
+   "question": "¿Cuál es el continente más grande en extensión territorial?",
+   "options": [
+    "África",
+    "América",
+    "Europa",
+    "Asia"
+   ],
+   "correct": 3,
+   "reference": "Geografía Global",
+   "explanation": "Asia es el continente más grande del mundo, tanto en superficie como en población."
+  }
+ ]
+}

@@ -1,0 +1,12 @@
+flowchart LR
+  DEV["Computador do desenvolvedor<br/>VS Code + python app.py"] -->|"git push ou upload .zip"| PA["PythonAnywhere"]
+  subgraph PA["PythonAnywhere"]
+    VENV["virtualenv<br/>pip install -r requirements.txt"]
+    WSGI["Arquivo WSGI<br/>HOST_PASSWORD, QUIZ_DB"]
+    APP["app.py (Flask)"]
+    DBF[("rooms.sqlite3")]
+    ST["Static files /static/"]
+  end
+  WSGI --> APP --> DBF
+  USERS["Telão e celulares<br/>https://usuario.pythonanywhere.com"] -->|HTTPS| APP
+  USERS --> ST

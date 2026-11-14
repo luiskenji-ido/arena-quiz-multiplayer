@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <title>Quiz Clássico - Apresentador</title>
+  {% include '_head.html' %}
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='corp.css') }}">
+</head>
+<body class="corp purple min-h-screen flex flex-col">
+
+<header class="topbar flex flex-wrap items-center justify-between gap-3 px-4 py-2.5">
+  <div class="flex items-center gap-3 min-w-0">
+    <span class="w-9 h-9 rounded-md bg-accent text-white flex items-center justify-center"><i class="fa-solid fa-briefcase"></i></span>
+    <div class="min-w-0">
+      <div id="hdrTitle" class="font-extrabold text-sm sm:text-base truncate"></div>
+      <div class="text-[11px] text-gray-500">PIN: <b id="hdrCode" class="pin text-gray-800">----</b> · <span data-i18n="mode_classic"></span></div>
+    </div>
+  </div>
+  <div class="flex flex-wrap items-center gap-2">
+    <span id="langBox1"></span>
+    <button id="ctlQuiz" onclick="qkOpen()" class="cbtn ghost"><i class="fa-solid fa-file-arrow-up"></i> <span data-i18n="btn_loadquiz"></span></button>
+    <button id="ctlConfig" onclick="openConfig()" class="cbtn ghost"><i class="fa-solid fa-sliders"></i> <span data-i18n="btn_config"></span></button>
+    <button onclick="openHelp()" class="cbtn ghost"><i class="fa-solid fa-circle-question"></i></button>
+    <button onclick="toggleFs()" class="cbtn ghost"><i class="fa-solid fa-expand"></i></button>
+  </div>
+</header>
+
+<!-- Controles do apresentador -->
+<div id="ctlBar" class="hidden flex flex-wrap items-center gap-2 px-4 py-2 bg-white/95 border-t border-gray-200 shadow-sm">
+  <span class="text-[11px] font-extrabold uppercase text-gray-500 mr-1"><i class="fa-solid fa-gamepad"></i> <span data-i18n="ctrl_title"></span></span>
+  <button id="ctlPause" onclick="hostAction('pause')" class="cbtn amber"><i class="fa-solid fa-pause"></i> <span data-i18n="ctrl_pause"></span></button>
+  <button id="ctlResume" onclick="hostAction('resume')" class="cbtn green"><i class="fa-solid fa-play"></i> <span data-i18n="ctrl_resume"></span></button>
+  <button id="ctlClose" onclick="hostAction('close')" class="cbtn red"><i class="fa-solid fa-stop"></i> <span data-i18n="btn_close_now"></span></button>
+  <button id="ctlNext" onclick="hostAction('next')" class="cbtn purple"><span id="ctlNextLbl"></span> <i class="fa-solid fa-forward"></i></button>
+  <label class="cbtn ghost cursor-pointer"><input id="ctlAuto" type="checkbox" onchange="setAuto()" class="accent-accent"> <i class="fa-solid fa-forward"></i> <span data-i18n="ctrl_auto"></span>
+    <select id="ctlAutoDelay" onchange="setAuto()" class="bg-white border border-gray-300 rounded px-1 py-0.5 text-gray-800"></select></label>
+  <button id="ctlHold" onclick="hostAction('pause')" class="cbtn amber"><i class="fa-solid fa-hand"></i> <span data-i18n="ctrl_hold"></span></button>
+  <button id="ctlRelease" onclick="hostAction('resume')" class="cbtn green"><i class="fa-solid fa-play"></i> <span data-i18n="ctrl_release"></span></button>
+  <span id="ctlAutoLbl" class="hidden px-3 py-1.5 rounded bg-accent text-white text-sm font-extrabold"></span>
+  <button id="ctlBoard" onclick="toggleBoardPeek()" class="cbtn ghost"><i class="fa-solid fa-ranking-star"></i> <span id="ctlBoardLbl"></span></button>
+  <span class="flex-1"></span>
+  <button id="ctlFinish" onclick="hostAction('finish')" class="cbtn dark"><i class="fa-solid fa-flag-checkered"></i> <span data-i18n="ctrl_finish"></span></button>
+  <button id="ctlRestart" onclick="hostAction('restart')" class="cbtn ghost"><i class="fa-solid fa-rotate-left"></i> <span data-i18n="ctrl_restart"></span></button>
+</div>
+
+<main class="flex-1 flex flex-col">
+  <!-- LOBBY -->
+  <section id="vLobby" class="hidden px-4 py-6">
+    <div class="card max-w-4xl mx-auto p-5 flex flex-col md:flex-row items-center gap-6">
+      <img id="qrImg" alt="QR" class="w-44 h-44 rounded-md border border-gray-200">
+      <div class="flex-1 text-center md:text-left">
+        <div class="text-lg font-bold text-gray-600"><span data-i18n="corp_join_at"></span> <span id="joinHost" class="text-gray-900 font-extrabold break-all"></span></div>
+        <div class="text-lg font-bold text-gray-600" data-i18n="corp_with_pin"></div>
+        <div id="bigCode" class="pin text-6xl sm:text-7xl text-gray-900">----</div>
+      </div>
+    </div>
+    <div class="max-w-4xl mx-auto mt-6 flex flex-wrap items-center justify-between gap-4">
+      <div class="chip text-lg"><i class="fa-solid fa-user mr-1"></i> <span id="nPlayers">0</span></div>
+      <div class="text-center text-white">
+        <div id="lobQuiz" class="text-2xl font-black"></div>
+        <div id="lobInfo" class="text-sm opacity-80"></div>
+      </div>
+      <button onclick="hostAction('start')" class="cbtn light text-lg px-6 py-3"><span data-i18n="corp_start"></span> <i class="fa-solid fa-play"></i></button>
+    </div>
+    <div id="chips" class="max-w-5xl mx-auto flex flex-wrap justify-center gap-3 mt-8"></div>
+    <p id="lobWait" class="text-center text-white/80 text-lg font-bold mt-10 animate-pulse" data-i18n="corp_waiting"></p>
+  </section>
+
+  <!-- PERGUNTA / RESULTADO -->
+  <section id="vQuestion" class="hidden flex-1 flex flex-col">
+    <div class="topbar text-center px-6 py-5">
+      <div id="qMeta" class="text-xs font-bold uppercase text-gray-500 mb-1"></div>
+      <h2 id="qText" class="text-2xl sm:text-4xl font-extrabold leading-tight"></h2>
+      <div id="qTurn" class="hidden inline-flex items-center gap-2 mt-3 px-4 py-2 rounded-full bg-accent text-white font-extrabold"></div>
+    </div>
+    <div class="flex-1 flex items-center justify-between gap-6 px-6 py-5">
+      <div id="ring" class="ring flex-none">--</div>
+      <div class="flex-1 flex justify-center">
+        <img id="qImg" class="hidden max-h-64 rounded-md shadow" alt="">
+        <div id="chart" class="chart hidden"></div>
+        <div id="qLogo" class="hidden text-accent text-7xl"><i class="fa-solid fa-circle-question"></i></div>
+      </div>
+      <div class="flex-none text-center space-y-3 w-44">
+        <div><div id="ansN" class="text-5xl font-black">0</div><div class="font-bold text-gray-600" data-i18n="corp_answers"></div></div>
+        <div id="liveBoard" class="hidden text-left space-y-1"></div>
+      </div>
+    </div>
+    <div id="explain" class="hidden mx-4 mb-3 card px-5 py-3 text-sm text-gray-700"></div>
+    <div id="tiles" class="grid grid-cols-1 sm:grid-cols-2 gap-2 px-3 pb-3"></div>
+    <div id="revBar" class="hidden flex justify-end gap-2 px-4 pb-4">
+      <button id="revBoardBtn" onclick="view='board'; render()" class="cbtn purple text-base px-5 py-3"><i class="fa-solid fa-ranking-star"></i> <span data-i18n="corp_scoreboard"></span></button>
+    </div>
+  </section>
+
+  <section id="vStage" class="hidden flex-1 px-3 py-3"></section>
+  <div id="revBarStage" class="hidden flex justify-end gap-2 px-4 pb-4">
+    <button onclick="view='board'; render()" class="cbtn purple text-base px-5 py-3"><i class="fa-solid fa-ranking-star"></i> <span data-i18n="corp_scoreboard"></span></button>
+  </div>
+
+  <!-- PLACAR ENTRE PERGUNTAS -->
+  <section id="vBoard" class="hidden px-4 py-8">
+    <h2 class="text-center text-white text-4xl font-black mb-6" data-i18n="corp_scoreboard"></h2>
+    <div id="boardRows" class="max-w-3xl mx-auto space-y-3"></div>
+    <div class="max-w-3xl mx-auto flex justify-end mt-6"><button onclick="hostAction('next')" class="cbtn light text-base px-5 py-3"><span id="boardNextLbl"></span> <i class="fa-solid fa-forward"></i></button></div>
+  </section>
+
+  <!-- FINAL -->
+  <section id="vFinal" class="hidden px-4 py-8">
+    <h2 class="text-center text-white text-4xl font-black mb-2" data-i18n="corp_podium"></h2>
+    <p id="finQuiz" class="text-center text-white/80 font-bold mb-8"></p>
+    <div id="podium" class="podium"></div>
+    <div class="text-center mt-6"><button onclick="document.getElementById('finAll').classList.toggle('hidden')" class="cbtn light"><i class="fa-solid fa-list-ol"></i> <span data-i18n="corp_view_all"></span></button></div>
+    <div id="finAll" class="hidden max-w-3xl mx-auto space-y-2 mt-5"></div>
+    <div class="text-center mt-6"><button onclick="hostAction('restart')" class="cbtn ghost"><i class="fa-solid fa-rotate-left"></i> <span data-i18n="btn_restart"></span></button></div>
+  </section>
+</main>
+
+<div id="pausedBanner" class="hidden fixed inset-0 z-50 bg-black/60 flex items-center justify-center pointer-events-none">
+  <div class="card px-10 py-6 text-4xl font-black text-accent"><i class="fa-solid fa-pause"></i> <span data-i18n="corp_paused"></span></div>
+</div>
+
+{% include '_host_modals.html' %}
+
+<script src="{{ url_for('static', filename='common.js') }}"></script>
+<script src="{{ url_for('static', filename='i18n_extra.js') }}"></script>
+<script src="{{ url_for('static', filename='fun.js') }}"></script>
+<script src="{{ url_for('static', filename='quizkit.js') }}"></script>
+<script src="{{ url_for('static', filename='host_core.js') }}"></script>
+<script>
+const PAGE_MODE = 'classic';
+const SHAPES = ['▲', '◆', '●', '■', '★', '⬟'];
+let view = 'question', lastQi = -2, lastPhase = '', lastSig = '', lastPodSig = '';
+function resetSig() { lastSig = ''; lastPodSig = ''; }
+
+document.getElementById('langBox1').innerHTML = langSelectHTML();
+setupLangSelects(); applyI18n();
+document.querySelectorAll('.langSel').forEach(s => s.className = 'langSel bg-gray-100 border border-gray-300 rounded px-2 py-1.5 text-xs text-gray-800');
+
+H = hostSession();
+if (!H) location.href = '/host';
+else {
+  document.getElementById('hdrCode').textContent = H.code;
+  document.getElementById('bigCode').textContent = H.code;
+  document.getElementById('qrImg').src = '/qr/' + H.code + '.svg';
+  document.getElementById('joinHost').textContent = location.host + '/join';
+  startHost();
+}
+
+function setBody(purple) { document.body.classList.toggle('purple', purple); }
+function quizName() { return ST.quiz_title || (ST.custom_quiz ? t('quiz_custom') : t('quiz_default')); }
+function rowsHTML(list) {
+  return list.map((b, i) => `<div class="srow ${i === 0 ? 'first' : ''}" style="animation-delay:${i * 80}ms"><span class="truncate">${i + 1}. ${esc(b.name)}${b.streak >= 2 ? ` <span class="text-sm">🔥${b.streak}</span>` : ''}</span><span>${fmt(b.score)}</span></div>`).join('');
+}
+
+function render() {
+  const ph = ST.phase, q = ST.question;
+  if (ST.qi !== lastQi) { view = 'question'; lastQi = ST.qi; lastSig = ''; }
+  const onBoard = ph === 'reveal' && view === 'board';
+  setBody(!(ph === 'open' || (ph === 'reveal' && !onBoard)));
+  const staged = (ph === 'open' || ph === 'reveal') && !onBoard && stageOn(ST.settings);
+  show('vLobby', ph === 'lobby'); show('vQuestion', (ph === 'open' || ph === 'reveal') && !onBoard && !staged);
+  show('vStage', staged);
+  if (staged) renderStage(document.getElementById('vStage'), ST);
+  show('vBoard', onBoard); show('vFinal', ph === 'finished'); show('ctlBar', ph !== 'lobby');
+  document.getElementById('hdrTitle').textContent = quizName();
+
+  if (ph === 'lobby') {
+    document.getElementById('nPlayers').textContent = ST.board.length;
+    document.getElementById('lobQuiz').textContent = quizName();
+    const s = ST.settings;
+    document.getElementById('lobInfo').textContent = `${s.visibility === 'public' ? '🌐 ' + t('vis_public') : '🔒 ' + t('vis_private')}${s.room_name ? ' · ' + s.room_name : ''} · ${s.answer_order === 'turns' ? t('order_turns') : t('order_speed')} · ${t('quiz_n', { n: ST.total })} · ${s.timer}s · ${t('cfg_board')}: ${t('board_' + s.board_mode)}${s.auto_next ? ' · ' + t('ctrl_auto') + ' ' + s.auto_delay + 's' : ''}`;
+    const turns = s.answer_order === 'turns';
+    document.getElementById('chips').innerHTML = ST.order.map((b, n) => `<button class="chip" title="${t('btn_kick')}" onclick="hostAction('kick','${b.id}')">${turns ? `<span class="text-accent mr-1">${n + 1}º</span>` : ''}${esc(b.name)}</button>`).join('');
+    show('lobWait', ST.board.length === 0);
+  }
+
+  show('revBarStage', staged && ph === 'reveal' && boardShown());
+  if (q && !onBoard) {
+    document.getElementById('qMeta').textContent = t('corp_question_n', { n: ST.qi + 1, total: ST.total }) + (q.poll ? ' · ' + t('poll_badge') : '');
+    document.getElementById('qText').textContent = q.question;
+    document.getElementById('ansN').textContent = q.answered;
+    const qt = document.getElementById('qTurn');
+    if (q.turn) { qt.classList.remove('hidden'); qt.textContent = ph === 'open' ? '🎯 ' + t('turn_of', { name: q.turn.name }) : turnResultText(q); }
+    else qt.classList.add('hidden');
+    const reveal = ph === 'reveal';
+    const img = document.getElementById('qImg');
+    if (q.image && !reveal) { img.src = q.image; img.classList.remove('hidden'); } else img.classList.add('hidden');
+    show('qLogo', !q.image && !reveal);
+    show('chart', reveal);
+    const sig = [ST.qi, ph, q.dist, q.turn_elim, q.turn_pick, LANG].join('|');
+    if (sig !== lastSig) {
+      lastSig = sig;
+      document.getElementById('tiles').innerHTML = q.options.map((o, i) => {
+        let cls = 'tile t' + i;
+        if (reveal && !q.poll) cls += i === q.correct ? ' ok' : ' dim';
+        else if (!reveal && (q.turn_elim || []).includes(i)) cls += ' dim';
+        if (q.turn && i === q.turn_pick) cls += ' picked';
+        return `<div class="${cls}"><span class="shape">${SHAPES[i]}</span><span class="txt">${esc(o)}</span></div>`;
+      }).join('');
+      if (reveal) {
+        const max = Math.max(1, ...q.dist);
+        document.getElementById('chart').innerHTML = q.options.map((o, i) => `<div class="col"><div class="num">${q.dist[i]}${!q.poll && i === q.correct ? ' ✓' : ''}</div><div class="bar c${i}" style="height:0%" data-h="${Math.max(3, q.dist[i] / max * 100)}"></div><div class="lbl c${i}">${SHAPES[i]}</div></div>`).join('');
+        requestAnimationFrame(() => document.querySelectorAll('#chart .bar').forEach(b => { b.style.height = b.dataset.h + '%'; }));
+      }
+    }
+    const ex = document.getElementById('explain');
+    if (reveal && !q.poll && (q.explanation || q.reference)) { ex.classList.remove('hidden'); ex.innerHTML = `<b>${t('correct_answer')}:</b> ${esc(q.options[q.correct])}. ${esc(q.explanation || '')} <span class="text-gray-400">${esc(q.reference || '')}</span>`; }
+    else if (reveal && q.poll) { ex.classList.remove('hidden'); ex.innerHTML = `<b>${t('poll_result')}</b>`; }
+    else ex.classList.add('hidden');
+    show('revBar', reveal && boardShown());
+    const lb = document.getElementById('liveBoard');
+    const live = ph === 'open' && boardShown();
+    lb.classList.toggle('hidden', !live);
+    if (live) lb.innerHTML = ST.board.slice(0, 5).map((b, i) => `<div class="flex justify-between gap-2 text-xs font-bold bg-white rounded px-2 py-1 shadow"><span class="truncate">${i + 1}. ${esc(b.name)}</span><span>${fmt(b.score)}</span></div>`).join('');
+  }
+
+  if (onBoard) {
+    document.getElementById('boardRows').innerHTML = rowsHTML(ST.board.slice(0, 5));
+    document.getElementById('boardNextLbl').textContent = ST.qi + 1 >= ST.total ? t('corp_podium') : t('btn_next');
+  }
+
+  if (ph === 'finished') {
+    document.getElementById('finQuiz').textContent = quizName();
+    // só redesenha quando o resultado muda: redesenhar a cada polling reiniciava a animação
+    // e o 1º lugar (o último a subir) nunca chegava a aparecer
+    const podSig = JSON.stringify([ST.board.map(b => [b.name, b.score, b.correct, b.streak]), LANG]);
+    if (podSig !== lastPodSig) {
+      const firstPaint = !lastPodSig;
+      lastPodSig = podSig;
+      const top = ST.board.slice(0, 3), order = [1, 0, 2], hs = [.7, 1, .5], medal = ['🥈', '🥇', '🥉'], delay = [300, 900, 0], rank = [2, 1, 3];
+      document.getElementById('podium').innerHTML = order.map((k, pos) => top[k] ? `<div class="pod-col pod-${rank[pos]}"><div class="pod-name">${rank[pos] === 1 ? '👑 ' : ''}${esc(top[k].name)}</div><div class="step${firstPaint ? '' : ' still'}" style="height:calc((100% - 2.6rem) * ${hs[pos]});animation-delay:${delay[pos]}ms"><span class="medal">${medal[pos]}</span><span class="text-xl">${fmt(top[k].score)}</span><span class="text-xs text-gray-500">${top[k].correct} ✓</span></div></div>` : '').join('');
+      document.getElementById('finAll').innerHTML = rowsHTML(ST.board);
+    }
+  } else {
+    lastPodSig = '';
+  }
+
+  if (ph !== lastPhase) {
+    if (ph === 'open') beep('start');
+    if (ph === 'reveal') beep('correct');
+    if (ph === 'finished') beep('fanfare');
+    lastPhase = ph;
+  }
+}
+
+function tickTimer() {
+  if (!ST || !ST.question) return;
+  const q = ST.question, ring = document.getElementById('ring');
+  if (ST.phase === 'reveal' && q.next_at && view === 'question' && boardShown() && nowS() >= q.next_at - ST.settings.auto_delay / 2) { view = 'board'; render(); }
+  if (ST.phase !== 'open') { ring.textContent = '✓'; ring.classList.remove('low'); stageTick(ST, 0); return; }
+  const left = qRemaining(q);
+  ring.textContent = q.paused ? '⏸' : Math.ceil(left);
+  stageTick(ST, left);
+  ring.classList.toggle('low', left <= 5 && !q.paused);
+}
+</script>
+</body>
+</html>

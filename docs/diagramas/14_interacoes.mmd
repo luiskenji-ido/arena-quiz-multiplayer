@@ -1,0 +1,21 @@
+sequenceDiagram
+  actor A as Ana (celular)
+  participant S as Servidor
+  actor B as Beto (celular)
+  participant H as Telão
+  A->>S: POST /api/nudge {target: Beto, kind: scare}
+  S->>S: verifica limite (padrão 2 por jogador)
+  S-->>A: {left: 1}
+  B->>S: polling: me.inbox traz a chamada nova
+  S-->>B: inbox [{from: Ana, kind: scare}]
+  B->>B: som alto + vibração + tela piscando
+  A->>S: POST /api/react {emoji: 🤣}
+  S->>S: lista branca de emojis e 1 a cada 0,8 s
+  H->>S: polling: reactions (últimos 10 s)
+  S-->>H: [{name: Ana, emoji: 🤣}]
+  H->>H: emoji sobe flutuando com o nome
+  H->>S: POST /api/host/CODE/hostemoji {emoji: 🏆}
+  A->>S: polling: me.broadcasts
+  S-->>A: [{emoji: 🏆, host: true}]
+  A->>A: emoji gigante com 🎤 Organizador
+  Note over H,B: Música de tensão toca localmente nos últimos N segundos

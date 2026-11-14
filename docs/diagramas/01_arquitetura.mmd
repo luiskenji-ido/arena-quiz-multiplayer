@@ -1,0 +1,21 @@
+flowchart LR
+  subgraph Clientes["Navegadores"]
+    H["Telão do apresentador<br/>/host e /host/classic"]
+    P["Celulares dos jogadores<br/>/play"]
+    I["Página inicial<br/>/ (código + salas públicas)"]
+  end
+  subgraph Servidor["Servidor Flask (WSGI)"]
+    A["app.py<br/>rotas, API REST, QR code"]
+    G["game.py<br/>regras do jogo"]
+    T["quiz_templates.py<br/>templates de quiz"]
+  end
+  DB[("SQLite<br/>rooms.sqlite3")]
+  CDN["CDNs públicos<br/>Tailwind, Font Awesome,<br/>Google Fonts"]
+  H -- "polling 1 s<br/>GET /api/state" --> A
+  P -- "polling 1 s<br/>POST answer / power" --> A
+  I -- "GET /api/public" --> A
+  A --> G
+  A --> T
+  A -- "transação BEGIN IMMEDIATE" --> DB
+  H -. "CSS / fontes" .-> CDN
+  P -. "CSS / fontes" .-> CDN

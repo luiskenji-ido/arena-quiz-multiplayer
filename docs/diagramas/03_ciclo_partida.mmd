@@ -1,0 +1,18 @@
+stateDiagram-v2
+  [*] --> lobby: sala criada
+  lobby --> open: start
+  open --> pausada: pause
+  pausada --> open: resume
+  open --> reveal: tempo acabou
+  open --> reveal: todos responderam / vez respondida
+  open --> reveal: close (apresentador)
+  open --> reveal: 1º acerto (opcional, Arena)
+  reveal --> segurando: pause (avanço automático)
+  segurando --> reveal: resume
+  reveal --> open: next ou avanço automático
+  reveal --> finished: última pergunta
+  open --> finished: finish
+  reveal --> finished: finish
+  finished --> lobby: restart
+  lobby --> lobby: settings / quiz / kick
+  finished --> [*]

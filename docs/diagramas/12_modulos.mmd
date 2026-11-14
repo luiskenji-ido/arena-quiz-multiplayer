@@ -1,0 +1,31 @@
+flowchart TB
+  subgraph Back["Backend Python"]
+    app["app.py"] --> game["game.py"]
+    app --> tpl["quiz_templates.py"]
+    game --> dq["default_quiz.json"]
+  end
+  subgraph Pages["templates/ (Jinja)"]
+    idx["index.html"]
+    host["host.html (Arena)"]
+    hostc["host_classic.html"]
+    play["play.html (Arena)"]
+    playc["play_classic.html"]
+    modals["_host_modals.html"]
+    head["_head.html"]
+  end
+  subgraph JS["static/ JavaScript"]
+    common["common.js<br/>i18n, API, sons"]
+    i18n["i18n_extra.js"]
+    fun["fun.js<br/>temas, palco, acessibilidade,<br/>chamar atenção, reações, tensão"]
+    core["host_core.js<br/>controles e configurações"]
+    qk["quizkit.js<br/>criação de quiz"]
+  end
+  subgraph CSS["static/ CSS"]
+    stylecss["style.css"] --- corp["corp.css"] --- themes["themes.css"]
+    show["showthemes.css"] --- incl["inclusion.css"] --- kids["kids.css"]
+  end
+  host --> modals
+  hostc --> modals
+  host & hostc --> core --> qk
+  host & hostc & play & playc --> fun --> i18n --> common
+  head --> CSS

@@ -1,0 +1,109 @@
+<!-- Modais compartilhados pelas telas do apresentador (Arena e Clássico) -->
+<div id="cfgModal" class="modal hidden">
+  <div class="panel neon-purple max-w-xl w-full max-h-[92vh] overflow-y-auto space-y-4 p-5 text-slate-100">
+    <div class="flex items-center justify-between"><h3 class="font-esports text-lg font-bold text-white" data-i18n="cfg_title"></h3>
+      <button onclick="closeConfig()" class="w-9 h-9 rounded-xl bg-slate-800 text-slate-300"><i class="fa-solid fa-xmark"></i></button></div>
+    <p id="cfgLiveNote" class="hidden text-[11px] text-amber-300 bg-amber-500/10 border border-amber-500/40 rounded-lg px-3 py-2" data-i18n="cfg_live_note"></p>
+    <div id="cfgModeBox">
+      <div class="text-[11px] font-esports uppercase text-purple-300 mb-2" data-i18n="lbl_mode"></div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+        <button type="button" data-cmode="arena" onclick="cfgMode('arena')" class="cfgCard btn text-left p-3 rounded-xl border-2 border-slate-700 bg-slate-900"><div class="font-esports text-xs font-bold text-cyan-300"><i class="fa-solid fa-bolt mr-1"></i><span data-i18n="mode_arena"></span></div><div class="text-[11px] text-slate-400 mt-1" data-i18n="mode_arena_d"></div></button>
+        <button type="button" data-cmode="classic" onclick="cfgMode('classic')" class="cfgCard btn text-left p-3 rounded-xl border-2 border-slate-700 bg-slate-900"><div class="font-esports text-xs font-bold text-amber-300"><i class="fa-solid fa-briefcase mr-1"></i><span data-i18n="mode_classic"></span></div><div class="text-[11px] text-slate-400 mt-1" data-i18n="mode_classic_d"></div></button>
+      </div>
+    </div>
+    <div class="space-y-2">
+      <div class="text-[11px] font-esports uppercase text-purple-300"><i class="fa-solid fa-door-open mr-1"></i><span data-i18n="cfg_room"></span></div>
+      <label class="block text-xs space-y-1"><span class="text-slate-400" data-i18n="lbl_room_name"></span>
+        <input id="sRoomName" maxlength="40" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2 py-1.5 text-white"></label>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+        <label class="flex items-start gap-2 rounded-lg border border-slate-700 bg-slate-900 px-3 py-2"><input type="radio" name="sVis" value="private" class="accent-purple-400 mt-0.5">
+          <span><b class="text-slate-100"><i class="fa-solid fa-lock"></i> <span data-i18n="vis_private"></span></b><br><span class="text-[11px] text-slate-400" data-i18n="vis_private_d"></span></span></label>
+        <label class="flex items-start gap-2 rounded-lg border border-slate-700 bg-slate-900 px-3 py-2"><input type="radio" name="sVis" value="public" class="accent-purple-400 mt-0.5">
+          <span><b class="text-slate-100"><i class="fa-solid fa-globe"></i> <span data-i18n="vis_public"></span></b><br><span class="text-[11px] text-slate-400" data-i18n="vis_public_d"></span></span></label>
+      </div>
+    </div>
+    <div class="space-y-2">
+      <div class="text-[11px] font-esports uppercase text-purple-300"><i class="fa-solid fa-people-arrows mr-1"></i><span data-i18n="cfg_order"></span></div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+        <label class="flex items-start gap-2 rounded-lg border border-slate-700 bg-slate-900 px-3 py-2"><input type="radio" name="sOrder" value="speed" class="accent-purple-400 mt-0.5">
+          <span><b class="text-slate-100"><i class="fa-solid fa-bolt"></i> <span data-i18n="order_speed"></span></b><br><span class="text-[11px] text-slate-400" data-i18n="order_speed_d"></span></span></label>
+        <label class="flex items-start gap-2 rounded-lg border border-slate-700 bg-slate-900 px-3 py-2"><input type="radio" name="sOrder" value="turns" class="accent-purple-400 mt-0.5">
+          <span><b class="text-slate-100"><i class="fa-solid fa-list-ol"></i> <span data-i18n="order_turns"></span></b><br><span class="text-[11px] text-slate-400" data-i18n="order_turns_d"></span></span></label>
+      </div>
+    </div>
+    <div class="space-y-2">
+      <label class="flex items-center gap-2 text-xs text-slate-300"><input id="sAuto" type="checkbox" class="accent-cyan-400"> <i class="fa-solid fa-forward"></i> <span data-i18n="cfg_auto"></span></label>
+      <label class="flex items-center gap-2 text-xs text-slate-400 pl-6"><span data-i18n="cfg_auto_delay"></span>
+        <select id="sAutoDelay" class="bg-slate-950 border border-slate-700 rounded-lg px-2 py-1 text-white"></select></label>
+    </div>
+    <div class="grid grid-cols-2 gap-2.5 text-xs">
+      <label class="space-y-1"><span class="block text-slate-400" data-i18n="lbl_timer"></span><input id="sTimer" type="number" min="5" max="300" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2 py-1.5 text-white"></label>
+      <label class="space-y-1 classicOnly"><span class="block text-slate-400" data-i18n="lbl_classic_points"></span><input id="sClassic" type="number" min="100" max="5000" step="100" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2 py-1.5 text-white"></label>
+      <label class="space-y-1 arenaOnly"><span class="block text-slate-400" data-i18n="lbl_basexp"></span><input id="sBase" type="number" min="100" max="5000" step="100" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2 py-1.5 text-white"></label>
+      <label class="space-y-1 arenaOnly"><span class="block text-slate-400" data-i18n="lbl_mult"></span><input id="sMult" type="number" min="1" max="5" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2 py-1.5 text-white"></label>
+      <label class="space-y-1 arenaOnly lobbyOnly"><span class="block text-slate-400" data-i18n="lbl_charges"></span><input id="sCharges" type="number" min="1" max="99" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2 py-1.5 text-white"></label>
+      <label class="space-y-1 lobbyOnly"><span class="block text-slate-400" data-i18n="lbl_quiz_lang"></span>
+        <select id="sLang" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2 py-1.5 text-white"><option value="pt">Português</option><option value="en">English</option><option value="es">Español</option></select></label>
+    </div>
+    <div>
+      <div class="text-[11px] font-esports uppercase text-purple-300 mb-2"><i class="fa-solid fa-ranking-star mr-1"></i><span data-i18n="cfg_board"></span></div>
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs">
+        <label class="flex items-center gap-2 rounded-lg border border-slate-700 bg-slate-900 px-3 py-2"><input type="radio" name="sBoard" value="live" class="accent-purple-400"> <span data-i18n="board_live"></span></label>
+        <label class="flex items-center gap-2 rounded-lg border border-slate-700 bg-slate-900 px-3 py-2"><input type="radio" name="sBoard" value="reveal" class="accent-purple-400"> <span data-i18n="board_reveal"></span></label>
+        <label class="flex items-center gap-2 rounded-lg border border-slate-700 bg-slate-900 px-3 py-2"><input type="radio" name="sBoard" value="end" class="accent-purple-400"> <span data-i18n="board_end"></span></label>
+      </div>
+    </div>
+    <div class="arenaOnly space-y-2">
+      <div class="text-[11px] font-esports uppercase text-purple-300"><i class="fa-solid fa-wand-magic-sparkles mr-1"></i><span data-i18n="cfg_powers"></span></div>
+      <p class="text-[11px] text-slate-400" data-i18n="cfg_powers_d"></p>
+      <label class="flex items-center gap-2 text-xs text-slate-300"><input id="sProg" type="checkbox" class="accent-cyan-400"> <span data-i18n="lbl_progressive"></span></label>
+      <label class="flex items-center gap-2 text-xs text-slate-300"><input id="sClose" type="checkbox" class="accent-cyan-400"> <span data-i18n="lbl_close_first"></span></label>
+      <div id="cfgPowers" class="grid grid-cols-1 sm:grid-cols-2 gap-1.5"></div>
+    </div>
+    <div class="space-y-2">
+      <div class="text-[11px] font-esports uppercase text-purple-300"><i class="fa-solid fa-face-grin-squint-tears mr-1"></i><span data-i18n="cfg_fun"></span></div>
+      <label class="flex items-center justify-between gap-2 text-xs text-slate-300"><span>📢 <span data-i18n="cfg_nudge"></span></span>
+        <input id="sNudge" type="number" min="0" max="10" class="w-16 bg-slate-950 border border-slate-700 rounded-lg px-2 py-1 text-center text-white"></label>
+      <label class="flex items-center gap-2 text-xs text-slate-300"><input id="sReact" type="checkbox" class="accent-cyan-400"> 😀 <span data-i18n="cfg_reactions"></span></label>
+      <label class="flex items-center gap-2 text-xs text-slate-300"><input id="sTension" type="checkbox" class="accent-cyan-400"> 🎵 <span data-i18n="cfg_tension"></span>
+        <span class="text-slate-400 ml-auto"><span data-i18n="cfg_tension_secs"></span> <select id="sTensionSecs" class="bg-slate-950 border border-slate-700 rounded px-1 py-0.5 text-white"><option>5</option><option>10</option><option>15</option><option>20</option></select> s</span></label>
+      <div class="text-[11px] text-slate-400 pt-1">🎨 <span data-i18n="cfg_theme"></span></div>
+      <div id="sThemes" class="grid grid-cols-2 sm:grid-cols-4 gap-2"></div>
+    </div>
+    <p id="setErr" class="hidden text-xs text-rose-300"></p>
+    <div class="flex justify-end gap-2">
+      <button onclick="closeConfig()" class="btn px-4 py-2.5 rounded-xl bg-slate-800 text-slate-200 font-esports text-xs font-bold uppercase" data-i18n="btn_close"></button>
+      <button onclick="applySettings()" class="btn px-5 py-2.5 rounded-xl bg-purple-500 text-white font-esports text-xs font-extrabold uppercase" data-i18n="btn_save"></button>
+    </div>
+  </div>
+</div>
+
+<div id="quizModal" class="modal hidden">
+  <div class="panel neon-danger max-w-3xl w-full max-h-[94vh] flex flex-col p-5 gap-3 text-slate-100">
+    <div class="flex items-center justify-between"><h3 class="font-esports text-lg font-bold text-white" data-i18n="quizmodal_title"></h3>
+      <button onclick="qkClose()" class="w-9 h-9 rounded-xl bg-slate-800 text-slate-300"><i class="fa-solid fa-xmark"></i></button></div>
+    <div id="qkTabs" class="flex gap-2 overflow-x-auto pb-1">
+      <button data-tab="templates" onclick="qkTab('templates')"><i class="fa-solid fa-layer-group"></i> <span data-i18n="tab_templates"></span></button>
+      <button data-tab="upload" onclick="qkTab('upload')"><i class="fa-solid fa-file-arrow-up"></i> <span data-i18n="tab_upload"></span></button>
+      <button data-tab="text" onclick="qkTab('text')"><i class="fa-solid fa-align-left"></i> <span data-i18n="tab_text"></span></button>
+      <button data-tab="editor" onclick="qkTab('editor')"><i class="fa-solid fa-pen-to-square"></i> <span data-i18n="tab_editor"></span></button>
+      <button data-tab="ai" onclick="qkTab('ai')"><i class="fa-solid fa-wand-magic-sparkles"></i> <span data-i18n="tab_ai"></span></button>
+    </div>
+    <div id="qkBody" class="overflow-y-auto flex-1 pr-1"></div>
+  </div>
+</div>
+
+<div id="helpModal" class="modal hidden">
+  <div class="panel neon-cyan max-w-lg w-full max-h-[92vh] overflow-y-auto space-y-3 p-5 text-slate-100">
+    <div class="flex items-center justify-between"><h3 class="font-esports text-lg font-bold text-white" data-i18n="help_title"></h3>
+      <button onclick="closeHelp()" class="w-9 h-9 rounded-xl bg-slate-800 text-slate-300"><i class="fa-solid fa-xmark"></i></button></div>
+    <div id="helpBody"></div>
+    <div class="text-right"><button onclick="closeHelp()" class="btn px-5 py-2.5 rounded-xl bg-cyan-500 text-slate-950 font-esports text-xs font-extrabold uppercase" data-i18n="help_close"></button></div>
+  </div>
+</div>
+
+<!-- Pedidos de entrada (salas públicas) -->
+<div id="reqDock" class="hidden fixed bottom-20 right-4 z-40 w-80 max-w-[calc(100vw-2rem)] panel neon-gold p-3 space-y-2 text-slate-100">
+  <div class="flex items-center justify-between"><span class="font-esports text-xs font-bold text-amber-300"><i class="fa-solid fa-bell"></i> <span data-i18n="req_title"></span> (<span id="reqN">0</span>)</span></div>
+  <div id="reqList" class="space-y-1.5 max-h-64 overflow-y-auto"></div>
+</div>

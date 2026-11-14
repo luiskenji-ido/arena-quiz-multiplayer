@@ -1,0 +1,60 @@
+classDiagram
+  class Room {
+    code: str
+    host_token: str
+    pub_id: str
+    phase: lobby|open|reveal|finished
+    qi: int
+    quiz_title: str
+    custom_quiz: bool
+    auto_hold: bool
+    turn_idx: int
+    host_seen: float
+    events: list
+    reactions: list
+  }
+  class Settings {
+    mode: arena|classic
+    answer_order: speed|turns
+    timer, base_xp, multiplier
+    charges, classic_points
+    board_mode: live|reveal|end
+    powers_on, thresholds
+    visibility, room_name
+    auto_next, auto_delay
+    nudge_limit, reactions_on
+    tension_music, tension_secs
+    theme, theme_variant, lang
+  }
+  class Player {
+    id, token, name, color
+    score, correct, answered
+    streak, max_streak
+    powers: dict
+    blocked_next, blocked_now
+    sealed, trap
+    nudges_used, inbox
+  }
+  class Question {
+    question, options[2..6]
+    correct: int|null
+    poll: bool
+    hint, explanation, reference
+    time, image, block, topic
+  }
+  class QuestionState {
+    start, end, duration
+    paused_at, reveal_at
+    winner, win_points
+    answers, used, elim
+    mods, pending, turn
+  }
+  class JoinRequest {
+    id, secret, name, t
+    status: pending|approved|denied
+  }
+  Room "1" *-- "1" Settings
+  Room "1" *-- "0..60" Player
+  Room "1" *-- "1..200" Question
+  Room "1" *-- "0..1" QuestionState
+  Room "1" *-- "0..100" JoinRequest

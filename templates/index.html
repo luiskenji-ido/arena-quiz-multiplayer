@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <title>Arena Quiz Multiplayer</title>
+  {% include '_head.html' %}
+</head>
+<body class="font-sans p-4">
+  <div class="fixed top-3 right-3 z-10" id="langBox"></div>
+  <main class="max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-5 items-start pt-10 lg:pt-16">
+    <!-- Entrar com código -->
+    <section class="lg:col-span-5 panel neon-cyan text-center space-y-6 p-7">
+      <div>
+        <span class="px-2.5 py-0.5 text-[10px] font-esports uppercase bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 rounded">PRO EDITION</span>
+        <h1 class="font-esports text-2xl font-black text-white mt-3" data-i18n="app_title">ARENA QUIZ MULTIPLAYER</h1>
+        <p class="text-sm text-slate-400 mt-2" data-i18n="landing_sub"></p>
+      </div>
+      <form id="joinForm" class="space-y-3 text-left">
+        <label class="block text-[11px] font-esports uppercase text-cyan-300" data-i18n="lbl_code"></label>
+        <input id="code" maxlength="4" autocomplete="off" autocapitalize="characters" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-3 text-center font-esports text-2xl tracking-[.4em] text-white uppercase focus:border-cyan-400 outline-none" placeholder="ABCD">
+        <button class="btn w-full py-3 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-esports text-sm font-extrabold uppercase" data-i18n="btn_join"></button>
+      </form>
+      <div class="border-t border-slate-800 pt-5">
+        <a href="/host" class="btn inline-block w-full py-3 rounded-xl bg-purple-500/20 hover:bg-purple-500/30 border border-purple-500/50 text-purple-200 font-esports text-xs font-bold uppercase" data-i18n="btn_host"></a>
+      </div>
+    </section>
+
+    <!-- Salas públicas -->
+    <section class="lg:col-span-7 panel neon-purple space-y-3 p-6">
+      <div class="flex items-center justify-between gap-3">
+        <h2 class="font-esports text-lg font-black text-white"><i class="fa-solid fa-globe text-emerald-300 mr-1"></i> <span data-i18n="pub_title"></span></h2>
+        <button onclick="loadRooms()" class="btn w-8 h-8 rounded-lg bg-slate-800 text-slate-300"><i class="fa-solid fa-rotate"></i></button>
+      </div>
+      <p class="text-xs text-slate-400" data-i18n="pub_sub"></p>
+      <div id="rooms" class="space-y-2"></div>
+    </section>
+  </main>
+
+  <!-- Pedido de entrada -->
+  <div id="reqModal" class="modal hidden">
+    <div class="panel neon-gold max-w-sm w-full p-6 space-y-4 text-center">
+      <div class="flex items-center justify-between text-left">
+        <div class="min-w-0"><div class="text-[10px] font-esports uppercase text-amber-300" data-i18n="pub_request"></div><div id="reqRoom" class="font-esports text-base font-bold text-white truncate"></div></div>
+        <button onclick="closeReq()" class="w-9 h-9 flex-none rounded-xl bg-slate-800 text-slate-300"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <form id="stName" class="space-y-3 text-left">
+        <label class="block text-[11px] font-esports uppercase text-cyan-300" data-i18n="lbl_name"></label>
+        <input id="reqName" maxlength="20" autocomplete="off" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-3 text-lg text-white outline-none focus:border-cyan-400">
+        <p id="reqErr" class="hidden text-xs text-rose-300"></p>
+        <button class="btn w-full py-3 rounded-xl bg-amber-400 text-slate-950 font-esports text-sm font-extrabold uppercase"><i class="fa-solid fa-paper-plane"></i> <span data-i18n="pub_send"></span></button>
+      </form>
+      <div id="stWait" class="hidden space-y-3 py-4">
+        <i class="fa-solid fa-hourglass-half text-4xl text-amber-300 animate-pulse"></i>
+        <p class="text-sm text-slate-200" data-i18n="pub_waiting"></p>
+      </div>
+      <div id="stOk" class="hidden space-y-3">
+        <p class="text-sm text-emerald-200" data-i18n="pub_approved"></p>
+        <div class="qr max-w-[220px] mx-auto"><img id="okQr" alt="QR" class="w-full bg-white rounded-2xl p-2"></div>
+        <div id="okCode" class="font-esports text-3xl tracking-[.3em] text-white"></div>
+        <a id="okEnter" class="btn block w-full py-3 rounded-xl bg-emerald-500 text-slate-950 font-esports text-sm font-extrabold uppercase"><i class="fa-solid fa-right-to-bracket"></i> <span data-i18n="pub_enter_now"></span></a>
+      </div>
+      <div id="stNo" class="hidden space-y-3 py-4">
+        <i class="fa-solid fa-circle-xmark text-4xl text-rose-400"></i>
+        <p class="text-sm text-rose-200" data-i18n="pub_denied"></p>
+      </div>
+    </div>
+  </div>
+
+  <script src="{{ url_for('static', filename='common.js') }}"></script>
+  <script src="{{ url_for('static', filename='i18n_extra.js') }}"></script>
+  <script>
+    document.getElementById('langBox').innerHTML = langSelectHTML();
+    function onLangChange() { loadRooms(); }
+    applyI18n();
+    const params = new URLSearchParams(location.search);
+    if (params.get('code')) document.getElementById('code').value = params.get('code').toUpperCase();
+    document.getElementById('joinForm').addEventListener('submit', e => {
+      e.preventDefault();
+      const c = document.getElementById('code').value.trim().toUpperCase();
+      if (c) location.href = '/play?code=' + encodeURIComponent(c);
+    });
+
+    // ---------- salas públicas ----------
+    let ROOMS = [], REQ = null, reqTimer = null;
+    const FLAG = { pt: '🇧🇷', en: '🇺🇸', es: '🇪🇸' };
+    async function loadRooms() {
+      const r = await api('/api/public');
+      if (!r.ok) return;
+      ROOMS = r.data;
+      document.getElementById('rooms').innerHTML = ROOMS.length ? ROOMS.map(x => `
+        <div class="flex items-center justify-between gap-3 px-4 py-3 rounded-xl bg-slate-900/80 border border-slate-700">
+          <div class="min-w-0">
+            <div class="font-semibold text-white truncate">${esc(x.name || x.quiz_title || '—')}</div>
+            <div class="text-[11px] text-slate-400 flex flex-wrap gap-x-2">
+              <span>${x.mode === 'classic' ? '<i class="fa-solid fa-briefcase text-amber-300"></i> ' + t('mode_classic') : '<i class="fa-solid fa-bolt text-cyan-300"></i> ' + t('mode_arena')}</span>
+              <span>${FLAG[x.lang] || ''}</span>
+              <span><i class="fa-solid fa-user"></i> ${t('pub_players', { n: x.players })}</span>
+              <span class="${x.phase === 'lobby' ? 'text-emerald-300' : 'text-amber-300'}">● ${x.phase === 'lobby' ? t('pub_in_lobby') : t('pub_in_game')}</span>
+              ${x.quiz_title && x.name ? `<span class="truncate">· ${esc(x.quiz_title)}</span>` : ''}
+            </div>
+          </div>
+          <button onclick="openReq('${x.id}')" class="btn flex-none px-3 py-2 rounded-lg bg-amber-400 text-slate-950 font-esports text-[11px] font-extrabold uppercase">${t('pub_request')}</button>
+        </div>`).join('') : `<p class="text-sm text-slate-500 py-6 text-center">${t('pub_empty')}</p>`;
+    }
+    loadRooms(); setInterval(loadRooms, 5000);
+
+    function step(id) { ['stName', 'stWait', 'stOk', 'stNo'].forEach(s => document.getElementById(s).classList.toggle('hidden', s !== id)); }
+    function openReq(pub) {
+      const room = ROOMS.find(r => r.id === pub);
+      REQ = { pub, name: room ? (room.name || room.quiz_title) : '' };
+      document.getElementById('reqRoom').textContent = REQ.name || '';
+      document.getElementById('reqErr').classList.add('hidden');
+      step('stName'); document.getElementById('reqModal').classList.remove('hidden');
+      setTimeout(() => document.getElementById('reqName').focus(), 50);
+    }
+    function closeReq() { document.getElementById('reqModal').classList.add('hidden'); clearInterval(reqTimer); }
+    document.getElementById('stName').addEventListener('submit', async e => {
+      e.preventDefault();
+      const r = await api(`/api/public/${REQ.pub}/request`, { name: document.getElementById('reqName').value });
+      if (!r.ok) { const er = document.getElementById('reqErr'); er.textContent = errText(r.data.error); er.classList.remove('hidden'); return; }
+      Object.assign(REQ, r.data); store('arena_pending_req', JSON.stringify(REQ));
+      step('stWait'); watchReq();
+    });
+    function watchReq() { clearInterval(reqTimer); checkReq(); reqTimer = setInterval(checkReq, 2000); }
+    async function checkReq() {
+      const r = await api(`/api/public/${REQ.pub}/request/${REQ.rid}?secret=${encodeURIComponent(REQ.secret)}`);
+      if (!r.ok) { clearInterval(reqTimer); store('arena_pending_req', null); step('stNo'); return; }
+      if (r.data.status === 'pending') return;
+      clearInterval(reqTimer); store('arena_pending_req', null);
+      if (r.data.status === 'denied') { beep('wrong'); step('stNo'); return; }
+      // aceito: já guarda a identidade do jogador e mostra QR code + botão
+      const code = r.data.code;
+      store('arena_player_' + code, JSON.stringify({ pid: r.data.pid, token: r.data.token }));
+      document.getElementById('okQr').src = '/qr/' + code + '.svg';
+      document.getElementById('okCode').textContent = code;
+      document.getElementById('okEnter').href = '/play?code=' + code;
+      beep('fanfare'); step('stOk');
+    }
+    // retoma um pedido em andamento (se a página foi recarregada)
+    try {
+      const pend = JSON.parse(store('arena_pending_req') || 'null');
+      if (pend && pend.rid) { REQ = pend; document.getElementById('reqRoom').textContent = REQ.name || ''; document.getElementById('reqModal').classList.remove('hidden'); step('stWait'); watchReq(); }
+    } catch (e) {}
+  </script>
+</body>
+</html>

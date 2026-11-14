@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <title>Arena Quiz - Apresentador</title>
+  {% include '_head.html' %}
+</head>
+<body class="font-sans">
+
+<!-- ============ CRIAR SALA ============ -->
+<section id="scrCreate" class="hidden min-h-screen flex items-center justify-center p-4">
+  <div class="panel neon-purple max-w-md w-full space-y-4 p-6">
+    <div class="flex items-center justify-between"><h1 class="font-esports text-lg font-black text-white" data-i18n="host_title"></h1><span id="langBox0"></span></div>
+    {% if host_password %}
+    <div><label class="block text-[11px] font-esports uppercase text-purple-300 mb-1" data-i18n="lbl_password"></label>
+      <input id="hostPass" type="password" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2.5 text-white outline-none focus:border-purple-400"></div>
+    {% endif %}
+    <div>
+      <label class="block text-[11px] font-esports uppercase text-purple-300 mb-2" data-i18n="create_mode"></label>
+      <div class="grid grid-cols-1 gap-2">
+        <button type="button" data-mode="arena" onclick="pickMode('arena')" class="modeCard btn text-left p-3 rounded-xl border-2 border-cyan-400 bg-slate-900">
+          <div class="font-esports text-xs font-bold text-cyan-300"><i class="fa-solid fa-bolt mr-1"></i><span data-i18n="mode_arena"></span></div><div class="text-[11px] text-slate-400 mt-1" data-i18n="mode_arena_d"></div></button>
+        <button type="button" data-mode="classic" onclick="pickMode('classic')" class="modeCard btn text-left p-3 rounded-xl border-2 border-slate-700 bg-slate-900">
+          <div class="font-esports text-xs font-bold text-amber-300"><i class="fa-solid fa-briefcase mr-1"></i><span data-i18n="mode_classic"></span></div><div class="text-[11px] text-slate-400 mt-1" data-i18n="mode_classic_d"></div></button>
+      </div>
+    </div>
+    <p id="createErr" class="hidden text-xs text-rose-300"></p>
+    <button onclick="createRoom()" class="btn w-full py-3 rounded-xl bg-purple-500 hover:bg-purple-400 text-white font-esports text-sm font-extrabold uppercase" data-i18n="btn_create"></button>
+    <a href="/" class="block text-center text-xs text-slate-500 hover:text-slate-300">← Home</a>
+  </div>
+</section>
+
+<!-- ============ PAINEL (ARENA) ============ -->
+<div id="scrHost" class="hidden max-w-7xl mx-auto p-3 sm:p-5 space-y-4">
+  <header class="panel neon-cyan flex flex-wrap items-center justify-between gap-3 py-3">
+    <div class="flex items-center gap-3">
+      <span class="px-2 py-0.5 text-[10px] font-esports uppercase bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 rounded">PRO</span>
+      <h1 class="font-esports text-base sm:text-xl font-black text-white" data-i18n="app_title"></h1>
+      <span class="font-esports text-sm text-amber-300 px-2 py-0.5 rounded bg-slate-900 border border-amber-500/40" id="hdrCode">----</span>
+    </div>
+    <div class="flex flex-wrap items-center gap-2">
+      <span id="langBox1"></span>
+      <button id="ctlQuiz" onclick="qkOpen()" class="btn px-3 py-1.5 rounded-lg bg-rose-500/20 border border-rose-500/50 text-rose-200 font-esports text-[11px] font-bold uppercase"><i class="fa-solid fa-file-arrow-up"></i> <span data-i18n="btn_loadquiz"></span></button>
+      <button id="ctlConfig" onclick="openConfig()" class="btn px-3 py-1.5 rounded-lg bg-purple-500/20 border border-purple-500/50 text-purple-200 font-esports text-[11px] font-bold uppercase"><i class="fa-solid fa-sliders"></i> <span data-i18n="btn_config"></span></button>
+      <button onclick="openHelp()" class="btn px-3 py-1.5 rounded-lg bg-slate-800 text-slate-200 font-esports text-[11px]"><i class="fa-solid fa-circle-question"></i> <span data-i18n="btn_help"></span></button>
+      <button onclick="toggleFs()" class="btn px-3 py-1.5 rounded-lg bg-slate-800 text-slate-200 font-esports text-[11px]"><i class="fa-solid fa-expand"></i></button>
+    </div>
+  </header>
+
+  <!-- CONTROLES DO JOGO -->
+  <div id="ctlBar" class="hidden panel border border-slate-800 flex flex-wrap items-center gap-2 py-2.5">
+    <span class="text-[10px] font-esports uppercase text-slate-400 mr-1"><i class="fa-solid fa-gamepad"></i> <span data-i18n="ctrl_title"></span></span>
+    <button id="ctlPause" onclick="hostAction('pause')" class="btn px-3 py-2 rounded-lg bg-amber-500/20 border border-amber-500/50 text-amber-200 font-esports text-[11px] font-bold uppercase"><i class="fa-solid fa-pause"></i> <span data-i18n="ctrl_pause"></span></button>
+    <button id="ctlResume" onclick="hostAction('resume')" class="btn px-3 py-2 rounded-lg bg-emerald-500 text-slate-950 font-esports text-[11px] font-extrabold uppercase"><i class="fa-solid fa-play"></i> <span data-i18n="ctrl_resume"></span></button>
+    <button id="ctlClose" onclick="hostAction('close')" class="btn px-3 py-2 rounded-lg bg-rose-500/20 border border-rose-500/50 text-rose-200 font-esports text-[11px] font-bold uppercase"><i class="fa-solid fa-stop"></i> <span data-i18n="btn_close_now"></span></button>
+    <button id="ctlNext" onclick="hostAction('next')" class="btn px-4 py-2 rounded-lg bg-cyan-500 text-slate-950 font-esports text-[11px] font-extrabold uppercase"><span id="ctlNextLbl"></span> <i class="fa-solid fa-forward"></i></button>
+    <label class="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-slate-900 border border-slate-700 text-[11px] font-esports font-bold uppercase text-cyan-200 cursor-pointer">
+      <input id="ctlAuto" type="checkbox" onchange="setAuto()" class="accent-cyan-400"> <i class="fa-solid fa-forward"></i> <span data-i18n="ctrl_auto"></span>
+      <select id="ctlAutoDelay" onchange="setAuto()" class="bg-slate-950 border border-slate-700 rounded px-1 py-0.5 text-white normal-case"></select></label>
+    <button id="ctlHold" onclick="hostAction('pause')" class="btn px-3 py-2 rounded-lg bg-amber-500/20 border border-amber-500/50 text-amber-200 font-esports text-[11px] font-bold uppercase"><i class="fa-solid fa-hand"></i> <span data-i18n="ctrl_hold"></span></button>
+    <button id="ctlRelease" onclick="hostAction('resume')" class="btn px-3 py-2 rounded-lg bg-emerald-500 text-slate-950 font-esports text-[11px] font-extrabold uppercase"><i class="fa-solid fa-play"></i> <span data-i18n="ctrl_release"></span></button>
+    <span id="ctlAutoLbl" class="hidden font-esports text-xs font-bold text-amber-300"></span>
+    <button id="ctlBoard" onclick="toggleBoardPeek()" class="btn px-3 py-2 rounded-lg bg-slate-800 text-slate-200 font-esports text-[11px] font-bold uppercase"><i class="fa-solid fa-ranking-star"></i> <span id="ctlBoardLbl"></span></button>
+    <span class="flex-1"></span>
+    <button id="ctlFinish" onclick="hostAction('finish')" class="btn px-3 py-2 rounded-lg bg-slate-800 text-amber-200 font-esports text-[11px] font-bold uppercase"><i class="fa-solid fa-flag-checkered"></i> <span data-i18n="ctrl_finish"></span></button>
+    <button id="ctlRestart" onclick="hostAction('restart')" class="btn px-3 py-2 rounded-lg bg-slate-800 text-rose-200 font-esports text-[11px] font-bold uppercase"><i class="fa-solid fa-rotate-left"></i> <span data-i18n="ctrl_restart"></span></button>
+  </div>
+  <div id="pausedBanner" class="hidden text-center font-esports text-xl font-black text-amber-300 py-3 rounded-2xl bg-amber-500/15 border border-amber-500/50 animate-pulse" data-i18n="paused_banner"></div>
+
+  <!-- LOBBY -->
+  <div id="boxLobby" class="hidden grid grid-cols-1 lg:grid-cols-12 gap-4">
+    <div class="lg:col-span-4 panel neon-gold text-center space-y-3">
+      <p class="font-esports text-xs uppercase text-amber-300" data-i18n="scan_to_join"></p>
+      <div class="qr max-w-[280px] mx-auto"><img id="qrImg" alt="QR" class="w-full bg-white rounded-2xl p-2"></div>
+      <div class="font-esports text-5xl tracking-[.3em] text-white" id="bigCode">----</div>
+      <p class="text-xs text-slate-400"><span data-i18n="or_open"></span> <span id="joinUrl" class="text-cyan-300 break-all"></span></p>
+    </div>
+    <div class="lg:col-span-4 panel border border-slate-800 space-y-3">
+      <h3 class="font-esports text-sm font-bold text-cyan-300"><i class="fa-solid fa-users mr-1"></i> <span data-i18n="players_in_room"></span> (<span id="lobbyN">0</span>)</h3>
+      <div id="lobbyPlayers" class="space-y-1.5 max-h-[420px] overflow-y-auto"></div>
+      <p id="lobbyEmpty" class="text-xs text-slate-500" data-i18n="waiting_players"></p>
+    </div>
+    <div class="lg:col-span-4 panel border border-slate-800 space-y-3">
+      <div class="rounded-xl bg-slate-900/80 border border-slate-700 p-3 space-y-1">
+        <div class="text-[10px] font-esports uppercase text-slate-400" data-i18n="lbl_mode"></div>
+        <div class="font-esports text-sm font-bold"><i class="fa-solid fa-bolt text-cyan-300 mr-1"></i><span data-i18n="mode_arena"></span></div>
+        <div id="sumSettings" class="text-[11px] text-slate-400"></div>
+      </div>
+      <div class="rounded-xl bg-slate-900/80 border border-slate-700 p-3 space-y-1">
+        <div class="text-[10px] font-esports uppercase text-slate-400" data-i18n="lbl_quiz"></div>
+        <div id="sumQuiz" class="font-semibold text-sm"></div>
+        <div id="sumQuizN" class="text-[11px] text-slate-400"></div>
+      </div>
+      <div class="flex gap-2">
+        <button onclick="qkOpen()" class="btn flex-1 py-2.5 rounded-xl bg-rose-500/20 border border-rose-500/50 text-rose-200 font-esports text-[11px] font-bold uppercase"><i class="fa-solid fa-file-arrow-up"></i> <span data-i18n="btn_loadquiz"></span></button>
+        <button onclick="openConfig()" class="btn flex-1 py-2.5 rounded-xl bg-purple-500/20 border border-purple-500/50 text-purple-200 font-esports text-[11px] font-bold uppercase"><i class="fa-solid fa-sliders"></i> <span data-i18n="btn_config"></span></button>
+      </div>
+      <div>
+        <div class="text-[10px] font-esports uppercase text-slate-400 mb-1" data-i18n="lbl_preview"></div>
+        <ol id="sumList" class="space-y-1 max-h-40 overflow-y-auto text-[11px] text-slate-300"></ol>
+      </div>
+      <button onclick="hostAction('start')" class="btn w-full py-3 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-esports text-sm font-extrabold uppercase"><i class="fa-solid fa-play"></i> <span data-i18n="btn_start"></span></button>
+    </div>
+  </div>
+
+  <!-- PERGUNTA -->
+  <div id="boxGame" class="hidden grid grid-cols-1 lg:grid-cols-12 gap-4">
+    <div id="vStage" class="hidden lg:col-span-8"></div>
+    <div id="gMain" class="lg:col-span-8 panel neon-purple space-y-4">
+      <div class="flex items-center justify-between gap-3">
+        <span id="gRound" class="font-esports text-xs uppercase text-slate-400"></span>
+        <div class="flex items-center gap-3">
+          <span id="gAnswered" class="text-xs text-slate-300"></span>
+          <span id="gTimer" class="font-esports text-3xl font-black text-amber-300 px-4 py-1 rounded-xl bg-slate-900 border border-amber-500/40 min-w-[5.5rem] text-center">--</span>
+        </div>
+      </div>
+      <div class="w-full bg-slate-950 h-2.5 rounded-full overflow-hidden"><div id="gBar" class="h-full bg-gradient-to-r from-emerald-400 to-cyan-400" style="width:100%"></div></div>
+      <div id="gTurn" class="hidden flex items-center gap-3 px-4 py-3 rounded-xl bg-cyan-500/10 border border-cyan-400/60 pop-in"></div>
+      <p id="gTopic" class="text-xs font-mono uppercase text-cyan-400"></p>
+      <img id="gImage" class="hidden max-h-56 mx-auto rounded-xl border border-slate-700" alt="">
+      <h2 id="gText" class="text-xl sm:text-3xl font-bold text-white leading-snug"></h2>
+      <div id="gOptions" class="grid grid-cols-1 sm:grid-cols-2 gap-3"></div>
+      <div id="gWinner" class="hidden text-center font-esports text-sm sm:text-lg font-bold py-3 rounded-xl pop-in"></div>
+      <div id="gExplain" class="hidden text-sm text-slate-300 bg-slate-950/70 rounded-xl p-4 border border-slate-800"></div>
+      <p class="text-[11px] text-slate-500" data-i18n="host_hint_auto"></p>
+    </div>
+    <div class="lg:col-span-4 space-y-4">
+      <div class="panel border border-slate-800"><h3 class="font-esports text-sm font-bold text-amber-300 mb-2"><i class="fa-solid fa-ranking-star mr-1"></i> <span data-i18n="lbl_leaderboard"></span></h3>
+        <div id="gBoard" class="space-y-1.5 max-h-[360px] overflow-y-auto"></div>
+        <p id="gBoardHidden" class="hidden text-xs text-slate-400 py-4 text-center" data-i18n="board_hidden"></p></div>
+      <div class="panel border border-slate-800"><h3 class="font-esports text-sm font-bold text-purple-300 mb-2"><i class="fa-solid fa-bolt mr-1"></i> <span data-i18n="lbl_feed"></span></h3><ul id="gFeed" class="space-y-1.5 text-xs text-slate-300"></ul></div>
+    </div>
+  </div>
+
+  <!-- FINAL -->
+  <div id="boxFinal" class="hidden panel neon-gold space-y-5 text-center">
+    <h2 class="font-esports text-2xl font-black text-amber-300"><i class="fa-solid fa-trophy"></i> <span data-i18n="final_title"></span></h2>
+    <div id="podium" class="grid grid-cols-3 gap-3 items-end max-w-xl mx-auto pt-4"></div>
+    <div id="finalBoard" class="max-w-md mx-auto space-y-1.5 text-left"></div>
+  </div>
+</div>
+
+{% include '_host_modals.html' %}
+
+<script src="{{ url_for('static', filename='common.js') }}"></script>
+<script src="{{ url_for('static', filename='i18n_extra.js') }}"></script>
+<script src="{{ url_for('static', filename='fun.js') }}"></script>
+<script src="{{ url_for('static', filename='quizkit.js') }}"></script>
+<script src="{{ url_for('static', filename='host_core.js') }}"></script>
+<script>
+const PAGE_MODE = 'arena';
+const needPass = {{ 'true' if host_password else 'false' }};
+let newMode = 'arena', lastSig = '', lastPhase = '';
+function resetSig() { lastSig = ''; }
+
+document.getElementById('langBox0').innerHTML = langSelectHTML();
+document.getElementById('langBox1').innerHTML = langSelectHTML();
+setupLangSelects(); applyI18n();
+
+H = hostSession();
+if (H) enterPanel(); else { document.getElementById('scrCreate').classList.remove('hidden'); pickMode('arena'); }
+
+function pickMode(m) {
+  newMode = m;
+  document.querySelectorAll('.modeCard').forEach(b => {
+    const on = b.dataset.mode === m;
+    b.classList.toggle('border-cyan-400', on); b.classList.toggle('border-slate-700', !on);
+  });
+}
+async function createRoom() {
+  const body = { settings: { lang: LANG, mode: newMode } };
+  if (needPass) body.password = document.getElementById('hostPass').value;
+  const r = await api('/api/room', body);
+  const err = document.getElementById('createErr');
+  if (!r.ok) { err.textContent = errText(r.data.error); err.classList.remove('hidden'); return; }
+  H = { code: r.data.code, token: r.data.host_token };
+  store(HKEY, JSON.stringify(H));
+  if (newMode === 'classic') { location.href = '/host/classic'; return; }
+  document.getElementById('scrCreate').classList.add('hidden');
+  enterPanel();
+}
+function enterPanel() {
+  document.getElementById('scrHost').classList.remove('hidden');
+  document.getElementById('hdrCode').textContent = H.code;
+  document.getElementById('bigCode').textContent = H.code;
+  document.getElementById('qrImg').src = '/qr/' + H.code + '.svg';
+  document.getElementById('joinUrl').textContent = location.origin + '/join?code=' + H.code;
+  startHost();
+}
+
+function canGiveTurn(b) { const q = ST.question; return ST.phase === 'open' && q && q.turn && !q.answered && q.turn.id !== b.id; }
+function boardRows() {
+  return ST.board.map((b, i) => `<div class="flex items-center justify-between gap-2 px-2.5 py-1.5 rounded-lg border ${ST.question && ST.question.turn && ST.question.turn.id === b.id && ST.phase === 'open' ? 'border-cyan-400 bg-cyan-500/10' : 'border-slate-800 bg-slate-900/60'}"><span class="flex items-center gap-2 min-w-0"><span class="font-esports text-[10px] text-slate-500 w-4">${i + 1}</span><span class="truncate text-sm font-semibold">${esc(b.name)}</span>${rankBadge(b.score)}${b.streak >= 2 ? `<span class="text-amber-400 text-[10px] font-bold"><i class="fa-solid fa-fire"></i>${b.streak}</span>` : ''}${b.blocked ? '<i class="fa-solid fa-ban text-rose-400 text-xs"></i>' : ''}${b.sealed ? '<i class="fa-solid fa-user-lock text-orange-400 text-xs"></i>' : ''}${b.trap ? '<i class="fa-solid fa-skull-crossbones text-red-400 text-xs"></i>' : ''}</span><span class="flex items-center gap-2 flex-none">${canGiveTurn(b) ? `<button onclick="hostAction('set_turn','${b.id}')" title="${t('give_turn')}" class="text-[10px] px-1.5 py-0.5 rounded bg-cyan-500/20 text-cyan-200"><i class="fa-solid fa-hand-pointer"></i></button>` : ''}<span class="font-esports text-sm font-black text-cyan-300">${fmt(b.score)}</span></span></div>`).join('');
+}
+
+function render() {
+  const ph = ST.phase, q = ST.question;
+  show('boxLobby', ph === 'lobby'); show('boxGame', ph === 'open' || ph === 'reveal'); show('boxFinal', ph === 'finished');
+  show('ctlBar', ph !== 'lobby');
+
+  if (ph === 'lobby') {
+    document.getElementById('lobbyN').textContent = ST.board.length;
+    show('lobbyEmpty', ST.board.length === 0);
+    const byId = Object.fromEntries(ST.board.map(b => [b.id, b]));
+    const turns = ST.settings.answer_order === 'turns';
+    document.getElementById('lobbyPlayers').innerHTML = ST.order.map((o, n) => byId[o.id]).filter(Boolean).map((b, n) => `<div class="flex items-center justify-between gap-2 px-3 py-1.5 rounded-lg bg-slate-900/70 border border-slate-800"><span class="flex items-center gap-2 min-w-0">${turns ? `<span class="font-esports text-[10px] text-amber-300 w-4">${n + 1}º</span>` : ''}<span class="w-7 h-7 rounded-lg bg-gradient-to-br ${b.color} flex items-center justify-center font-esports text-[10px] font-black flex-none">${esc(b.name.slice(0, 2).toUpperCase())}</span><span class="truncate text-sm font-semibold">${esc(b.name)}</span></span><button onclick="hostAction('kick','${b.id}')" class="text-[10px] text-rose-300 hover:text-rose-200"><i class="fa-solid fa-xmark"></i></button></div>`).join('');
+    const s = ST.settings, on = POWER_META.filter(m => s.powers_on[m.key]).length;
+    document.getElementById('sumSettings').innerHTML = `${s.visibility === 'public' ? '<i class="fa-solid fa-globe text-emerald-300"></i> ' + t('vis_public') : '<i class="fa-solid fa-lock text-slate-400"></i> ' + t('vis_private')}${s.room_name ? ' · ' + esc(s.room_name) : ''}<br>${t('cfg_order')}: ${turns ? t('order_turns') : t('order_speed')}<br>${s.timer}s · ${s.base_xp} XP × ${s.multiplier} · ${t('cfg_powers')}: ${on}/9 · ${t('cfg_board')}: ${t('board_' + s.board_mode)}${s.auto_next ? ' · ' + t('ctrl_auto') + ' ' + s.auto_delay + 's' : ''}`;
+    document.getElementById('sumQuiz').textContent = ST.quiz_title || (ST.custom_quiz ? t('quiz_custom') : t('quiz_default'));
+    document.getElementById('sumQuizN').textContent = t('quiz_n', { n: ST.total });
+    document.getElementById('sumList').innerHTML = (ST.quiz || []).map((x, i) => `<li class="truncate"><span class="text-slate-500">${i + 1}.</span> ${esc(x.question)} <span class="text-emerald-400">→ ${x.poll ? t('poll_label') : esc(x.options[x.correct])}</span>${x.time ? ` <span class="text-amber-300">${x.time}s</span>` : ''}</li>`).join('');
+  }
+
+  const staged = !!q && stageOn(ST.settings);
+  show('vStage', staged); show('gMain', !staged || !q);
+  if (staged) renderStage(document.getElementById('vStage'), ST);
+  if (q) {
+    document.getElementById('gRound').textContent = t('round_of', { n: ST.qi + 1, total: ST.total }) + (q.poll ? ' · ' + t('poll_badge') : '');
+    document.getElementById('gTopic').textContent = [q.block, q.topic].filter(Boolean).join(' · ');
+    document.getElementById('gText').textContent = q.question;
+    const img = document.getElementById('gImage');
+    if (q.image) { img.src = q.image; img.classList.remove('hidden'); } else img.classList.add('hidden');
+    document.getElementById('gAnswered').textContent = t('answered_count', { n: q.answered, total: q.eligible });
+    const gt = document.getElementById('gTurn');
+    if (q.turn) {
+      gt.classList.remove('hidden');
+      gt.innerHTML = `<span class="w-10 h-10 rounded-lg bg-gradient-to-br ${q.turn.color} flex items-center justify-center font-esports text-sm font-black flex-none">${esc(q.turn.name.slice(0, 2).toUpperCase())}</span>
+        <span><span class="block font-esports text-lg font-black text-cyan-200">${esc(t('turn_of', { name: q.turn.name }))}</span>
+        <span class="block text-xs text-slate-300">${ph === 'open' ? esc(t('turn_waiting', { name: q.turn.name })) : esc(turnResultText(q))}</span></span>`;
+    } else gt.classList.add('hidden');
+    const sig = ST.qi + '|' + ph + '|' + q.correct + '|' + (q.dist || '') + '|' + (q.turn_elim || '') + '|' + q.turn_pick + LANG;
+    if (sig !== lastSig) {
+      lastSig = sig;
+      const total = (q.dist || []).reduce((a, b) => a + b, 0) || 1;
+      document.getElementById('gOptions').innerHTML = q.options.map((o, i) => {
+        let cls = 'opt';
+        if (ph === 'reveal' && !q.poll) cls += i === q.correct ? ' right' : (q.turn && i === q.turn_pick ? ' wrong' : ' elim');
+        else if (ph === 'open' && (q.turn_elim || []).includes(i)) cls += ' elim';
+        else if (q.turn && i === q.turn_pick) cls += ' mine';
+        const cnt = q.dist ? `<span class="ml-auto flex-none text-right"><span class="block font-esports text-lg font-black">${q.dist[i]}</span><span class="block text-[10px] opacity-80">${Math.round(q.dist[i] / total * 100)}%</span></span>` : '';
+        const bar = q.dist ? `<span class="distbar" style="width:${q.dist[i] / total * 100}%"></span>` : '';
+        return `<div class="${cls}" style="font-size:1.1rem;position:relative;overflow:hidden;align-items:center">${bar}<span class="let">${'ABCDEF'[i]}</span><span class="leading-snug relative">${esc(o)}</span>${cnt}</div>`;
+      }).join('');
+    }
+    const w = document.getElementById('gWinner'), ex = document.getElementById('gExplain');
+    if (ph === 'reveal' && !q.poll) {
+      w.className = 'text-center font-esports text-sm sm:text-lg font-bold py-3 rounded-xl pop-in ' + (q.winner ? 'bg-emerald-500/20 border border-emerald-400 text-emerald-200' : 'bg-slate-800 text-slate-200 border border-slate-600');
+      w.textContent = q.turn ? turnResultText(q) + (q.winner ? ` (+${q.winner.points} XP)` : '') : q.winner ? t('winner_banner', { name: q.winner.name, pts: q.winner.points }) : t('nobody_won');
+      ex.classList.remove('hidden');
+      ex.innerHTML = `<strong>${t('correct_answer')}: ${'ABCDEF'[q.correct]}.</strong> ${esc(q.explanation || '')}<div class="mt-1 text-slate-500 text-xs">${esc(q.reference || '')}</div>`;
+    } else if (ph === 'reveal') {
+      w.className = 'text-center font-esports text-sm sm:text-lg font-bold py-3 rounded-xl pop-in bg-purple-500/20 border border-purple-400 text-purple-100';
+      w.textContent = t('poll_result'); ex.classList.add('hidden');
+    } else { w.classList.add('hidden'); ex.classList.add('hidden'); }
+  }
+
+  const vis = boardShown();
+  document.getElementById('gBoard').innerHTML = vis ? boardRows() : '';
+  show('gBoardHidden', !vis);
+  document.getElementById('gFeed').innerHTML = ST.events.slice(0, 10).map(e => `<li>${esc(eventText(e))}</li>`).join('');
+
+  if (ph === 'finished') {
+    const top = ST.board.slice(0, 3), order = [1, 0, 2], heights = ['h-28', 'h-36', 'h-20'], medal = ['🥈', '🥇', '🥉'];
+    document.getElementById('podium').innerHTML = order.map((k, pos) => top[k] ? `<div class="space-y-1"><div class="font-semibold truncate text-sm">${esc(top[k].name)}</div><div class="font-esports text-cyan-300 text-sm">${fmt(top[k].score)}</div><div class="${heights[pos]} rounded-t-xl bg-gradient-to-t from-amber-600/40 to-amber-400/20 border border-amber-400/50 flex items-start justify-center text-3xl pt-2">${medal[pos]}</div></div>` : '<div></div>').join('');
+    document.getElementById('finalBoard').innerHTML = boardRows();
+  }
+  if (ph !== lastPhase) {
+    if (ph === 'reveal') beep(q && (q.winner || q.poll) ? 'fanfare' : 'wrong');
+    if (ph === 'open') beep('start');
+    if (ph === 'finished') beep('fanfare');
+    lastPhase = ph;
+  }
+}
+function tickTimer() {
+  const el = document.getElementById('gTimer'); if (!ST || !ST.question) return;
+  const q = ST.question;
+  if (ST.phase !== 'open') { el.textContent = '--'; document.getElementById('gBar').style.width = '0%'; stageTick(ST, 0); return; }
+  const left = qRemaining(q), total = Math.max(1, q.duration || ST.settings.timer);
+  el.textContent = q.paused ? '⏸' : Math.ceil(left);
+  stageTick(ST, left);
+  document.getElementById('gBar').style.width = Math.min(100, left / total * 100) + '%';
+  el.classList.toggle('text-rose-400', left <= 5 && !q.paused);
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <title>Arena Quiz</title>
+  {% include '_head.html' %}
+</head>
+<body class="font-sans">
+
+<!-- ================= ENTRAR ================= -->
+<section id="scrJoin" class="hidden min-h-screen flex items-center justify-center p-4">
+  <div class="panel neon-cyan max-w-sm w-full space-y-4 p-6 text-center">
+    <div class="flex justify-end" id="langBox1"></div>
+    <h1 class="font-esports text-xl font-black text-white" data-i18n="app_title"></h1>
+    <div class="font-esports text-3xl tracking-[.35em] text-cyan-300" id="joinCode">----</div>
+    <form id="joinForm" class="space-y-3 text-left">
+      <label class="block text-[11px] font-esports uppercase text-cyan-300" data-i18n="lbl_name"></label>
+      <input id="nameInput" maxlength="20" autocomplete="off" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-3 text-lg text-white focus:border-cyan-400 outline-none">
+      <p id="joinErr" class="hidden text-xs text-rose-300"></p>
+      <button class="btn w-full py-3 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-esports text-sm font-extrabold uppercase" data-i18n="btn_enter"></button>
+    </form>
+  </div>
+</section>
+
+<!-- ================= JOGO ================= -->
+<section id="scrMain" class="hidden max-w-md mx-auto p-3 pb-10 space-y-3">
+  <header class="panel neon-cyan flex items-center justify-between gap-2 py-2.5">
+    <div class="flex items-center gap-2.5 min-w-0">
+      <div id="meAvatar" class="w-9 h-9 rounded-lg bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center font-esports text-sm font-black flex-none">?</div>
+      <div class="min-w-0">
+        <div id="meName" class="font-semibold text-sm truncate">-</div>
+        <div id="meRank" class="text-[10px]"></div>
+      </div>
+    </div>
+    <div class="text-right flex-none">
+      <div id="meScore" class="font-esports text-lg font-black text-cyan-300 leading-none">0</div>
+      <div class="text-[9px] font-esports uppercase text-amber-400">XP · <span id="meHits">0</span> <span data-i18n="lbl_corrects"></span></div>
+    </div>
+    <div class="flex flex-col gap-1 flex-none">
+      <span id="langBox2"></span>
+      <button onclick="openHelp()" class="btn text-[10px] px-2 py-1 rounded-lg bg-slate-800 text-slate-200 font-esports"><i class="fa-solid fa-circle-question"></i></button>
+    </div>
+  </header>
+
+  <!-- lobby / espera -->
+  <div id="boxLobby" class="hidden panel neon-purple text-center py-8 space-y-2">
+    <i class="fa-solid fa-hourglass-half text-3xl text-purple-300 animate-pulse"></i>
+    <p class="font-esports text-sm text-white" data-i18n="waiting_start"></p>
+    <p id="lobbyMode" class="text-xs text-amber-300 font-esports"></p>
+    <p id="lobbyQuiz" class="text-xs text-slate-300"></p>
+    <p class="text-xs text-slate-400"><span id="lobbyCount">0</span> <span data-i18n="players_in_room"></span></p>
+  </div>
+
+  <!-- pergunta -->
+  <div id="boxQuestion" class="hidden space-y-3">
+    <div class="panel neon-purple space-y-3">
+      <div class="flex items-center justify-between text-[10px] font-esports uppercase">
+        <span id="qRound" class="text-slate-400"></span>
+        <span id="qTimer" class="px-2 py-0.5 rounded bg-slate-900 border border-amber-500/40 text-amber-300 text-xs">--</span>
+      </div>
+      <div class="w-full bg-slate-950 h-1.5 rounded-full overflow-hidden"><div id="qBar" class="h-full bg-gradient-to-r from-emerald-400 to-cyan-400" style="width:100%"></div></div>
+      <p id="qTopic" class="text-[11px] font-mono uppercase text-cyan-400"></p>
+      <h2 id="qText" class="text-base font-bold text-white leading-snug"></h2>
+      <img id="qImage" class="hidden max-h-40 mx-auto rounded-xl border border-slate-700" alt="">
+      <div id="qMods" class="flex flex-wrap gap-1.5"></div>
+      <div id="qHint" class="hidden px-3 py-2 rounded-xl bg-amber-500/10 border border-amber-500/40 text-xs text-amber-200"></div>
+      <div id="qOptions" class="space-y-2"></div>
+      <div id="qStatus" class="text-center text-xs font-esports font-bold py-2 rounded-xl hidden"></div>
+      <div id="qExplain" class="hidden text-xs text-slate-300 bg-slate-950/70 rounded-xl p-3 border border-slate-800"></div>
+    </div>
+  </div>
+
+  <div id="pausedBar" class="hidden text-center font-esports text-sm font-black text-amber-300 py-2 rounded-xl bg-amber-500/15 border border-amber-500/50 animate-pulse" data-i18n="paused_banner"></div>
+
+  <!-- avisos -->
+  <div id="notices" class="space-y-2"></div>
+
+  <!-- arsenal -->
+  <div id="boxPowers" class="hidden panel border border-slate-800">
+    <div class="text-[11px] font-esports uppercase tracking-wider text-slate-300 mb-2"><i class="fa-solid fa-wand-magic-sparkles text-cyan-400"></i> <span data-i18n="lbl_arsenal"></span></div>
+    <div id="powerGrid" class="grid grid-cols-3 gap-2"></div>
+  </div>
+
+  <!-- interação: chamar atenção + reações -->
+  <div id="funBox" class="hidden panel border border-slate-800 space-y-2">
+    <div class="flex items-center justify-between gap-2">
+      <span class="text-[11px] font-esports uppercase tracking-wider text-slate-300">😀 <span data-i18n="react_title"></span></span>
+      <button id="nudgeBtn" onclick="doNudge()" class="btn flex-none px-3 py-1.5 rounded-lg bg-amber-500/20 border border-amber-500/50 text-amber-200 font-esports text-[11px] font-bold">📢 <span data-i18n="nudge_btn"></span> (<span id="nudgeLeft">0</span>)</button>
+    </div>
+    <div id="reactBar" class="flex flex-wrap gap-1.5"></div>
+  </div>
+
+  <!-- final -->
+  <div id="boxFinal" class="hidden panel neon-gold text-center space-y-2 py-6">
+    <i class="fa-solid fa-trophy text-4xl text-amber-300"></i>
+    <h2 class="font-esports text-lg font-black text-white" data-i18n="game_over"></h2>
+    <p id="finalPlace" class="text-sm text-amber-200"></p>
+  </div>
+
+  <!-- placar -->
+  <div class="panel border border-slate-800">
+    <div class="text-[11px] font-esports uppercase tracking-wider text-slate-300 mb-2"><i class="fa-solid fa-ranking-star text-amber-400"></i> <span data-i18n="lbl_leaderboard"></span></div>
+    <div id="board" class="space-y-1.5"></div>
+  </div>
+
+  <!-- feed -->
+  <div id="boxFeedWrap" class="panel border border-slate-800">
+    <div class="text-[11px] font-esports uppercase tracking-wider text-slate-300 mb-2"><i class="fa-solid fa-bolt text-purple-400"></i> <span data-i18n="lbl_feed"></span></div>
+    <ul id="feed" class="space-y-1 text-[11px] text-slate-300"></ul>
+  </div>
+</section>
+
+<!-- ================= MODAIS ================= -->
+<div id="helpModal" class="modal hidden">
+  <div class="panel neon-cyan max-w-lg w-full max-h-[92vh] overflow-y-auto space-y-3 p-5">
+    <div class="flex items-center justify-between"><h3 class="font-esports text-lg font-bold text-white" data-i18n="help_title"></h3>
+      <button onclick="closeHelp()" class="w-9 h-9 rounded-xl bg-slate-800 text-slate-300"><i class="fa-solid fa-xmark"></i></button></div>
+    <div id="helpBody"></div>
+    <div class="text-right"><button onclick="closeHelp()" class="btn px-5 py-2.5 rounded-xl bg-cyan-500 text-slate-950 font-esports text-xs font-extrabold uppercase" data-i18n="help_close"></button></div>
+  </div>
+</div>
+
+<div id="diceModal" class="modal hidden">
+  <div class="panel neon-cyan max-w-sm w-full text-center space-y-3 p-6">
+    <span class="px-3 py-1 rounded-full text-[10px] font-esports font-bold uppercase bg-cyan-500/20 text-cyan-300 border border-cyan-500/40" data-i18n="dice_badge"></span>
+    <h3 class="font-esports font-extrabold text-lg text-white" data-i18n="dice_title"></h3>
+    <p class="text-xs text-slate-400" data-i18n="dice_desc"></p>
+    <div class="py-2 flex justify-center">
+      <div id="diceBox" class="w-24 h-24 rounded-2xl bg-gradient-to-br from-cyan-500/30 to-purple-600/30 border-2 border-cyan-400 flex items-center justify-center text-5xl text-white"><i id="diceIcon" class="fa-solid fa-dice-six"></i></div>
+    </div>
+    <div id="diceResult" class="hidden rounded-xl bg-slate-900 border border-amber-400/60 p-3 space-y-1 pop-in">
+      <div id="diceResTitle" class="font-esports font-bold text-sm text-amber-300"></div>
+      <div id="diceResDesc" class="text-xs text-slate-200"></div>
+    </div>
+    <div class="flex justify-center gap-2">
+      <button id="diceBtn" onclick="rollDice()" class="btn px-5 py-3 rounded-xl bg-cyan-500 text-slate-950 font-esports text-xs font-extrabold uppercase"><i class="fa-solid fa-dice"></i> <span id="diceBtnLbl" data-i18n="dice_btn_roll"></span></button>
+      <button onclick="closeDice()" class="btn px-4 py-3 rounded-xl bg-slate-800 text-slate-200 font-esports text-xs font-bold uppercase" data-i18n="dice_btn_close"></button>
+    </div>
+  </div>
+</div>
+
+<div id="cardModal" class="modal hidden">
+  <div class="panel neon-purple max-w-md w-full space-y-3 p-5 max-h-[94vh] overflow-y-auto">
+    <div class="flex items-start justify-between">
+      <div><span class="px-2 py-0.5 rounded-full text-[10px] font-esports font-bold uppercase bg-purple-500/20 text-purple-300 border border-purple-500/40" data-i18n="card_badge"></span>
+        <h3 class="font-esports font-extrabold text-base text-white mt-1" data-i18n="card_title"></h3></div>
+      <button onclick="closeCard()" class="w-9 h-9 rounded-xl bg-slate-800 text-slate-300"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div id="cardGrid" class="grid grid-cols-2 gap-3"></div>
+  </div>
+</div>
+
+<div id="atkModal" class="modal hidden">
+  <div class="panel neon-danger max-w-sm w-full space-y-3 p-5 max-h-[92vh] overflow-y-auto">
+    <div class="flex items-start justify-between gap-2">
+      <div><span class="px-2 py-0.5 rounded-full text-[10px] font-esports font-bold uppercase bg-rose-500/20 text-rose-300 border border-rose-500/40" data-i18n="atk_badge"></span>
+        <h3 id="atkTitle" class="font-esports font-extrabold text-base text-white mt-1"></h3>
+        <p id="atkDesc" class="text-xs text-slate-400 mt-1"></p></div>
+      <button onclick="closeAtk()" class="w-9 h-9 flex-none rounded-xl bg-slate-800 text-slate-300"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div id="atkStep" class="text-[11px] font-esports uppercase text-amber-300"></div>
+    <div id="atkList" class="space-y-2"></div>
+    <div class="text-right"><button id="atkBack" onclick="renderTargets()" class="hidden btn px-3 py-2 rounded-xl bg-slate-800 text-slate-200 font-esports text-[11px] mr-1" data-i18n="atk_back"></button>
+      <button onclick="closeAtk()" class="btn px-3 py-2 rounded-xl bg-slate-800 text-slate-200 font-esports text-[11px]" data-i18n="atk_cancel"></button></div>
+  </div>
+</div>
+
+<script src="{{ url_for('static', filename='common.js') }}"></script>
+<script src="{{ url_for('static', filename='i18n_extra.js') }}"></script>
+<script src="{{ url_for('static', filename='fun.js') }}"></script>
+<script>
+const CODE = (new URLSearchParams(location.search).get('code') || '').toUpperCase();
+const KEY = 'arena_player_' + CODE;
+let ME = null, ST = null, offset = 0, polling = false, answering = false;
+let lastSig = '', lastQi = -2, lastEventT = 0, lastStatus = '', lastPhase = '';
+let atk = null;
+
+document.getElementById('langBox1').innerHTML = langSelectHTML();
+document.getElementById('langBox2').innerHTML = langSelectHTML();
+document.querySelectorAll('#langSelect').forEach(e => e.id = '');  // evita ids repetidos
+document.querySelectorAll('select[onchange^="setLang"]').forEach(s => { s.classList.add('langSel'); s.value = LANG; });
+function applyLangSel() { document.querySelectorAll('.langSel').forEach(s => s.value = LANG); }
+function onLangChange() { applyLangSel(); lastSig = ''; if (ST) render(); }
+
+(function init() {
+  applyI18n(); applyLangSel();
+  document.getElementById('joinCode').textContent = CODE || '----';
+  try { ME = JSON.parse(store(KEY) || 'null'); } catch (e) { ME = null; }
+  if (!CODE) { location.href = '/'; return; }
+  if (ME) startGame(); else {
+    document.getElementById('scrJoin').classList.remove('hidden');
+    setTimeout(() => document.getElementById('nameInput').focus(), 100);
+  }
+})();
+
+document.getElementById('joinForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  const name = document.getElementById('nameInput').value;
+  const r = await api('/api/join', { code: CODE, name });
+  const err = document.getElementById('joinErr');
+  if (!r.ok) { err.textContent = errText(r.data.error); err.classList.remove('hidden'); return; }
+  ME = { pid: r.data.pid, token: r.data.token };
+  store(KEY, JSON.stringify(ME));
+  document.getElementById('scrJoin').classList.add('hidden');
+  startGame();
+});
+
+function startGame() {
+  document.getElementById('scrMain').classList.remove('hidden');
+  poll(); setInterval(poll, 1000); setInterval(tickTimer, 200);
+  mountSoundToggle();
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) poll(); });
+}
+
+async function poll() {
+  if (polling) return; polling = true;
+  try {
+    const r = await api(`/api/state/${CODE}?pid=${ME.pid}&token=${encodeURIComponent(ME.token)}`);
+    if (!r.ok) {
+      if (r.status === 404 || r.status === 403) { store(KEY, null); document.body.innerHTML = `<div class="min-h-screen flex items-center justify-center p-6 text-center"><div class="panel neon-danger space-y-4"><p>${t('room_gone')}</p><a href="/" class="btn inline-block px-4 py-2 rounded-xl bg-cyan-500 text-slate-950 font-esports text-xs font-bold">OK</a></div></div>`; }
+      return;
+    }
+    ST = r.data; offset = ST.now - Date.now() / 1000;
+    applyTheme(ST.settings); handleInbox(ST.me.inbox); handleBroadcasts(ST.me.broadcasts); hostEventToasts(ST.events);
+    if (ST.settings.mode === 'classic') { location.reload(); return; }   // apresentador trocou para o Clássico
+    render();
+  } finally { polling = false; }
+}
+const nowS = () => Date.now() / 1000 + offset;
+
+function render() {
+  const me = ST.me, q = ST.question;
+  document.getElementById('meAvatar').className = 'w-9 h-9 rounded-lg bg-gradient-to-br ' + me.color + ' flex items-center justify-center font-esports text-sm font-black flex-none';
+  document.getElementById('meAvatar').textContent = me.name.slice(0, 2).toUpperCase();
+  document.getElementById('meName').textContent = me.name;
+  document.getElementById('meRank').innerHTML = rankBadge(me.score);
+  document.getElementById('meScore').textContent = fmt(me.score);
+  document.getElementById('meHits').textContent = me.correct;
+
+  const ph = ST.phase;
+  show('boxLobby', ph === 'lobby');
+  show('boxQuestion', ph === 'open' || ph === 'reveal');
+  const classic = ST.settings.mode === 'classic';
+  show('boxPowers', !classic && (ph === 'open' || ph === 'reveal'));
+  show('boxFeedWrap', !classic);
+  show('boxFinal', ph === 'finished');
+  document.getElementById('lobbyCount').textContent = ST.targets.length;
+  document.getElementById('lobbyMode').textContent = t(classic ? 'mode_classic' : 'mode_arena');
+  document.getElementById('lobbyQuiz').textContent = ST.quiz_title || '';
+
+  if (ph === 'finished') {
+    document.getElementById('finalPlace').textContent = ST.my_rank ? t('your_place', { n: ST.my_rank }) : '';
+  }
+  if (q) renderQuestion(q);
+  renderNotices();
+  renderPowers();
+  show('pausedBar', !!(q && q.paused && ph === 'open'));
+  renderBoard();
+  renderFeed();
+  renderFun();
+
+  if (ST.qi !== lastQi && ph === 'open') {
+    closeAllModals(); lastStatus = '';
+    if (q && q.turn && q.turn.id === me.id) { beep('fanfare'); toast(t('your_turn'), true); if (navigator.vibrate) navigator.vibrate(200); }
+    else beep('start');
+  }
+  if (classic && ph === 'reveal' && lastPhase !== 'reveal' && q) beep(q.my_pick === q.correct ? 'correct' : 'wrong');
+  lastQi = ST.qi;
+  if (q && q.status !== lastStatus) {
+    if (!classic && q.status === 'winner') { beep('fanfare'); toast(t('you_won_short'), true); }
+    if (!classic && q.status === 'blocked' && ph === 'open') toast(t('blocked_msg'), false);
+    lastStatus = q.status;
+  }
+  if (ph !== lastPhase) { if (ph === 'reveal') closeAllModals(); lastPhase = ph; }
+}
+function show(id, on) { document.getElementById(id).classList.toggle('hidden', !on); }
+function closeAllModals() { ['diceModal', 'cardModal', 'atkModal'].forEach(i => document.getElementById(i).classList.add('hidden')); }
+
+function renderQuestion(q) {
+  document.getElementById('qRound').textContent = t('round_of', { n: ST.qi + 1, total: ST.total });
+  document.getElementById('qTopic').textContent = [q.block, q.topic].filter(Boolean).join(' · ');
+  document.getElementById('qText').textContent = q.question;
+  const qi = document.getElementById('qImage');
+  if (q.image) { qi.src = q.image; qi.classList.remove('hidden'); } else qi.classList.add('hidden');
+  const classic = ST.settings.mode === 'classic';
+
+  const hint = document.getElementById('qHint');
+  if (q.hint) { hint.classList.remove('hidden'); hint.innerHTML = `<i class="fa-solid fa-lightbulb mr-1"></i><strong>${t('lbl_hint')}:</strong> ${esc(q.hint)}`; } else hint.classList.add('hidden');
+
+  const m = q.mods, chips = [];
+  if (m.double) chips.push(['tip_double', 'purple']); if (m.allin) chips.push(['tip_allin', 'amber']); if (m.pvp) chips.push(['tip_pvp', 'rose']);
+  if (m.shield) chips.push(['tip_shield', 'emerald']); if (m.streak_shield) chips.push(['tip_streak', 'cyan']);
+  const CH = { purple: 'bg-purple-500/20 text-purple-200 border-purple-500/50', amber: 'bg-amber-500/20 text-amber-200 border-amber-500/50', rose: 'bg-rose-500/20 text-rose-200 border-rose-500/50', emerald: 'bg-emerald-500/20 text-emerald-200 border-emerald-500/50', cyan: 'bg-cyan-500/20 text-cyan-200 border-cyan-500/50' };
+  document.getElementById('qMods').innerHTML = chips.map(c => `<span class="px-2 py-0.5 rounded-lg border text-[10px] font-esports ${CH[c[1]]}">${t(c[0])}</span>`).join('');
+
+  const spectator = q.status === 'spectator';
+  const elim = spectator ? (q.turn_elim || []) : q.elim;
+  const pick = spectator ? q.turn_pick : q.my_pick;
+  const sig = [ST.qi, ST.phase, q.status, elim.join(), pick, q.correct, answering, !!q.paused].join('|') + LANG;
+  if (sig !== lastSig) {
+    lastSig = sig;
+    const letters = 'ABCDEF';
+    const canAnswer = ST.phase === 'open' && q.status === 'none' && !answering && !q.paused;
+    const SH = ['▲', '◆', '●', '■', '★', '⬟'];
+    document.getElementById('qOptions').className = classic ? 'grid grid-cols-2 gap-2' : 'space-y-2';
+    document.getElementById('qOptions').innerHTML = q.options.map((o, i) => {
+      let cls = classic ? 'opt kopt k' + i : 'opt';
+      if (elim.includes(i)) cls += ' elim';
+      if (ST.phase === 'reveal' && !q.poll) { if (i === q.correct) cls += ' right'; else if (i === pick) cls += ' wrong'; else if (classic) cls += ' elim'; }
+      else if (ST.phase === 'reveal' && q.poll && i === pick) cls += ' mine';
+      else if (i === pick) cls += ' mine';
+      const dis = !canAnswer || elim.includes(i);
+      const badge = classic ? `<span class="let kshape">${SH[i]}</span>` : `<span class="let">${letters[i]}</span>`;
+      const cnt = ST.phase === 'reveal' && q.dist ? `<span class="ml-auto font-esports text-xs text-slate-300">${q.dist[i]}</span>` : '';
+      return `<button class="${cls}" ${dis ? 'disabled' : ''} onclick="sendAnswer(${i})" style="${classic ? 'min-height:5rem;align-items:center' : ''}">${badge}<span class="text-sm leading-snug">${esc(o)}</span>${cnt}</button>`;
+    }).join('');
+  }
+
+  const stEl = document.getElementById('qStatus'), ex = document.getElementById('qExplain');
+  let msg = '', cls = '';
+  if (q.turn) {
+    const mine = q.turn.id === ST.me.id;
+    if (ST.phase === 'open' && spectator) { msg = t('watch_turn', { name: q.turn.name }); cls = 'bg-cyan-500/15 text-cyan-200 border border-cyan-500/50'; }
+    else if (ST.phase === 'open' && mine && q.status === 'none') { msg = t('your_turn'); cls = 'bg-emerald-500/20 text-emerald-200 border border-emerald-400 pulse-glow'; }
+    else if (ST.phase === 'reveal') {
+      msg = turnResultText(q) + (q.winner ? ` (+${fmt(q.winner.points)} XP)` : '');
+      const ok = !q.poll && q.turn_pick === q.correct;
+      cls = ok ? 'bg-emerald-500/20 text-emerald-200 border border-emerald-500/50' : 'bg-slate-800 text-slate-200 border border-slate-600';
+    }
+  }
+  if (msg) { /* mensagem da vez já definida */ }
+  else if (classic) {
+    const picked = q.my_pick !== null && q.my_pick !== undefined;
+    if (ST.phase === 'open' && picked) { msg = t('cl_wait'); cls = 'bg-slate-800 text-slate-200 border border-slate-600'; }
+    else if (ST.phase === 'reveal') {
+      const ok = picked && q.my_pick === q.correct;
+      msg = !picked ? t('cl_timeup') : ok ? t('cl_correct', { pts: fmt(q.my_points) }) : t('cl_wrong');
+      msg += `\n${t('cl_rank', { n: ST.my_rank })}` + (ok && ST.me.streak >= 2 ? `\n${t('cl_streak', { n: ST.me.streak })}` : '');
+      cls = ok ? 'bg-emerald-500/20 text-emerald-200 border border-emerald-500/50' : 'bg-rose-500/20 text-rose-200 border border-rose-500/50';
+    }
+  } else if (q.poll) {
+    if (ST.phase === 'open' && q.status === 'voted') { msg = t('voted'); cls = 'bg-purple-500/20 text-purple-200 border border-purple-500/50'; }
+    else if (ST.phase === 'reveal') { msg = t('poll_result'); cls = 'bg-purple-500/20 text-purple-200 border border-purple-500/50'; }
+  } else if (ST.phase === 'open') {
+    if (q.status === 'blocked') { msg = t('blocked_msg'); cls = 'bg-rose-500/20 text-rose-200 border border-rose-500/50'; }
+    else if (q.status === 'wrong') { msg = t('locked_wrong'); cls = 'bg-rose-500/20 text-rose-200 border border-rose-500/50'; }
+    else if (q.status === 'late') { msg = t('answered_late'); cls = 'bg-amber-500/20 text-amber-200 border border-amber-500/50'; }
+    else if (q.status === 'winner') { msg = t('you_won_short'); cls = 'bg-emerald-500/20 text-emerald-200 border border-emerald-500/50'; }
+  } else if (ST.phase === 'reveal') {
+    if (q.winner) msg = q.winner.id === ST.me.id ? t('you_won', { pts: q.winner.points }) : t('someone_won', { name: q.winner.name, pts: q.winner.points });
+    else msg = t('nobody_won');
+    cls = q.winner && q.winner.id === ST.me.id ? 'bg-emerald-500/20 text-emerald-200 border border-emerald-500/50' : 'bg-slate-800 text-slate-200 border border-slate-600';
+  }
+  stEl.className = 'text-center text-xs font-esports font-bold py-2 rounded-xl whitespace-pre-line ' + cls + (msg ? '' : ' hidden');
+  stEl.textContent = msg;
+  if (ST.phase === 'reveal' && !q.poll) {
+    ex.classList.remove('hidden');
+    ex.innerHTML = `<strong>${t('correct_answer')}: ${'ABCDEF'[q.correct]}.</strong> ${esc(q.explanation || '')}<div class="mt-1 text-slate-500">${esc(q.reference || '')}</div><div class="mt-2 text-slate-400">${t('next_soon')}</div>`;
+  } else ex.classList.add('hidden');
+}
+
+function tickTimer() {
+  if (!ST || !ST.question) { Tension.stop(); return; }
+  const q = ST.question;
+  tensionTick(ST.phase, q, ST.settings, q.paused ? q.remaining : Math.max(0, q.end - nowS()));
+  if (ST.phase !== 'open') {
+    document.getElementById('qTimer').textContent = q.next_at ? t('next_in', { s: Math.max(0, Math.ceil(q.next_at - nowS())) }) : '--';
+    document.getElementById('qBar').style.width = '0%'; return;
+  }
+  const left = q.paused ? q.remaining : Math.max(0, q.end - nowS()), total = Math.max(1, q.duration || ST.settings.timer);
+  document.getElementById('qTimer').textContent = q.paused ? '⏸' : Math.ceil(left) + 's';
+  document.getElementById('qBar').style.width = Math.min(100, left / total * 100) + '%';
+}
+
+// ---------------- chamar atenção e reações ----------------
+function renderFun() {
+  const s = ST.settings, me = ST.me, live = ST.phase !== 'finished';
+  const nb = document.getElementById('nudgeBtn');
+  nb.classList.toggle('hidden', !live || !s.nudge_limit || ST.targets.length < 2);
+  nb.disabled = me.nudges_left <= 0;
+  document.getElementById('nudgeLeft').textContent = me.nudges_left;
+  const rb = document.getElementById('reactBar');
+  rb.classList.toggle('hidden', !s.reactions_on);
+  if (!rb.innerHTML) rb.innerHTML = reactionBarHTML('sendReact');
+  show('funBox', (live && s.nudge_limit > 0 && ST.targets.length > 1) || s.reactions_on);
+}
+function doNudge() {
+  if (!ST || ST.me.nudges_left <= 0) return;
+  openNudge(ST.targets, ST.me.id, ST.me.nudges_left, async (target, kind) => {
+    const r = await api('/api/nudge', { code: CODE, pid: ME.pid, token: ME.token, target, kind });
+    const tg = ST.targets.find(x => x.id === target);
+    if (!r.ok) toast(errText(r.data.error), false); else toast(t('nudge_sent', { name: tg ? tg.name : '' }), true);
+    poll();
+  });
+}
+let reactCooldown = 0;
+async function sendReact(emoji) {
+  if (Date.now() < reactCooldown) return;
+  reactCooldown = Date.now() + 850;
+  if (navigator.vibrate) navigator.vibrate(20);
+  const r = await api('/api/react', { code: CODE, pid: ME.pid, token: ME.token, emoji });
+  if (!r.ok && r.data.error !== 'slow_down') toast(errText(r.data.error), false);
+}
+
+async function sendAnswer(idx) {
+  if (answering) return; answering = true; lastSig = ''; renderQuestion(ST.question);
+  const r = await api('/api/answer', { code: CODE, pid: ME.pid, token: ME.token, idx });
+  answering = false;
+  if (!r.ok) toast(errText(r.data.error), false);
+  else if (r.data.accepted) beep('click');
+  else if (r.data.absorbed) { toast(t('tip_shield'), true); beep('power'); }
+  else if (r.data.correct === false) { beep('wrong'); toast(t('locked_wrong'), false); }
+  else if (r.data.correct) beep('correct');
+  lastSig = ''; poll();
+}
+
+function renderNotices() {
+  const me = ST.me, out = [];
+  const box = (txt, c) => `<div class="px-3 py-2 rounded-xl border text-xs font-esports ${c}">${txt}</div>`;
+  if (me.sealed > 0) out.push(box(t('sealed_notice', { n: me.sealed }), 'bg-orange-500/15 border-orange-400/50 text-orange-300'));
+  if (me.blocked_next) out.push(box(t('blocked_next_notice'), 'bg-rose-500/15 border-rose-400/50 text-rose-300'));
+  if (me.trap) out.push(box(t('trap_notice'), 'bg-red-500/15 border-red-400/50 text-red-300'));
+  document.getElementById('notices').innerHTML = out.join('');
+}
+
+// ---------------- Poderes ----------------
+function powerDisabled(key) {
+  const me = ST.me, q = ST.question; if (!q) return true;
+  if (!me.powers_on[key] || !me.unlocked[key] || me.powers[key] <= 0 || me.sealed > 0 || q.used.includes(key)) return true;
+  if (ST.phase === 'open' && q.paused) return true;
+  const attack = ['trap', 'block', 'seal', 'steal'].includes(key);
+  if (attack) { if (ST.targets.length < 2) return true; if (key === 'steal' && !ST.targets.some(b => b.id !== me.id && b.stealable.length)) return true; return false; }
+  return ST.phase !== 'open' || q.status !== 'none' || !!q.poll;
+}
+function renderPowers() {
+  if (!ST.question) return;
+  const me = ST.me;
+  document.getElementById('powerGrid').innerHTML = POWER_META.filter(m => me.powers_on[m.key]).map(m => {
+    const unlocked = me.unlocked[m.key], dis = powerDisabled(m.key), ch = me.powers[m.key];
+    const req = ST.thresholds[m.key];
+    const icon = unlocked ? m.icon : 'fa-lock';
+    const badge = unlocked ? (ch >= 90 ? '∞' : ch) : `${me.correct}/${req}`;
+    return `<button class="pw btn ${PW_STYLE[m.color]}" ${dis ? 'disabled' : ''} onclick="usePower('${m.key}')"><i class="fa-solid ${icon}"></i><span>${t('pwr_' + m.key)}</span><span class="n ${PW_BADGE[m.color]}">${badge}</span></button>`;
+  }).join('');
+}
+async function usePower(key) {
+  if (powerDisabled(key)) return;
+  beep('click');
+  if (key === 'dice') return openDice();
+  if (key === 'card') return openCard();
+  if (['trap', 'block', 'seal', 'steal'].includes(key)) return openAtk(key);
+  const r = await api('/api/power', { code: CODE, pid: ME.pid, token: ME.token, power: key });
+  if (!r.ok) toast(errText(r.data.error), false); else beep('power');
+  lastSig = ''; poll();
+}
+
+// ---- Dado ----
+let diceBusy = false;
+function openDice() {
+  document.getElementById('diceResult').classList.add('hidden');
+  document.getElementById('diceIcon').className = 'fa-solid fa-dice-six';
+  document.getElementById('diceBtn').disabled = false;
+  document.getElementById('diceBtnLbl').textContent = t('dice_btn_roll');
+  document.getElementById('diceModal').classList.remove('hidden');
+}
+function closeDice() { document.getElementById('diceModal').classList.add('hidden'); }
+async function rollDice() {
+  if (diceBusy) return; diceBusy = true;
+  const btn = document.getElementById('diceBtn'), box = document.getElementById('diceBox'), icon = document.getElementById('diceIcon');
+  btn.disabled = true; document.getElementById('diceBtnLbl').textContent = t('dice_rolling');
+  document.getElementById('diceResult').classList.add('hidden');
+  box.classList.add('dice-rolling'); beep('power');
+  const faces = ['fa-dice-one', 'fa-dice-two', 'fa-dice-three', 'fa-dice-four', 'fa-dice-five', 'fa-dice-six'];
+  let i = 0; const anim = setInterval(() => { icon.className = 'fa-solid ' + faces[i++ % 6]; }, 80);
+  const [r] = await Promise.all([api('/api/power', { code: CODE, pid: ME.pid, token: ME.token, power: 'dice' }), new Promise(res => setTimeout(res, 900))]);
+  clearInterval(anim); box.classList.remove('dice-rolling'); diceBusy = false;
+  document.getElementById('diceBtnLbl').textContent = t('dice_btn_roll');
+  if (!r.ok) { toast(errText(r.data.error), false); closeDice(); poll(); return; }
+  const roll = r.data.roll;
+  icon.className = 'fa-solid ' + faces[roll - 1];
+  beep(roll === 6 ? 'fanfare' : 'correct');
+  document.getElementById('diceResTitle').textContent = t('dice_t' + roll);
+  document.getElementById('diceResDesc').textContent = t('dice_d' + roll, { xp: fmt(r.data.xp) });
+  document.getElementById('diceResult').classList.remove('hidden');
+  lastSig = ''; poll();
+}
+
+// ---- Cartas ----
+let cardPicked = false;
+async function openCard() {
+  const r = await api('/api/power', { code: CODE, pid: ME.pid, token: ME.token, power: 'card', stage: 'open' });
+  if (!r.ok) { toast(errText(r.data.error), false); return; }
+  cardPicked = false;
+  document.getElementById('cardGrid').innerHTML = [0, 1, 2, 3].map(i => `
+    <div class="perspective-1000 cursor-pointer" onclick="pickCard(${i})">
+      <div id="cardInner${i}" class="flip-card-inner">
+        <div class="flip-card-front">
+          <div class="w-11 h-11 rounded-full bg-purple-500/20 border border-purple-400 flex items-center justify-center text-xl text-purple-300 mb-2"><i class="fa-solid fa-question"></i></div>
+          <div class="font-esports font-bold text-[10px] text-white uppercase">${t('card_front', { n: i + 1 })}</div>
+          <div class="text-[10px] text-purple-300 mt-1">${t('card_front_click')}</div>
+        </div>
+        <div class="flip-card-back" id="cardBack${i}"></div>
+      </div>
+    </div>`).join('');
+  document.getElementById('cardModal').classList.remove('hidden');
+}
+function closeCard() { document.getElementById('cardModal').classList.add('hidden'); lastSig = ''; poll(); }
+const CARD_ICON = { HINT: 'fa-user-graduate', PVP: 'fa-bolt-lightning', SHIELD: 'fa-shield-halved', ALLIN: 'fa-fire-flame-curved' };
+function cardBackHTML(id) {
+  return `<i class="fa-solid ${CARD_ICON[id]} text-2xl text-amber-300 mb-2"></i><div class="font-esports font-bold text-[11px] text-amber-300 uppercase">${t('card_' + id + '_t')}</div><p class="text-[11px] text-slate-200 mt-1.5 leading-snug">${t('card_' + id + '_d')}</p>`;
+}
+async function pickCard(i) {
+  if (cardPicked) return; cardPicked = true;
+  const r = await api('/api/power', { code: CODE, pid: ME.pid, token: ME.token, power: 'card', stage: 'pick', card_idx: i });
+  if (!r.ok) { cardPicked = false; toast(errText(r.data.error), false); return; }
+  const deck = r.data.deck;
+  deck.forEach((id, k) => { document.getElementById('cardBack' + k).innerHTML = cardBackHTML(id); });
+  document.getElementById('cardInner' + i).classList.add('flipped', 'chosen'); beep('fanfare');
+  setTimeout(() => document.querySelectorAll('#cardGrid .flip-card-inner').forEach(el => { if (!el.classList.contains('flipped')) el.classList.add('flipped', 'dimmed'); }), 900);
+  toast(t('card_' + r.data.effect + '_t'), true);
+  setTimeout(closeCard, 2600);
+}
+
+// ---- Ataque ----
+function openAtk(kind) {
+  atk = { kind };
+  const meta = POWER_META.find(m => m.key === kind);
+  document.getElementById('atkTitle').innerHTML = `<i class="fa-solid ${meta.icon} mr-1"></i> ${t('atk_title_' + kind)}`;
+  document.getElementById('atkDesc').textContent = t('atk_desc_' + kind);
+  renderTargets();
+  document.getElementById('atkModal').classList.remove('hidden');
+}
+function closeAtk() { document.getElementById('atkModal').classList.add('hidden'); atk = null; }
+function renderTargets() {
+  if (!atk) return;
+  document.getElementById('atkStep').textContent = t('atk_pick');
+  document.getElementById('atkBack').classList.add('hidden');
+  document.getElementById('atkList').innerHTML = ST.targets.filter(b => b.id !== ST.me.id).map(b => {
+    let tag = '';
+    if (atk.kind === 'block' && b.blocked) tag = t('tag_blocked');
+    else if (atk.kind === 'seal' && b.sealed > 0) tag = t('tag_sealed');
+    else if (atk.kind === 'trap' && b.trap) tag = t('tag_trapped');
+    else if (atk.kind === 'steal' && !b.stealable.length) tag = t('tag_nothing');
+    return `<button ${tag ? 'disabled' : ''} onclick="pickTarget('${b.id}')" class="btn w-full text-left p-3 rounded-xl border bg-slate-900/90 border-slate-700 hover:border-rose-400 flex items-center justify-between gap-3">
+      <span class="flex items-center gap-2 min-w-0"><span class="w-8 h-8 rounded-lg bg-gradient-to-br ${b.color} flex items-center justify-center font-esports text-xs font-black flex-none">${esc(b.name.slice(0, 2).toUpperCase())}</span><span class="truncate text-sm font-semibold">${esc(b.name)}</span></span>
+      <span class="text-right flex-none"><span class="block font-esports text-xs font-black text-cyan-300">${fmt(b.score)} XP</span>${tag ? `<span class="block text-[10px] text-amber-300">${tag}</span>` : ''}</span></button>`;
+  }).join('');
+}
+function pickTarget(id) {
+  if (!atk) return;
+  if (atk.kind !== 'steal') return applyAtk(id, null);
+  const tg = ST.targets.find(b => b.id === id); if (!tg) return;
+  document.getElementById('atkStep').textContent = t('atk_steal_step', { name: tg.name });
+  document.getElementById('atkBack').classList.remove('hidden');
+  document.getElementById('atkList').innerHTML = tg.stealable.map(k => {
+    const m = POWER_META.find(x => x.key === k);
+    return `<button onclick="applyAtk('${id}','${k}')" class="btn w-full text-left p-3 rounded-xl border bg-slate-900/90 border-slate-700 hover:border-indigo-400 flex items-center gap-3 font-esports text-xs font-bold"><i class="fa-solid ${m.icon} text-base"></i> ${t('pwr_' + k)}</button>`;
+  }).join('');
+}
+async function applyAtk(target, steal) {
+  const kind = atk.kind;
+  const r = await api('/api/power', { code: CODE, pid: ME.pid, token: ME.token, power: kind, target, steal });
+  closeAtk();
+  if (!r.ok) toast(errText(r.data.error), false); else beep('fanfare');
+  lastSig = ''; poll();
+}
+
+// ---------------- Placar / feed ----------------
+function renderBoard() {
+  if (!ST.board_visible) { document.getElementById('board').innerHTML = `<p class="text-xs text-slate-400 text-center py-2">${t('board_hidden')}</p>`; return; }
+  document.getElementById('board').innerHTML = ST.board.map((b, i) => {
+    const me = b.id === ST.me.id;
+    const st = (b.blocked ? '<i class="fa-solid fa-ban text-rose-400 ml-1"></i>' : '') + (b.sealed ? '<i class="fa-solid fa-user-lock text-orange-400 ml-1"></i>' : '') + (b.trap ? '<i class="fa-solid fa-skull-crossbones text-red-400 ml-1"></i>' : '');
+    return `<div class="flex items-center justify-between gap-2 px-2.5 py-1.5 rounded-lg border ${me ? 'border-cyan-400 bg-slate-900' : 'border-slate-800 bg-slate-900/50'}">
+      <span class="flex items-center gap-2 min-w-0"><span class="font-esports text-[10px] text-slate-500 w-4">${i + 1}</span><span class="truncate text-xs font-semibold">${esc(b.name)}${st}</span>${b.streak >= 2 ? `<span class="text-amber-400 text-[10px] font-bold"><i class="fa-solid fa-fire"></i>${b.streak}</span>` : ''}</span>
+      <span class="font-esports text-xs font-black text-cyan-300 flex-none">${fmt(b.score)}</span></div>`;
+  }).join('');
+}
+function renderFeed() {
+  const evs = ST.events.slice(0, 8);
+  document.getElementById('feed').innerHTML = evs.map(e => `<li>${esc(eventText(e))}</li>`).join('');
+  // avisa quando alguém te ataca
+  const myName = ST.me.name;
+  ST.events.slice().reverse().forEach(e => {
+    if (e.t > lastEventT) {
+      if (lastEventT && e.p && e.p.target === myName) { toast(eventText(e), false); beep('wrong'); }
+    }
+  });
+  if (ST.events.length) lastEventT = Math.max(lastEventT, ...ST.events.map(e => e.t));
+  else lastEventT = lastEventT || 0;
+}
+</script>
+</body>
+</html>

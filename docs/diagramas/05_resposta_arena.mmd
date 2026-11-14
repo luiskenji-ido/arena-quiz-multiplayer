@@ -1,0 +1,21 @@
+flowchart TD
+  A["POST /api/answer"] --> B{"Pergunta aberta,<br/>sem pausa e no tempo?"}
+  B -- não --> X["erro: not_open / paused / closed"]
+  B -- sim --> V{"Modo Por vez e<br/>não é a vez do jogador?"}
+  V -- sim --> X2["erro: not_your_turn"]
+  V -- não --> P{"Enquete?"}
+  P -- sim --> PV["Registra voto<br/>sem pontos"]
+  P -- não --> C{"Resposta correta?"}
+  C -- não --> S{"Carta Seguro ativa?"}
+  S -- sim --> SA["Anula o clique,<br/>elimina a opção"]
+  S -- não --> W["Perde o combo (exceto escudo do dado)<br/>-50% base×mult se apostou 2x<br/>-base×mult se havia armadilha"]
+  C -- sim --> F{"Já existe vencedor?"}
+  F -- sim --> L["Acerto tardio: 0 ponto"]
+  F -- não --> WIN["Vencedor: XP = (base + velocidade) × mult × combo<br/>× 2 (dobro) × 3 (all-in) + 150 (PvP)"]
+  WIN --> U["+1 acerto: verifica desbloqueio de poderes"]
+  U --> CL{"Fechar no 1º acerto?"}
+  CL -- sim --> R["reveal"]
+  CL -- não --> AC["Fecha se todos responderam"]
+  W --> AC
+  L --> AC
+  PV --> AC

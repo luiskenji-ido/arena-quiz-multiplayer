@@ -1,0 +1,13 @@
+flowchart TD
+  A["Jogador toca numa alternativa"] --> B["Servidor responde {accepted: true}<br/>(não revela acerto)"]
+  B --> C{"Correta?"}
+  C -- sim --> D["pontos = máx × (1 − tempo/duração ÷ 2)<br/>+ bônus de sequência (100 por acerto, até 500)"]
+  C -- não --> E["0 ponto, sequência zerada"]
+  D --> F["Fecha quando o tempo acaba<br/>ou todos responderam"]
+  E --> F
+  F --> G["Telão: gráfico de respostas e resposta certa"]
+  G --> H{"Placar visível?<br/>(ao vivo / após pergunta)"}
+  H -- sim --> I["Placar top 5"]
+  H -- não --> J["Próxima pergunta"]
+  I --> J
+  J --> K["Fim: pódio animado"]

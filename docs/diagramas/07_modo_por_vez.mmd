@@ -1,0 +1,14 @@
+flowchart TD
+  S["start_question"] --> M{"answer_order = turns?"}
+  M -- não --> ALL["Todos respondem (o mais rápido)"]
+  M -- sim --> O["Ordem = ordem de entrada na sala"]
+  O --> N["Próximo da fila (turn_idx)"]
+  N --> B{"Foi bloqueado?<br/>(poder Bloqueio)"}
+  B -- sim --> SK["Perde a vez<br/>evento ev_turn_skip"] --> N
+  B -- não --> T["q.turn = jogador da vez"]
+  T --> V["Jogador da vez: responde e usa poderes próprios"]
+  T --> E["Demais: modo espectador<br/>veem eliminadas e a escolha"]
+  T --> H["Apresentador pode 'Dar a vez'"]
+  V --> R{"Respondeu?"}
+  R -- sim --> CL["Fecha a pergunta e mostra a jogada a todos"]
+  R -- "tempo esgotou" --> TO["Perde o combo<br/>ev_turn_timeout"]

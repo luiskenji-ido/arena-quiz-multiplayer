@@ -1,0 +1,25 @@
+sequenceDiagram
+  actor O as Organizador (telão)
+  participant S as Servidor
+  actor P as Participantes (celulares)
+  Note over O: Barra flutuante: 🧰 Arsenal + emojis
+  O->>S: POST /api/host/CODE/hostemoji {emoji: 🔥}
+  S->>S: lista branca HOST_EMOJIS e 1 a cada 0,35 s
+  S-->>O: {ok}
+  P->>S: polling /api/state
+  S-->>P: me.broadcasts (últimos 10 s)
+  P->>P: emoji gigante + "🎤 Organizador"
+  O->>S: POST hostpower {power: all_dice}
+  alt pergunta aberta
+    S->>S: rola D6 e aplica a todos (q.global, q.elim_all, tempo)
+    S-->>O: {roll: 4}
+    S->>S: evento ev_host_dice
+  else lobby / revelação
+    S-->>O: 400 not_open
+  end
+  O->>S: POST hostpower {power: trap|block|seal, target}
+  O->>S: POST hostpower {power: give, give: block, target: all}
+  S->>S: só Arena: aplica no alvo / +1 carga
+  P->>S: polling
+  S-->>P: events ev_host_* e efeitos (elim, mods, end)
+  P->>P: aviso 🎤 + alternativas somem / tempo extra

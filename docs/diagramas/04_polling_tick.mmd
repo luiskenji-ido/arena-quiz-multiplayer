@@ -1,0 +1,18 @@
+sequenceDiagram
+  participant C as Cliente (telão ou celular)
+  participant A as app.py
+  participant DB as SQLite
+  participant G as game.py
+  C->>A: GET /api/state/CODE
+  A->>DB: BEGIN IMMEDIATE + SELECT data
+  A->>G: tick(room)
+  alt pergunta aberta e tempo esgotado (sem pausa)
+    G->>G: close_question
+  else resultado com avanço automático vencido
+    G->>G: start_question (próxima)
+  end
+  A->>G: host_view / player_view
+  G-->>A: visão filtrada (sem gabarito para jogadores)
+  A->>DB: UPDATE somente se o JSON mudou + COMMIT
+  A-->>C: JSON da tela
+  C->>C: render() e relógio local (offset do servidor)

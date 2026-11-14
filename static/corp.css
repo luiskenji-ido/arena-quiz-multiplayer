@@ -1,0 +1,61 @@
+/* Visual corporativo do modo Clássico: claro, limpo, botões coloridos. */
+body.corp{--c-accent:var(--c-accent);--c-bg:#f2f2f2;font-family:'Montserrat','Inter',sans-serif;background:var(--c-bg);background-image:none;color:#1f1f1f}
+body.corp.purple{background:var(--c-accent);background-image:radial-gradient(circle at 10% 10%,rgba(255,255,255,.08) 0 18%,transparent 18%),radial-gradient(circle at 90% 85%,rgba(255,255,255,.06) 0 22%,transparent 22%);color:#fff}
+.corp .card{background:#fff;color:#1f1f1f;border-radius:.6rem;box-shadow:0 4px 0 rgba(0,0,0,.12)}
+.corp .topbar{background:#fff;color:#1f1f1f;box-shadow:0 2px 6px rgba(0,0,0,.12)}
+.corp .cbtn{display:inline-flex;align-items:center;gap:.4rem;font-weight:800;border-radius:.35rem;padding:.55rem .9rem;font-size:.8rem;box-shadow:0 4px 0 rgba(0,0,0,.25);transition:transform .1s,filter .15s;white-space:nowrap}
+.corp .cbtn:hover:not(:disabled){filter:brightness(1.08)}
+.corp .cbtn:active:not(:disabled){transform:translateY(3px);box-shadow:0 1px 0 rgba(0,0,0,.25)}
+.corp .cbtn:disabled{opacity:.5;cursor:not-allowed}
+.corp .cbtn.dark{background:#333;color:#fff}.corp .cbtn.light{background:#fff;color:#333}.corp .cbtn.ghost{background:#e9e9e9;color:#333;box-shadow:0 3px 0 #c9c9c9}
+.corp .cbtn.purple{background:var(--c-accent);color:#fff}.corp .cbtn.green{background:#26890c;color:#fff}.corp .cbtn.red{background:#e21b3c;color:#fff}.corp .cbtn.amber{background:#d89e00;color:#fff}
+.corp .pin{font-weight:900;letter-spacing:.12em}
+.corp .chip{background:#fff;color:#333;font-weight:800;border-radius:.4rem;padding:.45rem .9rem;box-shadow:0 3px 0 rgba(0,0,0,.2);animation:popIn .3s ease-out}
+/* Alternativas (tiles) */
+.tile{position:relative;display:flex;align-items:center;gap:.9rem;border-radius:.35rem;color:#fff;font-weight:800;padding:1rem 1.1rem;min-height:5.5rem;text-align:left;box-shadow:0 4px 0 rgba(0,0,0,.22);transition:filter .15s,opacity .2s,transform .1s;overflow:hidden}
+.tile .shape{font-size:1.9rem;line-height:1;flex:none;width:2.4rem;text-align:center;text-shadow:0 2px 0 rgba(0,0,0,.2)}
+.tile .txt{font-size:1.15rem;line-height:1.25;position:relative}
+.tile.t0{background:#e21b3c}.tile.t1{background:#1368ce}.tile.t2{background:#d89e00}.tile.t3{background:#26890c}.tile.t4{background:#864cbf}.tile.t5{background:#0aa3a3}
+button.tile:hover:not(:disabled){filter:brightness(1.1)}
+button.tile:active:not(:disabled){transform:translateY(3px)}
+.tile.dim{opacity:.28}
+.tile.ok::after{content:'\2713';position:absolute;right:1rem;font-size:2rem;font-weight:900}
+.tile.picked{outline:4px solid #fff;outline-offset:-4px}
+/* Timer circular */
+.ring{width:6.5rem;height:6.5rem;border-radius:50%;background:var(--c-accent);color:#fff;display:flex;align-items:center;justify-content:center;font-size:2.4rem;font-weight:900;box-shadow:0 4px 0 rgba(0,0,0,.25)}
+.ring.low{background:#e21b3c;animation:pulseGlow 1s infinite}
+/* Gráfico de respostas */
+.chart{display:flex;align-items:flex-end;justify-content:center;gap:1.2rem;height:14rem}
+.chart .col{width:5.5rem;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%}
+.chart .bar{width:100%;border-radius:.3rem .3rem 0 0;transition:height .8s cubic-bezier(.2,.8,.2,1);min-height:.5rem;box-shadow:0 3px 0 rgba(0,0,0,.15)}
+.chart .lbl{width:100%;color:#fff;font-weight:900;text-align:center;padding:.35rem 0;border-radius:0 0 .3rem .3rem;font-size:1.1rem}
+.chart .num{font-weight:900;font-size:1.3rem;color:#333;margin-bottom:.25rem}
+.chart .c0{background:#e21b3c}.chart .c1{background:#1368ce}.chart .c2{background:#d89e00}.chart .c3{background:#26890c}.chart .c4{background:#864cbf}.chart .c5{background:#0aa3a3}
+/* Placar */
+.srow{display:flex;align-items:center;justify-content:space-between;background:#fff;color:#333;font-weight:800;border-radius:.35rem;padding:.8rem 1.1rem;font-size:1.15rem;box-shadow:0 3px 0 rgba(0,0,0,.15);animation:popIn .35s ease-out both}
+.srow.first{background:linear-gradient(90deg,#fde047,#f59e0b);color:#1c1917;box-shadow:0 3px 0 rgba(0,0,0,.25),0 0 0 2px rgba(255,255,255,.7)}
+.podium{height:20rem;max-width:40rem;margin:0 auto}
+.podium .pod-col{height:100%;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;min-width:0}
+.podium .pod-name{height:2.6rem;display:flex;align-items:flex-end;padding-bottom:.4rem;color:#fff;font-weight:900;font-size:1.15rem;max-width:11rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.podium .pod-1 .pod-name{font-size:1.4rem}
+.podium .pod-1 .step{background:linear-gradient(180deg,#fef9c3,#fff);box-shadow:0 4px 0 rgba(0,0,0,.2),0 0 0 3px #facc15}
+.podium .step.still{animation:none}
+@media (max-width:640px){.podium .step{width:6.5rem}.podium{height:16rem}}
+/* Pódio */
+.podium{display:flex;align-items:flex-end;justify-content:center;gap:.9rem}
+.podium .step{width:11rem;border-radius:.4rem .4rem 0 0;background:#fff;color:var(--c-accent);display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding-top:.8rem;font-weight:900;box-shadow:0 4px 0 rgba(0,0,0,.2);animation:rise .9s cubic-bezier(.2,.8,.2,1) both}
+.podium .step .medal{font-size:2.6rem}
+@keyframes rise{from{transform:translateY(100%);opacity:0}to{transform:translateY(0);opacity:1}}
+/* Feedback no celular */
+.fb{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;color:#fff;padding:1.5rem;gap:.8rem}
+.fb.ok{background:#26890c}.fb.bad{background:#e21b3c}.fb.neutral{background:var(--c-accent)}
+.fb .big{font-size:2.2rem;font-weight:900}
+.fb .pill{background:rgba(0,0,0,.25);border-radius:999px;padding:.5rem 1.2rem;font-weight:800}
+.spinner{width:3rem;height:3rem;border-radius:50%;border:5px solid rgba(255,255,255,.3);border-top-color:#fff;animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+/* Os modais reaproveitados continuam escuros, legíveis sobre o fundo claro */
+.corp .modal .panel{color:#f1f5f9}
+
+.corp .bg-accent{background:var(--c-accent)}.corp .text-accent{color:var(--c-accent)}.corp .accent-accent{accent-color:var(--c-accent)}.corp .focus\:border-accent:focus{border-color:var(--c-accent)}
+.corp .bg-\[\#f2f2f2\]{background:var(--c-bg)}
+.corp .bg-cbg{background:var(--c-bg)}

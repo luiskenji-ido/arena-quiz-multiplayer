@@ -1,0 +1,24 @@
+sequenceDiagram
+  autonumber
+  actor O as Organizador
+  participant HT as Telão (/host)
+  participant S as Servidor Flask
+  participant DB as SQLite
+  actor J as Jogador (celular)
+  O->>HT: Escolhe o modo e clica em "Criar sala"
+  HT->>S: POST /api/room {settings}
+  S->>DB: INSERT sala (código de 4 letras + host_token)
+  S-->>HT: {code, host_token}
+  HT->>S: GET /qr/CODE.svg
+  S-->>HT: QR code apontando para /join?code=CODE
+  J->>S: Escaneia o QR e abre /join?code=CODE
+  S-->>J: Redireciona para /play (tela Arena ou Clássico)
+  J->>S: POST /api/join {code, name}
+  S->>DB: Adiciona jogador (pid + token)
+  S-->>J: {pid, token} salvo no navegador
+  loop a cada 1 segundo
+    HT->>S: GET /api/state?role=host
+    J->>S: GET /api/state?pid&token
+  end
+  O->>HT: Clica em "Iniciar jogo"
+  HT->>S: POST /api/host/CODE/start

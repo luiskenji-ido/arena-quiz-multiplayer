@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <title>Quiz</title>
+  <meta name="page" content="play_classic">
+  {% include '_head.html' %}
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='corp.css') }}">
+</head>
+<body class="corp purple min-h-screen">
+
+<!-- ENTRAR -->
+<section id="sJoin" class="hidden min-h-screen flex flex-col items-center justify-center p-5 gap-4">
+  <div class="flex justify-end w-full max-w-xs" id="langBox1"></div>
+  <div class="text-white text-3xl font-black"><i class="fa-solid fa-briefcase"></i> Quiz</div>
+  <div class="card w-full max-w-xs p-4 space-y-3">
+    <div class="text-center text-xs font-bold text-gray-500">PIN <b id="joinCode" class="pin text-gray-900 text-base">----</b></div>
+    <form id="joinForm" class="space-y-3">
+      <input id="nameInput" maxlength="20" autocomplete="off" data-i18n-ph="corp_nick" class="w-full border-2 border-gray-300 rounded-md px-3 py-3 text-center text-lg font-bold text-gray-900 outline-none focus:border-accent">
+      <p id="joinErr" class="hidden text-xs text-red-600 text-center"></p>
+      <button class="cbtn dark w-full justify-center text-base py-3" data-i18n="corp_enter"></button>
+    </form>
+  </div>
+</section>
+
+<!-- JOGO -->
+<section id="sMain" class="hidden min-h-screen flex flex-col">
+  <div class="topbar flex items-center justify-between px-3 py-2 text-sm font-extrabold">
+    <span id="topLeft" class="truncate"></span>
+    <span class="flex items-center gap-2">
+      <span id="topTimer" class="hidden px-2 py-0.5 rounded bg-accent text-white"></span>
+      <span id="langBox2"></span>
+      <button onclick="openHelp()" class="text-gray-500"><i class="fa-solid fa-circle-question"></i></button>
+    </span>
+  </div>
+
+  <!-- espera / lobby -->
+  <div id="vLobby" class="hidden flex-1 flex flex-col items-center justify-center text-center text-white p-6 gap-3">
+    <div class="text-3xl font-black" data-i18n="corp_youre_in"></div>
+    <div class="text-lg font-bold opacity-90" data-i18n="corp_see_name"></div>
+    <div id="lobQuiz" class="mt-4 text-sm font-bold opacity-80"></div>
+  </div>
+
+  <!-- pergunta -->
+  <div id="vQuestion" class="hidden flex-1 flex flex-col bg-cbg">
+    <div class="px-4 pt-4 pb-2 text-center">
+      <div id="qMeta" class="text-[11px] font-bold uppercase text-gray-500"></div>
+      <div id="qText" class="text-lg font-extrabold text-gray-900 leading-snug mt-1"></div>
+      <div id="qTurn" class="hidden mt-2 px-3 py-2 rounded-md font-extrabold text-sm"></div>
+      <img id="qImg" class="hidden max-h-36 mx-auto mt-2 rounded-md" alt="">
+    </div>
+    <div id="tiles" class="flex-1 grid grid-cols-2 gap-2 p-2"></div>
+  </div>
+
+  <!-- enviado / aguardando -->
+  <div id="vWait" class="hidden fb neutral flex-1">
+    <div class="spinner"></div>
+    <div class="text-xl font-extrabold" id="waitTxt"></div>
+  </div>
+
+  <!-- resultado -->
+  <div id="vResult" class="hidden fb flex-1">
+    <div id="resIcon" class="text-6xl"></div>
+    <div id="resTitle" class="big"></div>
+    <div id="resPts" class="pill"></div>
+    <div id="resStreak" class="text-sm font-bold"></div>
+    <div id="resRank" class="text-base font-extrabold mt-2"></div>
+    <div id="resNext" class="text-sm font-bold opacity-80 mt-3"></div>
+  </div>
+
+  <!-- final -->
+  <div id="vFinal" class="hidden flex-1 flex flex-col items-center justify-center text-center text-white p-6 gap-3">
+    <div id="finMedal" class="text-7xl"></div>
+    <div id="finPos" class="text-3xl font-black"></div>
+    <div id="finPts" class="pill bg-black/25 rounded-full px-5 py-2 font-extrabold"></div>
+  </div>
+
+  <div id="funBox" class="hidden flex items-center gap-1.5 overflow-x-auto px-2 py-1.5 bg-white/95 border-t border-gray-200">
+    <button id="nudgeBtn" onclick="doNudge()" class="cbtn amber flex-none">📢 <span id="nudgeLeft">0</span></button>
+    <div id="reactBar" class="flex gap-1.5 flex-none"></div>
+  </div>
+  <div class="topbar flex items-center justify-between px-4 py-2.5 font-extrabold">
+    <span id="meName" class="truncate"></span>
+    <span id="meScore" class="px-3 py-1 rounded bg-[#333] text-white"></span>
+  </div>
+</section>
+
+<div id="pausedBanner" class="hidden fixed inset-0 z-50 bg-black/60 flex items-center justify-center pointer-events-none">
+  <div class="card px-8 py-5 text-2xl font-black text-accent"><i class="fa-solid fa-pause"></i> <span data-i18n="corp_paused"></span></div>
+</div>
+
+<div id="helpModal" class="modal hidden">
+  <div class="panel neon-cyan max-w-lg w-full max-h-[92vh] overflow-y-auto space-y-3 p-5 text-slate-100">
+    <div class="flex items-center justify-between"><h3 class="font-esports text-lg font-bold text-white" data-i18n="help_title"></h3>
+      <button onclick="closeHelp()" class="w-9 h-9 rounded-xl bg-slate-800 text-slate-300"><i class="fa-solid fa-xmark"></i></button></div>
+    <div id="helpBody"></div>
+    <div class="text-right"><button onclick="closeHelp()" class="btn px-5 py-2.5 rounded-xl bg-cyan-500 text-slate-950 font-esports text-xs font-extrabold uppercase" data-i18n="help_close"></button></div>
+  </div>
+</div>
+
+<script src="{{ url_for('static', filename='common.js') }}"></script>
+<script src="{{ url_for('static', filename='i18n_extra.js') }}"></script>
+<script src="{{ url_for('static', filename='fun.js') }}"></script>
+<script>
+const CODE = (new URLSearchParams(location.search).get('code') || '').toUpperCase();
+const KEY = 'arena_player_' + CODE;
+const SHAPES = ['▲', '◆', '●', '■', '★', '⬟'];
+let ME = null, ST = null, offset = 0, polling = false, sending = false, lastSig = '', lastPhase = '', lastQi = -2;
+const nowS = () => Date.now() / 1000 + offset;
+function show(id, on) { document.getElementById(id).classList.toggle('hidden', !on); }
+
+document.getElementById('langBox1').innerHTML = langSelectHTML();
+document.getElementById('langBox2').innerHTML = langSelectHTML();
+document.querySelectorAll('select[onchange^="setLang"]').forEach(s => { s.removeAttribute('id'); s.className = 'langSel bg-gray-100 border border-gray-300 rounded px-1 py-0.5 text-[11px] text-gray-800'; s.value = LANG; });
+function onLangChange() { document.querySelectorAll('.langSel').forEach(s => s.value = LANG); lastSig = ''; if (ST) render(); }
+applyI18n();
+
+(function init() {
+  if (!CODE) { location.href = '/'; return; }
+  document.getElementById('joinCode').textContent = CODE;
+  try { ME = JSON.parse(store(KEY) || 'null'); } catch (e) { ME = null; }
+  if (ME) start(); else { show('sJoin', true); setTimeout(() => document.getElementById('nameInput').focus(), 100); }
+})();
+
+document.getElementById('joinForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  const r = await api('/api/join', { code: CODE, name: document.getElementById('nameInput').value });
+  const err = document.getElementById('joinErr');
+  if (!r.ok) { err.textContent = errText(r.data.error); err.classList.remove('hidden'); return; }
+  ME = { pid: r.data.pid, token: r.data.token }; store(KEY, JSON.stringify(ME));
+  show('sJoin', false); start();
+});
+
+function start() {
+  show('sMain', true);
+  poll(); setInterval(poll, 1000); setInterval(tick, 250);
+  mountSoundToggle();
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) poll(); });
+}
+async function poll() {
+  if (polling) return; polling = true;
+  try {
+    const r = await api(`/api/state/${CODE}?pid=${ME.pid}&token=${encodeURIComponent(ME.token)}`);
+    if (!r.ok) {
+      if (r.status === 404 || r.status === 403) { store(KEY, null); document.body.innerHTML = `<div class="fb neutral"><div class="big">${t('room_gone')}</div><a href="/" class="cbtn light">OK</a></div>`; }
+      return;
+    }
+    ST = r.data; offset = ST.now - Date.now() / 1000;
+    applyTheme(ST.settings); handleInbox(ST.me.inbox); handleBroadcasts(ST.me.broadcasts); hostEventToasts(ST.events);
+    if (ST.settings.mode !== 'classic') { location.reload(); return; }   // apresentador trocou para Arena
+    render();
+  } finally { polling = false; }
+}
+
+function render() {
+  const ph = ST.phase, q = ST.question, me = ST.me;
+  document.getElementById('meName').textContent = me.name;
+  document.getElementById('meScore').textContent = fmt(me.score);
+  document.getElementById('topLeft').textContent = ST.quiz_title || 'PIN ' + CODE;
+  if (ST.qi !== lastQi) {
+    lastQi = ST.qi; lastSig = '';
+    if (ph === 'open' && q && q.turn && q.turn.id === me.id) { toast(t('your_turn'), true); if (navigator.vibrate) navigator.vibrate(200); }
+  }
+  const spectator = !!(q && q.status === 'spectator');
+
+  const picked = q && q.my_pick !== null && q.my_pick !== undefined;
+  show('vLobby', ph === 'lobby');
+  show('vQuestion', ph === 'open' && !picked);
+  show('vWait', ph === 'open' && picked);
+  show('vResult', ph === 'reveal');
+  show('vFinal', ph === 'finished');
+  show('pausedBanner', !!(q && q.paused && ph === 'open'));
+  document.body.classList.toggle('purple', ph !== 'open' || picked);
+
+  if (ph === 'lobby') document.getElementById('lobQuiz').textContent = ST.quiz_title || '';
+  renderFun();
+
+  if (ph === 'open' && !picked) {
+    document.getElementById('qMeta').textContent = t('corp_question_n', { n: ST.qi + 1, total: ST.total }) + (q.poll ? ' · ' + t('poll_badge') : '');
+    document.getElementById('qText').textContent = q.question;
+    const img = document.getElementById('qImg');
+    if (q.image) { img.src = q.image; img.classList.remove('hidden'); } else img.classList.add('hidden');
+    const qt = document.getElementById('qTurn');
+    if (q.turn) {
+      qt.classList.remove('hidden');
+      qt.className = 'mt-2 px-3 py-2 rounded-md font-extrabold text-sm ' + (spectator ? 'bg-gray-200 text-gray-700' : 'bg-[#26890c] text-white');
+      qt.textContent = spectator ? t('watch_turn', { name: q.turn.name }) : t('your_turn');
+    } else qt.classList.add('hidden');
+    const telim = spectator ? (q.turn_elim || []) : [];
+    const sig = ST.qi + '|' + q.options.length + '|' + sending + '|' + !!q.paused + '|' + spectator + '|' + telim + LANG;
+    if (sig !== lastSig) {
+      lastSig = sig;
+      document.getElementById('tiles').innerHTML = q.options.map((o, i) =>
+        `<button class="tile t${i} flex-col justify-center ${telim.includes(i) ? 'dim' : ''}" ${sending || q.paused || spectator ? 'disabled' : ''} onclick="send(${i})" style="min-height:7rem"><span class="shape">${SHAPES[i]}</span><span class="txt text-base text-center">${esc(o)}</span></button>`).join('');
+    }
+  }
+  if (ph === 'open' && picked) document.getElementById('waitTxt').textContent = q.poll ? t('voted') : t('corp_answered');
+
+  if (ph === 'reveal') {
+    const box = document.getElementById('vResult');
+    let cls, icon, title, pts = '', streak = '';
+    if (spectator) {            // por vez: quem assistiu vê a jogada do colega
+      const ok = !q.poll && q.turn_pick === q.correct;
+      cls = q.poll ? 'neutral' : ok ? 'ok' : 'bad'; icon = '👀'; title = turnResultText(q);
+      if (!q.poll) streak = t('correct_answer') + ': ' + q.options[q.correct];
+    }
+    else if (q.poll) { cls = 'neutral'; icon = '📊'; title = t('corp_poll_thanks'); }
+    else if (!picked) { cls = 'bad'; icon = '⏰'; title = t('corp_timeup'); }
+    else if (q.my_pick === q.correct) { cls = 'ok'; icon = '✔'; title = t('corp_correct'); pts = '+' + fmt(q.my_points) + ' ' + t('corp_points'); if (me.streak >= 2) streak = t('cl_streak', { n: me.streak }); }
+    else { cls = 'bad'; icon = '✖'; title = t('corp_wrong'); }
+    box.className = 'fb flex-1 ' + cls;
+    document.getElementById('resIcon').textContent = icon;
+    document.getElementById('resTitle').textContent = title;
+    document.getElementById('resTitle').style.fontSize = spectator ? '1.35rem' : '';
+    const pe = document.getElementById('resPts'); pe.textContent = pts; pe.classList.toggle('hidden', !pts);
+    document.getElementById('resStreak').textContent = streak;
+    document.getElementById('resRank').textContent = rankText();
+  }
+
+  if (ph === 'finished') {
+    const pos = ST.my_rank;
+    document.getElementById('finMedal').textContent = pos === 1 ? '🥇' : pos === 2 ? '🥈' : pos === 3 ? '🥉' : '🎉';
+    document.getElementById('finPos').textContent = pos ? t('corp_final_pos', { n: pos }) : t('game_over');
+    document.getElementById('finPts').textContent = fmt(me.score) + ' ' + t('corp_points');
+  }
+
+  if (ph !== lastPhase) {
+    if (ph === 'reveal' && q && !q.poll) beep((spectator ? q.turn_pick : q.my_pick) === q.correct ? 'correct' : 'wrong');
+    if (ph === 'open') beep('start');
+    if (ph === 'finished') beep('fanfare');
+    lastPhase = ph;
+  }
+}
+// "Você está em 3º lugar, 120 pts atrás de Ana" (só quando o placar está visível)
+function rankText() {
+  if (!ST.my_rank) return '';
+  const pos = ST.my_rank;
+  if (pos === 1) return t('corp_lead');
+  const above = ST.board[pos - 2];
+  const diff = above ? above.score - ST.me.score : 0;
+  return t('cl_rank', { n: pos }) + (diff > 0 ? ' · ' + t('corp_behind', { pts: fmt(diff), name: above.name }) : '');
+}
+function tick() {
+  const el = document.getElementById('topTimer');
+  const nx = document.getElementById('resNext');
+  if (nx) { const q = ST && ST.question; nx.textContent = ST && ST.phase === 'reveal' && q && q.next_at ? t('next_q_in', { s: Math.max(0, Math.ceil(q.next_at - nowS())) }) : ''; }
+  if (!ST || ST.phase !== 'open' || !ST.question) { el.classList.add('hidden'); Tension.stop(); return; }
+  const q = ST.question;
+  tensionTick(ST.phase, q, ST.settings, q.paused ? q.remaining : Math.max(0, q.end - nowS()));
+  el.classList.remove('hidden');
+  el.textContent = q.paused ? '⏸' : Math.ceil(q.paused ? q.remaining : Math.max(0, q.end - nowS())) + 's';
+}
+// ---------------- chamar atenção e reações ----------------
+function renderFun() {
+  const s = ST.settings, me = ST.me, live = ST.phase !== 'finished';
+  const nb = document.getElementById('nudgeBtn');
+  nb.classList.toggle('hidden', !live || !s.nudge_limit || ST.targets.length < 2);
+  nb.disabled = me.nudges_left <= 0;
+  document.getElementById('nudgeLeft').textContent = me.nudges_left;
+  const rb = document.getElementById('reactBar');
+  rb.classList.toggle('hidden', !s.reactions_on);
+  if (!rb.innerHTML) rb.innerHTML = reactionBarHTML('sendReact');
+  show('funBox', (live && s.nudge_limit > 0 && ST.targets.length > 1) || s.reactions_on);
+}
+function doNudge() {
+  if (!ST || ST.me.nudges_left <= 0) return;
+  openNudge(ST.targets, ST.me.id, ST.me.nudges_left, async (target, kind) => {
+    const r = await api('/api/nudge', { code: CODE, pid: ME.pid, token: ME.token, target, kind });
+    const tg = ST.targets.find(x => x.id === target);
+    if (!r.ok) toast(errText(r.data.error), false); else toast(t('nudge_sent', { name: tg ? tg.name : '' }), true);
+    poll();
+  });
+}
+let reactCooldown = 0;
+async function sendReact(emoji) {
+  if (Date.now() < reactCooldown) return;
+  reactCooldown = Date.now() + 850;
+  if (navigator.vibrate) navigator.vibrate(20);
+  const r = await api('/api/react', { code: CODE, pid: ME.pid, token: ME.token, emoji });
+  if (!r.ok && r.data.error !== 'slow_down') toast(errText(r.data.error), false);
+}
+
+async function send(idx) {
+  if (sending) return; sending = true; lastSig = ''; render();
+  const r = await api('/api/answer', { code: CODE, pid: ME.pid, token: ME.token, idx });
+  sending = false;
+  if (!r.ok) toast(errText(r.data.error), false); else beep('click');
+  lastSig = ''; await poll();
+}
+</script>
+</body>
+</html>

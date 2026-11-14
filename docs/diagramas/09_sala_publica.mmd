@@ -1,0 +1,24 @@
+sequenceDiagram
+  autonumber
+  actor V as Visitante
+  participant I as Página inicial
+  participant S as Servidor
+  participant H as Telão do organizador
+  I->>S: GET /api/public (a cada 5 s)
+  S-->>I: salas públicas ativas (sem o código)
+  V->>I: "Pedir para entrar" + nome
+  I->>S: POST /api/public/ID/request
+  S-->>I: {rid, secret}
+  loop a cada 2 s
+    I->>S: GET /api/public/ID/request/RID?secret
+  end
+  H->>S: polling mostra o pedido pendente
+  alt organizador aceita
+    H->>S: POST /api/host/CODE/approve {rid}
+    S->>S: cria o jogador com o nome pedido
+    S-->>I: status approved + código + pid/token
+    I-->>V: QR code e botão "Entrar agora"
+  else organizador recusa
+    H->>S: POST /api/host/CODE/deny {rid}
+    S-->>I: status denied
+  end
