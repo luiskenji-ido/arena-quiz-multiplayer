@@ -335,7 +335,7 @@ Para atualizar um diagrama, edite o `.mmd` e gere o `.png` com o [Mermaid CLI](h
 3. Rode os testes (`pytest -q tests`) antes de enviar.
 4. Faça o commit e abra um **Pull Request** explicando a mudança.
 
-Sugestões e problemas: use a aba [Issues](https://github.com/luiskenji-ido/arena-quiz-multiplayer/issues).
+Sugestões e problemas: [abra uma Issue](https://github.com/luiskenji-ido/arena-quiz-multiplayer/issues/new) (a lista de Issues fica vazia até alguém abrir a primeira).
 
 ## 📄 Licença: uso gratuito para estudo
 
@@ -358,7 +358,7 @@ Este projeto é distribuído sob a **[PolyForm Noncommercial License 1.0.0](LICE
 
 ### Uso comercial
 
-Para uso comercial (empresas, eventos pagos, revenda ou SaaS), abra uma [Issue](https://github.com/luiskenji-ido/arena-quiz-multiplayer/issues) com o título **"Licença comercial"** para combinar uma licença separada.
+Para uso comercial (empresas, eventos pagos, revenda ou SaaS), [clique aqui para abrir um pedido de licença comercial](https://github.com/luiskenji-ido/arena-quiz-multiplayer/issues/new?title=Licen%C3%A7a%20comercial&body=Empresa%2Finstitui%C3%A7%C3%A3o%3A%0AComo%20pretende%20usar%3A%0AN%C3%BAmero%20aproximado%20de%20participantes%3A%0A) (abre uma Issue já com o título **"Licença comercial"**) para combinar uma licença separada.
 
 > O software é fornecido "como está", sem garantias. Leia o texto completo em [`LICENSE`](LICENSE).
 

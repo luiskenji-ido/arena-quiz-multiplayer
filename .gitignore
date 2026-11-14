@@ -1,3 +1,28 @@
+# Python
 __pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+env/
+
+# Banco local das salas (criado ao rodar o app)
 *.sqlite3
-*.pyc
+*.db
+
+# Node / testes de navegador
+node_modules/
+package-lock.json
+test-results/
+playwright-report/
+
+# Pacotes e arquivos temporários
+*.zip
+*.log
+~$*.docx
+
+# Editores e sistema
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
