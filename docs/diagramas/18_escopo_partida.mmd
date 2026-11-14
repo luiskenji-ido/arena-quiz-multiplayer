@@ -1,0 +1,14 @@
+flowchart TB
+  A["Quiz carregado (banco)<br/>ex.: 120 perguntas"] --> B["Configurar Jogo → Escopo da partida<br/>q_limit = 90 · q_pick"]
+  B --> C["Organizador clica<br/>Iniciar jogo"]
+  C --> D{"q_pick"}
+  D -- "first" --> E["Usa as 90 primeiras,<br/>na ordem do quiz"]
+  D -- "random" --> F["Sorteia 90 sem repetir,<br/>em ordem aleatória"]
+  E --> G["room.bank = quiz completo<br/>room.questions = 90 escolhidas"]
+  F --> G
+  G --> H["Partida: RODADA 1/90 … 90/90<br/>telão e celulares"]
+  H --> I["Pódio"]
+  I --> J["Reiniciar partida"]
+  J --> K["room.questions = room.bank<br/>(quiz completo de volta)"]
+  K --> B
+  B -. "estimativa na tela" .-> L["≈ por jogador (modo Por vez)<br/>duração ≈ N × (tempo + resultado)"]
