@@ -55,7 +55,7 @@ A aplicação foi pensada para rodar em hospedagens simples, como o **PythonAnyw
 
 > 📖 O passo a passo de cada função está no [Manual completo](docs/MANUAL.md).
 
-## 🏗️ Arquitetura
+## 🧱 Arquitetura
 
 ```mermaid
 flowchart LR
@@ -97,7 +97,7 @@ Mais diagramas (sequência, estados, dados, implantação) estão em [`docs/diag
 | Documentação | **Mermaid**, **docx** (Node.js) | Diagramas e geração dos documentos PRD, PTD e DTD |
 | Hospedagem | **PythonAnywhere** (ou qualquer servidor WSGI) | Publicação |
 
-## 🗂️ Estrutura do projeto
+## 📁 Estrutura do projeto
 
 ```text
 arena-quiz-multiplayer/
@@ -191,7 +191,7 @@ Abra **http://localhost:5000/host** para criar uma sala. Para jogar com celulare
 | `PORT` | `5000` | Porta do servidor local. |
 | `DEBUG` | *(vazia)* | Qualquer valor ativa o modo debug do Flask. |
 
-## ☁️ Publicação no PythonAnywhere
+## 🌐 Publicação no PythonAnywhere
 
 1. Crie uma conta em [pythonanywhere.com](https://www.pythonanywhere.com) e abra um **Bash console**.
 2. Clone o repositório:
@@ -321,7 +321,7 @@ Para atualizar um diagrama, edite o `.mmd` e gere o `.png` com o [Mermaid CLI](h
 - Quiz validado no servidor (tamanho, número de alternativas, URLs de imagem).
 - Limites de reações, emojis, chamadas de atenção e pedidos de entrada; textos escapados contra XSS.
 
-## 🗺️ Próximos passos
+## 🧭 Próximos passos
 
 - [ ] WebSockets opcionais para hospedagens que suportam conexões persistentes
 - [ ] Exportação de resultados (CSV/Excel) ao final da partida
