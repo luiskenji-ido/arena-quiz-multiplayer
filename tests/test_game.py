@@ -675,3 +675,83 @@ def test_scope_cannot_change_during_game(client):
     host(client, code, ht, 'settings', settings={'q_limit': 15, 'timer': 40})
     s = state(client, code, ht=ht)
     assert s['total'] == 5 and s['settings']['q_limit'] == 5 and s['settings']['timer'] == 40
+
+
+# ---------------- Presença: sair e expirar após 5 min sem conexão ----------------
+def _ago(code, pid, secs):
+    set_room(code, lambda r: r['players'][pid].__setitem__('seen', time.time() - secs))
+
+
+def test_idle_player_is_dropped_after_5_min_and_unblocks_round(client):
+    code, ht, (a, b) = mk(client, 2)
+    host(client, code, ht, 'start')
+    ans(client, code, a, 0)
+    assert state(client, code, ht=ht)['phase'] == 'open'            # falta o Beto responder
+    _ago(code, b['pid'], 200)                                       # 3 min: ainda conectado
+    assert len(state(client, code, ht=ht)['board']) == 2
+    _ago(code, b['pid'], 400)                                       # > 5 min: some
+    s = state(client, code, ht=ht)
+    assert [x['name'] for x in s['board']] == ['P1']
+    assert s['phase'] == 'reveal'                                   # todos (que restam) responderam -> fechou
+    assert any(e['k'] == 'ev_left_idle' for e in s['events'])
+    assert client.get(f'/api/state/{code}?pid={b["pid"]}&token={b["token"]}').status_code == 403
+    assert state(client, code, a)['phase'] == 'reveal'              # quem estava ativo continua
+
+
+def test_polling_keeps_the_session_alive(client):
+    code, ht, (a,) = mk(client, 1)
+    _ago(code, a['pid'], 100)
+    state(client, code, a)                                          # polling renova o "visto"
+    assert appmod.with_room(code, lambda r: time.time() - r['players'][a['pid']]['seen']) < 5
+    _ago(code, a['pid'], 290)
+    assert state(client, code, ht=ht)['board'][0]['name'] == 'P1'
+
+
+def test_host_gone_for_5_min_closes_room(client):
+    code, ht, (a,) = mk(client, 1)
+    set_room(code, lambda r: r.__setitem__('host_seen', time.time() - 400))
+    assert client.get(f'/api/state/{code}?pid={a["pid"]}&token={a["token"]}').status_code == 410
+    assert client.get(f'/api/state/{code}?role=host&token={ht}').status_code == 410
+    assert client.post('/api/join', json={'code': code, 'name': 'Novo'}).status_code == 410
+    assert ans(client, code, a, 0).status_code == 410
+
+
+def test_host_back_within_5_min_keeps_room(client):
+    code, ht, (a,) = mk(client, 1)
+    set_room(code, lambda r: r.__setitem__('host_seen', time.time() - 250))
+    assert client.get(f'/api/state/{code}?role=host&token={ht}').status_code == 200
+    assert client.get(f'/api/state/{code}?pid={a["pid"]}&token={a["token"]}').status_code == 200
+
+
+def test_host_logout_ends_room_for_everyone(client):
+    code, ht, (a,) = mk(client, 1, visibility='public', room_name='Fecha')
+    assert host(client, code, ht, 'end_room').status_code == 200
+    assert client.get(f'/api/state/{code}?pid={a["pid"]}&token={a["token"]}').status_code == 410
+    assert client.get(f'/api/state/{code}?role=host&token={ht}').status_code == 410
+    assert all(r['name'] != 'Fecha' for r in client.get('/api/public').get_json())
+    assert client.post(f'/api/host/{code}/end_room', json={'token': 'errado'}).status_code in (403, 410)
+
+
+def test_player_leave_removes_immediately_and_turn_moves_on(client):
+    code, ht, (a, b) = mk(client, 2, answer_order='turns')
+    host(client, code, ht, 'start')
+    s = state(client, code, ht=ht)
+    turn_pid = s['question']['turn']['id']
+    leaver = a if a['pid'] == turn_pid else b
+    r = client.post('/api/leave', json={'code': code, 'pid': leaver['pid'], 'token': leaver['token']})
+    assert r.status_code == 200
+    s = state(client, code, ht=ht)
+    assert len(s['board']) == 1 and s['phase'] == 'reveal'          # a vez dele terminou
+    assert client.post('/api/leave', json={'code': code, 'pid': leaver['pid'], 'token': leaver['token']}).status_code == 403
+
+
+def test_leave_at_podium_keeps_final_ranking(client):
+    code, ht, (a, b) = mk(client, 2)
+    host(client, code, ht, 'start')
+    host(client, code, ht, 'finish')
+    assert state(client, code, ht=ht)['phase'] == 'finished'
+    assert client.post('/api/leave', json={'code': code, 'pid': a['pid'], 'token': a['token']}).status_code == 200
+    assert len(state(client, code, ht=ht)['board']) == 2            # pódio preservado
+    _ago(code, b['pid'], 9999)
+    set_room(code, lambda r: r.__setitem__('host_seen', time.time() - 9999))
+    assert state(client, code, ht=ht)['phase'] == 'finished'        # no pódio ninguém expira

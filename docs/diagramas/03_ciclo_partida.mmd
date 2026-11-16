@@ -15,4 +15,8 @@ stateDiagram-v2
   reveal --> finished: finish
   finished --> lobby: restart (devolve o quiz completo)
   lobby --> lobby: settings / quiz / kick
+  lobby --> encerrada: organizador sai ou some 5 min
+  open --> encerrada: organizador sai ou some 5 min
+  reveal --> encerrada: organizador sai ou some 5 min
+  encerrada --> [*]
   finished --> [*]

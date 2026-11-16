@@ -20,6 +20,8 @@ THRESHOLDS = dict(p5050=2, doubleXp=3, dice=4, hint=5, card=6, trap=3, block=4, 
 SEAL_ROUNDS = 2          # lacre vale para o resto da rodada atual + a próxima
 INFINITE = 90            # >= 90 cargas = ilimitado
 MAX_PLAYERS = 60
+PRESENCE_TIMEOUT = int(os.environ.get('PRESENCE_TIMEOUT', 300))   # sem sinal por 5 min = sessão encerrada
+PRESENCE_TOUCH = 30      # o "visto por último" é gravado no máximo a cada 30 s (evita gravar a sala a cada polling)
 CARD_IDS = ['HINT', 'PVP', 'SHIELD', 'ALLIN']
 COLORS = [
     'from-cyan-500 to-blue-600', 'from-purple-500 to-indigo-600', 'from-emerald-500 to-teal-600',
@@ -186,7 +188,7 @@ def _new_player(room, name):
         'score': 0, 'correct': 0, 'answered': 0, 'streak': 0, 'max_streak': 0,
         'powers': {k: room['settings']['charges'] for k in POWERS},
         'blocked_next': False, 'blocked_now': False, 'sealed': 0, 'trap': None,
-        'nudges_used': 0, 'inbox': [], 'last_react': 0,
+        'nudges_used': 0, 'inbox': [], 'last_react': 0, 'seen': time.time(),
     }
 
 
@@ -459,7 +461,65 @@ def get_player(room, pid, token=None):
         raise GameError('bad_auth', 403)
     if token is not None and not secrets.compare_digest(str(token), p['token']):
         raise GameError('bad_auth', 403)
+    touch_player(p)                       # qualquer chamada do participante conta como "estou conectado"
     return p
+
+
+# --------------------------------------------------------------------------
+# Presença: quem fecha o navegador e não volta em 5 min é desconectado
+# --------------------------------------------------------------------------
+def touch_player(p):
+    now = time.time()
+    if now - p.get('seen', 0) > PRESENCE_TOUCH:
+        p['seen'] = now
+
+
+def touch_host(room):
+    now = time.time()
+    if now - room.get('host_seen', 0) > PRESENCE_TOUCH:
+        room['host_seen'] = now
+
+
+def close_room(room, reason):
+    """Encerra a sala para todos (organizador saiu ou ficou ausente)."""
+    room['closed'] = reason
+
+
+def drop_player(room, pid, key='ev_left'):
+    """Remove o participante e destrava a pergunta (vez dele ou 'todos responderam')."""
+    p = room['players'].pop(pid, None)
+    if not p:
+        return
+    event(room, key, name=p['name'])
+    q = room.get('q')
+    if q and room['phase'] == 'open':
+        if q.get('turn') == pid:
+            close_question(room)          # era a vez dele: passa para o resultado
+        else:
+            _maybe_auto_close(room)       # ele podia ser o único que faltava responder
+
+
+def check_presence(room):
+    """Chamado a cada requisição (sem processos em segundo plano no PythonAnywhere).
+    Sala encerrada -> erro 410. Organizador ausente por mais de PRESENCE_TIMEOUT -> encerra a sala.
+    Participante ausente por mais de PRESENCE_TIMEOUT -> sai da sala. O pódio (finished) é preservado."""
+    if room.get('closed'):
+        raise GameError('room_closed', 410)
+    if room['phase'] == 'finished':
+        return
+    now = time.time()
+    if now - room.get('host_seen', now) > PRESENCE_TIMEOUT:
+        close_room(room, 'host_timeout')
+        raise GameError('room_closed', 410)
+    for pid, p in list(room['players'].items()):
+        if now - p.setdefault('seen', now) > PRESENCE_TIMEOUT:
+            drop_player(room, pid, 'ev_left_idle')
+
+
+def leave(room, pid):
+    """Participante clicou em Sair. No pódio nada muda no servidor (o ranking final é mantido)."""
+    if room['phase'] != 'finished':
+        drop_player(room, pid, 'ev_left')
 
 
 # --------------------------------------------------------------------------
@@ -615,6 +675,8 @@ def host_action(room, action, arg=None):
             p['powers'] = {k: room['settings']['charges'] for k in POWERS}
     elif action == 'kick':
         room['players'].pop(arg, None)
+    elif action == 'end_room':                   # organizador clicou em Sair: encerra a sala para todos
+        close_room(room, 'host_left')
     else:
         raise GameError('bad_action')
 

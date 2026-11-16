@@ -17,7 +17,7 @@ async function poll() {
   try {
     const r = await api(`/api/state/${H.code}?role=host&token=${encodeURIComponent(H.token)}`);
     if (!r.ok) {
-      if (r.status === 404 || r.status === 403) { store(HKEY, null); location.href = '/host'; }
+      if (r.status === 404 || r.status === 403 || r.status === 410) { store(HKEY, null); location.href = r.status === 410 ? '/host?ended=1' : '/host'; }
       return;
     }
     ST = r.data; offset = ST.now - Date.now() / 1000;
@@ -175,6 +175,7 @@ function mountHostDock() {
   d.addEventListener('click', e => {
     const b = e.target.closest('button'); if (!b) return;
     if (b.id === 'hdArsenal') return openArsenal();
+    if (b.id === 'hdLogout') return hostLogout();
     if (b.id === 'hdToggle') { dockOpen = !dockOpen; store('arena_dock', dockOpen ? '1' : '0'); return paintDock(); }
     if (b.dataset.e) sendHostEmoji(b.dataset.e, b);
   });
@@ -185,6 +186,7 @@ function paintDock() {
   d.innerHTML = `<button id="hdArsenal" class="hd-main" title="${esc(t('host_arsenal_title'))}">🧰 <span>${t('host_arsenal')}</span></button>
     <span class="hd-label">${t('host_emojis')}</span>
     <div class="hd-emojis ${dockOpen ? '' : 'hidden'}">${HOST_EMOJIS.map(e => `<button class="hd-emo" data-e="${e}" title="${esc(t('host_emojis'))}">${e === 'HAHAHA' ? '<b class="hd-ha">HAHAHA</b>' : e}</button>`).join('')}</div>
+    <button id="hdLogout" class="hd-out" title="${esc(t('host_leave_title'))}"><i class="fa-solid fa-right-from-bracket"></i> <span>${t('btn_leave')}</span></button>
     <button id="hdToggle" class="hd-tg" title="${esc(t(dockOpen ? 'win_restore' : 'host_emojis'))}">${dockOpen ? '◂' : '😀▸'}</button>`;
 }
 async function sendHostEmoji(e, btn) {
@@ -331,3 +333,14 @@ function quizCountText() {
   if (ST.total >= bank) return t('quiz_n', { n: ST.total }) + (ST.settings.q_pick === 'random' ? ' · ' + t('scope_random_short') : '');
   return t('quiz_n_of', { n: ST.total, total: bank }) + (ST.settings.q_pick === 'random' ? ' · ' + t('scope_random_short') : '');
 }
+
+// ---------- Sair (logout do organizador): encerra a sala para todos ----------
+async function hostLogout() {
+  if (!H || !confirm(t('host_leave_confirm'))) return;
+  try { await api(`/api/host/${H.code}/end_room`, { token: H.token }); } catch (e) {}
+  store(HKEY, null); location.href = '/';
+}
+(function () {   // aviso na tela de criar sala depois de a sessão expirar
+  const n = document.getElementById('endedNote');
+  if (n && /[?&]ended=1/.test(location.search)) n.classList.remove('hidden');
+})();

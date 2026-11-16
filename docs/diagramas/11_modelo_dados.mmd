@@ -13,6 +13,7 @@ classDiagram
     events: list
     reactions: list
     broadcasts: list
+    closed: host_left|host_timeout|ausente
     bank: list (quiz completo durante a partida)
   }
   class Settings {
@@ -38,6 +39,7 @@ classDiagram
     blocked_next, blocked_now
     sealed, trap
     nudges_used, inbox
+    seen: float (visto por último)
   }
   class Question {
     question, options[2..6]

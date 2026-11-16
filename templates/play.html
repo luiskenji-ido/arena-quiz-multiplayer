@@ -211,12 +211,18 @@ function startGame() {
   document.addEventListener('visibilitychange', () => { if (!document.hidden) poll(); });
 }
 
+async function leaveRoom() {
+  if (!ME || !confirm(t(ST && ST.phase === 'finished' ? 'leave_confirm_end' : 'leave_confirm'))) return;
+  try { await api('/api/leave', { code: CODE, pid: ME.pid, token: ME.token }); } catch (e) {}
+  store(KEY, null); location.href = '/';
+}
+
 async function poll() {
   if (polling) return; polling = true;
   try {
     const r = await api(`/api/state/${CODE}?pid=${ME.pid}&token=${encodeURIComponent(ME.token)}`);
     if (!r.ok) {
-      if (r.status === 404 || r.status === 403) { store(KEY, null); document.body.innerHTML = `<div class="min-h-screen flex items-center justify-center p-6 text-center"><div class="panel neon-danger space-y-4"><p>${t('room_gone')}</p><a href="/" class="btn inline-block px-4 py-2 rounded-xl bg-cyan-500 text-slate-950 font-esports text-xs font-bold">OK</a></div></div>`; }
+      if (r.status === 404 || r.status === 403 || r.status === 410) { store(KEY, null); document.body.innerHTML = `<div class="min-h-screen flex items-center justify-center p-6 text-center"><div class="panel neon-danger space-y-4"><p>${t(r.status === 410 ? 'room_closed' : r.status === 403 ? 'session_ended' : 'room_gone')}</p><a href="/" class="btn inline-block px-4 py-2 rounded-xl bg-cyan-500 text-slate-950 font-esports text-xs font-bold">OK</a></div></div>`; }
       return;
     }
     ST = r.data; offset = ST.now - Date.now() / 1000;

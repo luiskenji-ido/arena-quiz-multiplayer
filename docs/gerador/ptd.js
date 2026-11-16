@@ -6,7 +6,7 @@ build({
   kind: 'PTD – Product Technical Document',
   title: 'Arena Quiz Multiplayer',
   subtitle: 'Visão técnica da solução: arquitetura, componentes, sincronização, segurança, implantação e qualidade',
-  version: '1.2', date: '14/11/2026', status: 'Atualizado com o escopo da partida',
+  version: '1.3', date: '16/11/2026', status: 'Atualizado com saída e expiração de sessão',
   blocks: [
     ['h1', '1. Objetivo do documento'],
     ['p', 'Este documento descreve **como** o Arena Quiz Multiplayer foi construído, no nível de produto. É para quem vai manter, hospedar ou evoluir a plataforma. Os requisitos de negócio estão no PRD, e os detalhes de implementação (campos, rotas, algoritmos) estão no DTD.'],
@@ -110,6 +110,16 @@ build({
       '**Emojis**: lista branca `HOST_EMOJIS`, limite de 1 a cada 0,35 s; cada item vai para `room.broadcasts` (celulares, via `me.broadcasts` dos últimos 10 s) e para `room.reactions` (telão, marcado `host: true`). O celular usa um conjunto de ids já vistos para tocar cada emoji uma única vez.',
       '**Avisos**: cada ação gera um evento `ev_host_*`; o celular mostra como aviso 🎤 os eventos mais novos que o último visto.']],
 
+    ['h2', '7.2 Sessão, saída e expiração (presença)'],
+    ['p', 'Como o PythonAnywhere não tem processos em segundo plano, a presença é avaliada de forma "preguiçosa": a cada requisição, `with_room` chama `check_presence()` antes de executar a ação. Cada participante tem o campo `seen` e a sala tem `host_seen`; ambos são renovados por qualquer chamada autenticada, mas só são gravados se passaram mais de 30 s desde a última gravação, para não regravar a sala a cada polling.'],
+    ['img', '19_sessao_presenca.png', 'Sessão, saída e expiração'],
+    ['bullets', [
+      '**Participante ausente (> 5 min):** `drop_player()` remove da sala, registra `ev_left_idle` e destrava a rodada: se era a vez dele, a pergunta passa ao resultado; senão, `_maybe_auto_close()` fecha a pergunta quando todos os demais já responderam.',
+      '**Organizador ausente (> 5 min):** `closed = host_timeout`. Daí em diante toda requisição à sala devolve `410 room_closed`; as telas limpam a sessão guardada e mostram o aviso.',
+      '**Botão Sair:** o participante chama `POST /api/leave` (saída imediata); o organizador chama a ação `end_room` (`closed = host_left`). No pódio (`finished`) a sala não expira e o Sair do participante não altera o ranking.',
+      '**Fechar o navegador não encerra na hora:** a página não avisa o servidor ao fechar, para que recarregar ou perder o sinal por instantes não derrube ninguém. A janela de 5 minutos é configurável pela variável `PRESENCE_TIMEOUT` (segundos).',
+      'Salas encerradas são apagadas do banco depois de 1 hora; as demais, após 24 h sem uso.']],
+
     ['h1', '8. Interface, temas e acessibilidade'],
     ['p', 'A tela é escolhida pelo modo da sala: `/play` entrega a versão Arena ou Clássico conforme a sala, e o telão troca de página sozinho se o organizador mudar o modo. Os temas são aplicados por atributos no elemento raiz (`data-theme`, `data-variant`) e por classes (`show-theme`, `show-dark`, `show-light`). Nos temas de auditório, inclusão e infantil, a pergunta no telão é desenhada como um **palco** em tela cheia por `renderStage()`.'],
     ['img', '15_temas.png', 'Temas, tons e acessibilidade'],
@@ -127,7 +137,7 @@ build({
       ['Vazamento de gabarito', 'Visões por papel; resposta certa só aparece no resultado; Clássico não revela acerto ao responder.'],
       ['Sala pública', 'Código não aparece na lista; status do pedido exige segredo; limite de 30 pedidos pendentes.'],
       ['Entrada de dados', 'Quiz validado no servidor (2–6 alternativas, tempo 5–300 s, imagem só http/https, máx. 200 perguntas, corpo até 1 MB); nomes até 20 caracteres.'],
-      ['Abuso', 'Limite de reações (0,8 s) e de emojis do organizador (0,35 s), limite de chamadas de atenção, emojis em lista branca, arsenal só com token do apresentador, máx. 60 jogadores.'],
+      ['Abuso', 'Sessão expira após 5 min sem conexão (PRESENCE_TIMEOUT), limite de reações (0,8 s) e de emojis do organizador (0,35 s), limite de chamadas de atenção, emojis em lista branca, arsenal só com token do apresentador, máx. 60 jogadores.'],
       ['XSS', 'Todo texto vindo do usuário é escapado (esc()) antes de ir para o HTML.']] }],
 
     ['h1', '10. Implantação'],
@@ -141,13 +151,14 @@ build({
       'Reload. Endereço: https://USUARIO.pythonanywhere.com.']],
     ['table', { title: 'Variáveis de ambiente', widths: [2, 2, 4], header: ['Variável', 'Padrão', 'Descrição'], rows: [
       ['HOST_PASSWORD', '(vazia)', 'Se definida, exige senha para criar salas.'],
+      ['PRESENCE_TIMEOUT', '300', 'Segundos sem conexão até desconectar o participante ou encerrar a sala do organizador ausente.'],
       ['QUIZ_DB', 'rooms.sqlite3 na pasta do app', 'Caminho do banco SQLite.'],
       ['PORT', '5000', 'Porta ao rodar localmente com python app.py.'],
       ['DEBUG', '(vazia)', 'Se definida, ativa o modo debug do Flask (recarrega ao salvar).']] }],
 
     ['h1', '11. Qualidade e testes'],
     ['table', { title: 'Suítes de teste', widths: [2, 2, 4], header: ['Suíte', 'Ferramenta', 'Cobertura'], rows: [
-      ['tests/test_game.py', 'pytest', '45 testes: pontuação, autenticação, tempo, pausa, placar oculto, poderes, enquete, Clássico, por vez, salas públicas, avanço automático, chamar atenção, reações, temas, arsenal e emojis do organizador.'],
+      ['tests/test_game.py', 'pytest', '52 testes: pontuação, autenticação, tempo, pausa, placar oculto, poderes, enquete, Clássico, por vez, salas públicas, avanço automático, chamar atenção, reações, temas, arsenal e emojis do organizador.'],
       ['tests/e2e.js', 'Playwright', 'Partida Arena com 2 celulares, dado, cartas, bloqueio e roubo.'],
       ['tests/e2e2.js', 'Playwright', 'Criação de quiz: JSON, CSV, texto rápido, editor e templates.'],
       ['tests/e2e3.js', 'Playwright', 'Clássico corporativo, pausa, placar, finalizar, reiniciar e troca de modo.'],
@@ -155,7 +166,8 @@ build({
       ['tests/e2e5.js', 'Playwright', 'Modo por vez nos modos Arena e Clássico.'],
       ['tests/e2e6.js', 'Playwright', 'Chamar atenção, reações, música de tensão e temas.'],
       ['tests/e2e7.js', 'Playwright', 'Arsenal e emojis do organizador nos modos Arena e Clássico.'],
-      ['tests/e2e8.js', 'Playwright', 'Escopo da partida: 90 de 120 perguntas, sorteio, reinício e modo Clássico.']] }],
+      ['tests/e2e8.js', 'Playwright', 'Escopo da partida: 90 de 120 perguntas, sorteio, reinício e modo Clássico.'],
+      ['tests/e2e9.js', 'Playwright', 'Botão Sair, expiração por 5 minutos sem conexão e sala encerrada pelo organizador.']] }],
     ['code', 'pip install pytest\npytest -q tests\nQUIZ_DB=/tmp/e2e.db PORT=5055 python app.py   # em outro terminal\nnode tests/e2e.js'],
 
     ['h1', '12. Limitações conhecidas e evolução'],

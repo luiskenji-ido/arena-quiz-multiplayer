@@ -48,6 +48,7 @@ def with_room(code, fn):
             raise GameError('room_not_found', 404)
         room = json.loads(row[0])
         try:
+            game.check_presence(room)         # sala encerrada / organizador ou participante ausente há mais de 5 min
             result = fn(room)
         except GameError:
             # mesmo com erro, guardamos efeitos do tick (ex.: pergunta fechada)
@@ -78,6 +79,7 @@ def create_room_row(room):
     c = _connect()
     try:
         c.execute('DELETE FROM rooms WHERE updated < ?', (time.time() - ROOM_TTL,))
+        c.execute('DELETE FROM rooms WHERE data LIKE \'%"closed":"%\' AND updated < ?', (time.time() - 3600,))   # encerradas há +1 h
         c.execute('INSERT INTO rooms (code, data, updated) VALUES (?,?,?)',
                   (room['code'], json.dumps(room, ensure_ascii=False, separators=(',', ':')), time.time()))
     finally:
@@ -206,8 +208,7 @@ def api_state(code):
         game.tick(room)
         if role == 'host':
             check_host(room, token)
-            if time.time() - room.get('host_seen', 0) > 30:     # sala "viva" para a lista pública
-                room['host_seen'] = time.time()
+            game.touch_host(room)                               # sala "viva" para a lista pública e contra a expiração
             return game.host_view(room)
         game.get_player(room, pid, token)
         return game.player_view(room, pid)
@@ -220,6 +221,7 @@ def api_host_action(code, action):
 
     def fn(room):
         check_host(room, b.get('token'))
+        game.touch_host(room)
         game.tick(room)
         if action == 'settings':
             lobby = room['phase'] == 'lobby'
@@ -260,6 +262,18 @@ def api_answer():
     return jsonify(with_room(b.get('code'), fn))
 
 
+@app.post('/api/leave')
+def api_leave():
+    """Participante clica em Sair: sai da sala na hora (sem esperar os 5 min)."""
+    b = body()
+
+    def fn(room):
+        game.get_player(room, b.get('pid'), b.get('token'))
+        game.leave(room, b['pid'])
+        return {'ok': True}
+    return jsonify(with_room(b.get('code'), fn))
+
+
 @app.post('/api/power')
 def api_power():
     b = body()
@@ -287,6 +301,7 @@ def _public_rooms():
     for code, raw in rows:
         room = json.loads(raw)
         if (room['settings'].get('visibility') == 'public' and room.get('pub_id') and room['phase'] != 'finished'
+                and not room.get('closed')
                 and time.time() - room.get('host_seen', 0) < PUBLIC_ALIVE):
             out.append((code, room))
     return out

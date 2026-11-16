@@ -6,7 +6,7 @@ build({
   kind: 'DTD – Detail Technical Document',
   title: 'Arena Quiz Multiplayer',
   subtitle: 'Detalhamento técnico: estrutura de código, modelo de dados, API, máquina de estados, algoritmos, front-end e testes',
-  version: '1.2', date: '14/11/2026', status: 'Atualizado com o escopo da partida',
+  version: '1.3', date: '16/11/2026', status: 'Atualizado com saída e expiração de sessão',
   blocks: [
     ['h1', '1. Introdução'],
     ['p', 'Este documento é a referência detalhada de implementação do Arena Quiz Multiplayer (protótipo v9). Ele complementa o PRD (o que o produto faz) e o PTD (visão técnica). Os nomes de campos, rotas e funções correspondem ao código-fonte.'],
@@ -47,6 +47,7 @@ build({
       ['reactions', 'list', 'Reações recentes {id, name, emoji, t, host?} (até 40, últimos 15 s); itens do organizador têm host = true.'],
       ['broadcasts', 'list', 'Emojis do organizador para os celulares {id, emoji, t, host} (até 20, últimos 15 s).'],
       ['last_host_emoji', 'float', 'Último emoji do organizador (limite de 0,35 s).'],
+      ['closed', 'str | ausente', 'host_left | host_timeout: sala encerrada; toda requisição devolve 410 room_closed.'],
       ['bank', 'list[Question] | ausente', 'Quiz completo guardado durante a partida quando o escopo usa só parte dele; volta para questions no restart.'],
       ['turn_idx', 'int', 'Ponteiro do rodízio no modo por vez.'],
       ['auto_hold', 'bool', 'Avanço automático segurado pelo apresentador.'],
@@ -87,6 +88,7 @@ build({
       ['sealed', 'int', 'Perguntas restantes sem poderes (Lacre).'],
       ['trap', 'obj | null', 'Armadilha ativa {by}.'],
       ['nudges_used / inbox', 'int / list', 'Chamadas de atenção usadas e recebidas (últimos 60 s).'],
+      ['seen', 'float', 'Visto por último (epoch). Renovado por qualquer chamada autenticada, gravado no máximo a cada 30 s. Mais de 5 min sem renovar = removido da sala.'],
       ['last_react / joined', 'float', 'Controle de frequência de reações / ordem de entrada.']] }],
     ['h2', '3.4 Pergunta (Question)'],
     ['table', { title: 'Campos da pergunta', widths: [2, 2, 5], header: ['Campo', 'Tipo', 'Regra'], rows: [
@@ -134,6 +136,7 @@ build({
       ['POST', '/api/power', '{code, pid, token, power, target?, steal?, stage?, card_idx?}', 'Depende do poder (ex.: {roll, xp}, {deck, picked, effect})'],
       ['POST', '/api/nudge', '{code, pid, token, target, kind}', '{left}'],
       ['POST', '/api/react', '{code, pid, token, emoji}', '{}'],
+      ['POST', '/api/leave', '{code, pid, token}', '{ok: true}'],
       ['GET', '/api/public', '—', 'Lista de salas públicas {id, name, quiz_title, mode, lang, players, phase, total}'],
       ['POST', '/api/public/<pub_id>/request', '{name}', '{rid, secret}'],
       ['GET', '/api/public/<pub_id>/request/<rid>', '?secret=', '{status, name, code?, pid?, token?}'],
@@ -145,6 +148,7 @@ build({
       ['next', 'reveal', 'Próxima pergunta ou pódio.'],
       ['close', 'open', 'Encerra a pergunta (remove pausa).'],
       ['pause / resume', 'open', 'Congela/retoma o relógio.'],
+      ['end_room', 'qualquer', 'Sair do organizador: closed = host_left; a sala deixa de existir para todos (410).'],
       ['pause / resume', 'reveal', 'Segura/continua o avanço automático.'],
       ['finish', 'open, reveal, finished', 'Vai ao pódio.'],
       ['restart', 'qualquer', 'Devolve o quiz completo (_restore_bank), zera pontos, poderes e chamadas; volta ao lobby.'],
@@ -261,6 +265,16 @@ build({
       ['_restore_bank(room)', 'Chamada no restart: questions = bank e remove bank.']] }],
     ['code', '# exemplo: quiz com 120 perguntas, escopo de 90 sorteadas\nPOST /api/host/ABCD/settings  {"token": "...", "settings": {"q_limit": 90, "q_pick": "random"}}\nPOST /api/host/ABCD/start     {"token": "..."}\nGET  /api/state/ABCD?role=host&token=...   ->  {"total": 90, "bank_total": 120, ...}'],
 
+    ['h2', '6.10 Presença, saída e expiração'],
+    ['img', '19_sessao_presenca.png', 'Sessão, saída e expiração'],
+    ['table', { title: 'Funções de presença (game.py)', widths: [2, 6], header: ['Função', 'Comportamento'], rows: [
+      ['check_presence(room)', 'Chamada em with_room antes de cada ação. closed → 410. Em finished não faz nada. host_seen > PRESENCE_TIMEOUT → closed = host_timeout (410). Participante com seen > PRESENCE_TIMEOUT → drop_player(ev_left_idle).'],
+      ['touch_player(p) / touch_host(room)', 'Renovam seen / host_seen se passaram mais de 30 s. touch_player é chamada por get_player (toda ação do participante); touch_host, no polling e nas ações do organizador.'],
+      ['drop_player(room, pid, key)', 'Remove o jogador e registra o evento (ev_left ou ev_left_idle). Se a pergunta está aberta: era a vez dele → close_question; senão → _maybe_auto_close.'],
+      ['leave(room, pid)', 'Saída voluntária: drop_player, exceto no pódio (mantém o ranking).'],
+      ['close_room(room, reason)', 'Define closed (host_left ou host_timeout).']] }],
+    ['p', 'O prazo é a variável de ambiente `PRESENCE_TIMEOUT` (padrão 300 s). No navegador: o celular trata 410 com a mensagem "A sala foi encerrada" e 403 com "Você saiu da sala (5 min sem conexão ou removido)"; em ambos apaga a sessão guardada. O organizador, ao receber 410, apaga a sessão e vai para `/host?ended=1`, que mostra o aviso na tela de criar sala.'],
+
     ['h1', '7. Salas públicas, interações e criação de quiz'],
     ['img', '09_sala_publica.png', 'Pedido de entrada'],
     ['table', { title: 'Regras das salas públicas', widths: [3, 5], header: ['Regra', 'Valor'], rows: [
@@ -299,6 +313,7 @@ build({
       ['quiz_invalid', '400 / 413', 'Quiz fora do formato ou maior que 1 MB.'],
       ['template_not_found / request_not_found', '404', 'Template ou pedido inexistente.'],
       ['too_many_requests / slow_down', '429', 'Muitos pedidos pendentes / reações rápidas demais.'],
+      ['room_closed', '410', 'Sala encerrada: organizador saiu ou ficou mais de 5 min sem conexão.'],
       ['no_nudges / reactions_off / bad_emoji', '400', 'Sem chamadas restantes / reações desligadas / emoji fora da lista.'],
       ['powers_off (hostpower)', '400', 'Alvo ou cargas pedidos no modo Clássico.']] }],
 
@@ -350,8 +365,9 @@ build({
       ['Por vez', 'turns_rotate_only_turn_player_answers, turns_block_skips_turn_and_powers_only_on_own_turn, turns_classic_scoring_and_host_set_turn, turn_timeout_resets_streak'],
       ['Interações e temas', 'nudge_limit_and_inbox, reactions_whitelist_rate_limit_and_toggle, theme_and_tension_settings'],
       ['Arsenal do organizador', 'host_arsenal_all_players, host_shield_for_everyone_once_each, host_target_and_give_charges, host_arsenal_classic_mode, host_emoji_broadcast'],
+      ['Presença e saída', 'idle_player_is_dropped_after_5_min_and_unblocks_round, polling_keeps_the_session_alive, host_gone_for_5_min_closes_room, host_back_within_5_min_keeps_room, host_logout_ends_room_for_everyone, player_leave_removes_immediately_and_turn_moves_on, leave_at_podium_keeps_final_ranking'],
       ['Escopo da partida', 'scope_first_n_questions, scope_random_pick_and_restart_restores_bank, scope_limit_bigger_than_quiz_and_all, scope_cannot_change_during_game']] }],
-    ['p', 'Roteiros de navegador (Playwright): e2e.js (partida Arena), e2e2.js (criação de quiz), e2e3.js (Clássico e controles), e2e4.js (sala pública e avanço automático), e2e5.js (por vez), e2e6.js (interações e temas), e2e7.js (arsenal e emojis do organizador), e2e8.js (escopo da partida).'],
+    ['p', 'Roteiros de navegador (Playwright): e2e.js (partida Arena), e2e2.js (criação de quiz), e2e3.js (Clássico e controles), e2e4.js (sala pública e avanço automático), e2e5.js (por vez), e2e6.js (interações e temas), e2e7.js (arsenal e emojis do organizador), e2e8.js (escopo da partida), e2e9.js (saída e expiração de sessão).'],
     ['note', 'Os diagramas deste documento são gerados a partir dos arquivos .mmd em docs/diagramas. Para atualizar, edite o .mmd e gere o PNG novamente; para regenerar os documentos, rode `node docs/gerador/prd.js`, `ptd.js` e `dtd.js`.']
   ]
 }, path.join(__dirname, '..', 'DTD_Arena_Quiz_Multiplayer.docx'));

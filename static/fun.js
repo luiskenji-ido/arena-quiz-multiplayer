@@ -357,3 +357,18 @@ function hostEventToasts(events) {
   events.filter(e => e.t > lastHostEventT && /^ev_host_/.test(e.k)).reverse().forEach(e => { toast(eventText(e), true); beep('power'); });
   lastHostEventT = Math.max(lastHostEventT, maxT);
 }
+
+// ---------------- botão Sair (celulares) ----------------
+function mountLeaveButton() {
+  if (document.getElementById('leaveBtn') || typeof leaveRoom !== 'function') return;
+  const b = document.createElement('button');
+  b.id = 'leaveBtn';
+  b.className = 'fixed bottom-3 right-3 z-[70] h-10 px-3 rounded-full bg-slate-900/90 border border-slate-600 text-slate-100 text-xs font-bold shadow-lg';
+  b.style.right = '.75rem';
+  b.innerHTML = '<i class="fa-solid fa-right-from-bracket"></i> <span data-i18n="btn_leave"></span>';
+  b.querySelector('span').textContent = t('btn_leave');
+  b.onclick = () => leaveRoom();
+  document.body.appendChild(b);
+}
+const _mountSound3 = mountSoundToggle;
+mountSoundToggle = function () { _mountSound3(); mountLeaveButton(); };

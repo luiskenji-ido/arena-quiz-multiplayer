@@ -8,13 +8,14 @@ build({
   kind: 'PRD – Product Requirements Document',
   title: 'Arena Quiz Multiplayer',
   subtitle: 'Requisitos de produto da plataforma de quiz ao vivo para eventos, salas de aula e treinamentos',
-  version: '1.2', date: '14/11/2026', status: 'Atualizado com o escopo da partida',
+  version: '1.3', date: '16/11/2026', status: 'Atualizado com saída e expiração de sessão',
   blocks: [
     ['h1', '1. Controle do documento'],
     ['table', { title: 'Histórico de versões', widths: [1, 2, 5], header: ['Versão', 'Data', 'Descrição'], rows: [
       ['1.0', '14/11/2026', 'Primeira versão consolidada a partir das entregas v1 a v9 do protótipo (Arena, Clássico, salas públicas, modo por vez, interações, temas e acessibilidade).'],
       ['1.1', '14/11/2026', 'Arsenal e emojis do organizador (RF-39 a RF-43): efeitos para todos, poderes contra um participante, dar cargas e emojis enviados a todos os celulares.'],
-      ['1.2', '14/11/2026', 'Escopo da partida (RF-44 a RF-46): o organizador define quantas perguntas do quiz usar (ex.: 90 de 120), na sequência ou sorteadas, com estimativa de duração.']] }],
+      ['1.2', '14/11/2026', 'Escopo da partida (RF-44 a RF-46): o organizador define quantas perguntas do quiz usar (ex.: 90 de 120), na sequência ou sorteadas, com estimativa de duração.'],
+      ['1.3', '16/11/2026', 'Sessão, saída e expiração (RF-47 a RF-50): botão Sair para participante e organizador e desconexão automática após 5 minutos sem conexão.']] }],
     ['table', { title: 'Documentos relacionados', widths: [2, 5], header: ['Documento', 'Conteúdo'], rows: [
       ['PTD – Product Technical Document', 'Visão técnica da solução: arquitetura, componentes, segurança e implantação.'],
       ['DTD – Detail Technical Document', 'Detalhamento: modelo de dados, API, máquina de estados, algoritmos e códigos de erro.'],
@@ -143,6 +144,15 @@ build({
       RF('RF-42', 'Dar +1 carga de qualquer poder a um participante ou a todos.', 'S', 'Só no modo Arena; o celular mostra o aviso e o contador de cargas atualiza.'),
       RF('RF-43', 'Emojis do organizador para todos os participantes.', 'M', '20 emojis (inclui HAHAHA, 👋, ⏰, 💪, 🏆); aparecem grandes no celular com "🎤 Organizador" e no telão; limite de 1 a cada 0,35 s.')] }],
     ['img', '17_arsenal_organizador.png', 'Arsenal e emojis do organizador'],
+
+    ['h2', '5.8 Sessão, saída e expiração por inatividade'],
+    ['p', 'O navegador guarda o acesso da pessoa para retomar a sala ao reabrir a página. Para a conexão não ficar "presa" depois que alguém fecha o navegador, a sessão passa a ter botão de saída e um prazo de 5 minutos sem conexão.'],
+    ['table', { title: 'Requisitos de sessão', widths: [1, 5, 1, 4], header: ['ID', 'Requisito', 'Prior.', 'Critério de aceite'], rows: [
+      RF('RF-47', 'Botão Sair para o participante.', 'M', 'Pede confirmação (avisa que os pontos da partida serão perdidos), remove o participante da sala na hora e volta à página inicial. No pódio, o ranking final é mantido.'),
+      RF('RF-48', 'Botão Sair para o organizador.', 'M', 'Encerra a sala para todos, após confirmação. Os participantes veem "A sala foi encerrada" e voltam à página inicial; a sala sai da lista pública.'),
+      RF('RF-49', 'Desconexão automática do participante após 5 minutos sem conexão.', 'M', 'Quem não se reconecta em 5 minutos sai da sala (aviso no feed) e não trava mais "todos responderam" nem a vez do modo Por vez. Voltar em até 5 minutos mantém tudo. O tempo é configurável (PRESENCE_TIMEOUT).'),
+      RF('RF-50', 'Encerramento automático da sala quando o organizador some por 5 minutos.', 'M', 'Participantes e organizador recebem aviso; ao reabrir, o organizador cai na tela de criar sala com a mensagem de sessão encerrada. No pódio a sala não expira.')] }],
+    ['img', '19_sessao_presenca.png', 'Sessão, saída e expiração'],
     ['img', '15_temas.png', 'Temas visuais e acessibilidade'],
 
     ['h1', '6. Requisitos não funcionais'],

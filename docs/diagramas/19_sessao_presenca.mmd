@@ -1,0 +1,16 @@
+flowchart TB
+  A["Qualquer requisição à sala<br/>polling, resposta, poder, entrada…"] --> B["with_room → check_presence"]
+  B --> C{"Sala já encerrada?"}
+  C -- "sim" --> X["410 room_closed<br/>as telas voltam ao início"]
+  C -- "não" --> D{"Fase = pódio<br/>(finished)?"}
+  D -- "sim" --> OK["segue para a requisição<br/>(no pódio o ranking é preservado)"]
+  D -- "não" --> E{"Organizador sem sinal<br/>há mais de 5 min?"}
+  E -- "sim" --> F["closed = host_timeout<br/>410 room_closed"]
+  E -- "não" --> G{"Participante sem sinal<br/>há mais de 5 min?"}
+  G -- "sim" --> H["drop_player<br/>remove, registra ev_left_idle,<br/>passa a vez ou fecha a pergunta"]
+  G -- "não" --> OK
+  H --> OK
+  OK --> T["Processa a requisição e atualiza<br/>o visto por último<br/>(no máximo a cada 30 s)"]
+  S1["Botão Sair do participante<br/>POST /api/leave"] --> H2["drop_player (ev_left)"]
+  S2["Botão Sair do organizador<br/>POST host/end_room"] --> H3["closed = host_left"]
+  H3 --> X

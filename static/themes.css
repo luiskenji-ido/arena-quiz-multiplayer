@@ -139,3 +139,7 @@ html.a11y .stage-opt{font-size:clamp(1.1rem,1.9vw,1.6rem)}
 @keyframes bcPop{0%{transform:scale(.3);opacity:0}15%{transform:scale(1.15);opacity:1}30%{transform:scale(1)}80%{opacity:1}100%{transform:translateY(-30px) scale(.95);opacity:0}}
 .react-float.host .react-name{background:#f59e0b;color:#1c1917}
 .hd-ha{font-size:9px;font-weight:900;letter-spacing:-.02em;line-height:1}
+
+.host-dock .hd-out{flex:none;display:flex;align-items:center;gap:.3rem;padding:.4rem .7rem;border-radius:999px;background:rgba(239,68,68,.18);border:1px solid rgba(239,68,68,.55);color:#fecaca;font-weight:800;font-size:.72rem}
+.host-dock .hd-out:hover{background:rgba(239,68,68,.35)}
+@media (max-width:760px){.host-dock .hd-out span{display:none}}

@@ -81,6 +81,16 @@ Durante o jogo aparece a barra de controles:
 * **Configurar Jogo** continua disponível: tempo, pontos, placar e poderes podem mudar com o jogo rolando;
   modo, idioma, cargas e quiz só no lobby.
 
+### 🚪 Sair e expiração da conexão
+* **Participante:** o botão **Sair** (canto inferior direito do celular) pede confirmação, tira você da sala na hora e volta à página inicial.
+  Durante a partida os seus pontos são perdidos; no pódio, o ranking final é mantido.
+* **Organizador:** o botão **Sair** da barra inferior encerra a sala para todos. Os participantes veem "A sala foi encerrada".
+* **Fechou o navegador?** Você tem **5 minutos** para voltar (mesmo link ou código) e continuar de onde parou.
+  Passando disso, a sessão é encerrada:
+  * o **participante** sai da sala (aparece "ficou 5 min sem conexão" no feed) e não trava mais a rodada nem a vez dos outros;
+  * se o **organizador** some por 5 minutos, a sala é encerrada. Ao reabrir, ele vê o aviso e pode criar uma nova sala.
+* No pódio a sala não expira. O prazo pode ser mudado com a variável de ambiente `PRESENCE_TIMEOUT` (em segundos; padrão 300).
+
 ### 🔢 Escopo da partida (quantas perguntas usar)
 Em **Configurar Jogo → Escopo da partida** (no lobby, antes de iniciar):
 * Escolha quantas perguntas do quiz serão usadas, pelo controle deslizante ou digitando o número.
@@ -192,7 +202,7 @@ templates/         index (entrada), host + play (Arena), host_classic + play_cla
 static/            common.js e i18n_extra.js (idiomas, manual), host_core.js (controles do apresentador),
                    fun.js (sons, chamar atenção, reações, temas, palco, acessibilidade), themes.css, showthemes.css, inclusion.css e kids.css,
                    quizkit.js (criação de quiz), style.css (Arena), corp.css (Clássico)
-tests/             test_game.py (pytest), e2e.js ... e2e8.js (Playwright), fixtures/
+tests/             test_game.py (pytest), e2e.js ... e2e9.js (Playwright), fixtures/
 ```
 
 ## Testes
@@ -206,5 +216,5 @@ Em `docs/`:
 * `PRD_Arena_Quiz_Multiplayer.docx` – requisitos de produto.
 * `PTD_Arena_Quiz_Multiplayer.docx` – visão técnica (arquitetura, segurança, implantação, testes).
 * `DTD_Arena_Quiz_Multiplayer.docx` – detalhamento (modelo de dados, API, algoritmos, erros, front-end).
-* `diagramas/` – 18 diagramas Mermaid (`.mmd`) e as imagens geradas (`.png`).
+* `diagramas/` – 19 diagramas Mermaid (`.mmd`) e as imagens geradas (`.png`).
 * `gerador/` – scripts que geram os documentos: `docs/gerador/gerar.sh`.

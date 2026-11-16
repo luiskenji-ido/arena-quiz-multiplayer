@@ -84,7 +84,7 @@
   helpHTML = function () {
     if (typeof ST !== 'undefined' && ST && ST.settings && ST.settings.mode === 'classic') {
       const li = k => `<li>${t(k)}</li>`;
-      return `<div class="panel border border-amber-500/30 text-sm text-slate-300 space-y-2"><h4 class="font-esports text-sm font-bold text-amber-300">${t('help_classic_title')}</h4><ul class="list-disc list-inside space-y-1">${['help_classic_1', 'help_classic_2', 'help_classic_3', 'help_classic_4', 'help_classic_5', 'help_classic_6', 'help_classic_7'].map(li).join('')}</ul></div>`;
+      return `<div class="panel border border-amber-500/30 text-sm text-slate-300 space-y-2"><h4 class="font-esports text-sm font-bold text-amber-300">${t('help_classic_title')}</h4><ul class="list-disc list-inside space-y-1">${['help_classic_1', 'help_classic_2', 'help_classic_3', 'help_classic_4', 'help_classic_5', 'help_classic_6', 'help_classic_7', 'help_classic_8'].map(li).join('')}</ul></div>`;
     }
     return baseHelp();
   };
@@ -395,6 +395,40 @@ function turnResultText(q) {
           quiz_n_of: "{n} de {total} preguntas",
           help_s1_l6: "<strong>Alcance de la partida:</strong> en Configurar Juego, el organizador elige cuántas preguntas del quiz usar (ej.: 90 de 120), en orden o sorteadas. La pantalla muestra cuántas responde cada jugador en modo Por turno y la duración estimada.",
           help_classic_7: "El organizador puede usar solo parte del quiz (ej.: 90 de 120 preguntas), en orden o sorteadas, en <strong>Configurar Juego → Alcance de la partida</strong>." }
+  };
+  for (const l in X) Object.assign(I18N[l], X[l]);
+})();
+
+/* Sair e expiração da sessão (5 min sem conexão) */
+(function () {
+  const X = {
+    pt: { btn_leave: "Sair", leave_confirm: "Sair da sala? Seus pontos desta partida serão perdidos.", leave_confirm_end: "Sair da sala?",
+          host_leave_title: "Sair e encerrar a sala", host_leave_confirm: "Encerrar a sala e sair? Todos os participantes serão desconectados.",
+          session_ended: "Você saiu da sala: ficou mais de 5 minutos sem conexão ou foi removido pelo organizador. Entre novamente com o código.",
+          room_closed: "A sala foi encerrada: o organizador saiu ou ficou mais de 5 minutos sem conexão.",
+          host_session_ended: "Sua sala foi encerrada (você saiu ou ficou mais de 5 minutos sem conexão). Crie uma nova sala.",
+          err_room_closed: "A sala foi encerrada.",
+          ev_left: "👋 {name} saiu da sala", ev_left_idle: "📴 {name} ficou 5 min sem conexão e saiu da sala",
+          help_s1_l7: "<strong>Sair e conexão:</strong> use o botão <b>Sair</b> para deixar a sala. Se fechar o navegador ou o celular desconectar, você tem <b>5 minutos</b> para voltar (mesmo link ou código): depois disso a sessão é encerrada. Se o organizador ficar 5 minutos sem conexão, a sala é encerrada.",
+          help_classic_8: "Use o botão <strong>Sair</strong> para deixar a sala. Quem fica <strong>5 minutos sem conexão</strong> é desconectado, e a sala é encerrada se o organizador ficar 5 minutos ausente." },
+    en: { btn_leave: "Leave", leave_confirm: "Leave the room? Your points in this game will be lost.", leave_confirm_end: "Leave the room?",
+          host_leave_title: "Leave and close the room", host_leave_confirm: "Close the room and leave? All participants will be disconnected.",
+          session_ended: "You left the room: you were offline for more than 5 minutes or were removed by the organizer. Join again with the code.",
+          room_closed: "The room was closed: the organizer left or was offline for more than 5 minutes.",
+          host_session_ended: "Your room was closed (you left or were offline for more than 5 minutes). Create a new room.",
+          err_room_closed: "The room was closed.",
+          ev_left: "👋 {name} left the room", ev_left_idle: "📴 {name} was offline for 5 min and left the room",
+          help_s1_l7: "<strong>Leaving and connection:</strong> use the <b>Leave</b> button to exit the room. If you close the browser or your phone disconnects, you have <b>5 minutes</b> to come back (same link or code): after that the session ends. If the organizer is offline for 5 minutes, the room is closed.",
+          help_classic_8: "Use the <strong>Leave</strong> button to exit the room. Anyone offline for <strong>5 minutes</strong> is disconnected, and the room is closed if the organizer is away for 5 minutes." },
+    es: { btn_leave: "Salir", leave_confirm: "¿Salir de la sala? Perderás tus puntos de esta partida.", leave_confirm_end: "¿Salir de la sala?",
+          host_leave_title: "Salir y cerrar la sala", host_leave_confirm: "¿Cerrar la sala y salir? Todos los participantes serán desconectados.",
+          session_ended: "Saliste de la sala: pasaste más de 5 minutos sin conexión o el organizador te quitó. Entra de nuevo con el código.",
+          room_closed: "La sala fue cerrada: el organizador salió o pasó más de 5 minutos sin conexión.",
+          host_session_ended: "Tu sala fue cerrada (saliste o pasaste más de 5 minutos sin conexión). Crea una sala nueva.",
+          err_room_closed: "La sala fue cerrada.",
+          ev_left: "👋 {name} salió de la sala", ev_left_idle: "📴 {name} estuvo 5 min sin conexión y salió de la sala",
+          help_s1_l7: "<strong>Salir y conexión:</strong> usa el botón <b>Salir</b> para dejar la sala. Si cierras el navegador o el móvil se desconecta, tienes <b>5 minutos</b> para volver (mismo enlace o código): después la sesión termina. Si el organizador pasa 5 minutos sin conexión, la sala se cierra.",
+          help_classic_8: "Usa el botón <strong>Salir</strong> para dejar la sala. Quien pasa <strong>5 minutos sin conexión</strong> es desconectado, y la sala se cierra si el organizador se ausenta 5 minutos." }
   };
   for (const l in X) Object.assign(I18N[l], X[l]);
 })();
