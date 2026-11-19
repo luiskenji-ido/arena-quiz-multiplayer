@@ -766,3 +766,43 @@ def test_version_endpoint_and_static_files_are_versioned(client):
     for page in ('/play', '/host', '/host/classic', '/'):
         html = client.get(page).get_data(as_text=True)
         assert re.search(r'/static/\w+\.(js|css)\?v=\d+', html), page            # ?v=<data>: o celular nunca usa JS antigo do cache
+
+
+# ---------------- Chamar atenção do organizador ----------------
+def _hostnudge(client, code, ht, target, kind='scare'):
+    return client.post(f'/api/host/{code}/hostnudge', json={'token': ht, 'target': target, 'kind': kind})
+
+
+def test_host_nudge_one_participant_and_everyone(client):
+    code, ht, (a, b, c) = mk(client, 3)
+    r = _hostnudge(client, code, ht, b['pid'], 'siren')
+    assert r.status_code == 200 and r.get_json() == {'sent': 1}
+    inbox_b = state(client, code, b)['me']['inbox']
+    assert len(inbox_b) == 1 and inbox_b[0]['host'] is True and inbox_b[0]['kind'] == 'siren'
+    assert state(client, code, a)['me']['inbox'] == []                      # só o escolhido recebe
+    time.sleep(1.05)
+    assert _hostnudge(client, code, ht, 'all', 'horn').get_json() == {'sent': 3}
+    for p in (a, b, c):
+        assert any(m['host'] and m['kind'] == 'horn' for m in state(client, code, p)['me']['inbox'])
+    assert any(e['k'] == 'ev_host_nudge' and e['p']['target'] == '*' for e in state(client, code, ht=ht)['events'])
+
+
+def test_host_nudge_validation_and_limits(client):
+    code, ht, (a,) = mk(client, 1)
+    assert _hostnudge(client, code, ht, 'inexistente').status_code == 400          # bad_target
+    assert client.post(f'/api/host/{code}/hostnudge', json={'token': 'errado', 'target': 'all'}).status_code == 403
+    assert _hostnudge(client, code, ht, a['pid'], 'qualquer-coisa').status_code == 200   # tipo inválido vira buzina
+    assert state(client, code, a)['me']['inbox'][-1]['kind'] == 'horn'
+    assert _hostnudge(client, code, ht, a['pid']).status_code == 429                # no máximo 1 por segundo
+    time.sleep(1.05)
+    assert _hostnudge(client, code, ht, 'all').status_code == 200                   # sem limite de usos
+
+
+def test_host_nudge_works_in_classic_and_empty_room_and_podium(client):
+    code, ht, ps = mk(client, 0, mode='classic')
+    assert _hostnudge(client, code, ht, 'all').status_code == 400                   # sala vazia
+    j = client.post('/api/join', json={'code': code, 'name': 'Ana'}).get_json()
+    assert _hostnudge(client, code, ht, j['pid']).status_code == 200                # vale também no Clássico
+    host(client, code, ht, 'start'); host(client, code, ht, 'finish')
+    time.sleep(1.05)
+    assert _hostnudge(client, code, ht, 'all').status_code == 400                   # no pódio não

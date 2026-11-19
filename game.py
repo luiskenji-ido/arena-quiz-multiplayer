@@ -394,6 +394,30 @@ def host_power(room, power, args=None):
     raise GameError('bad_power')
 
 
+def host_nudge(room, target_id, kind):
+    """Chamar atenção do organizador: toca um som alto no celular de um participante (ou de todos). Sem limite de usos."""
+    if room['phase'] == 'finished':
+        raise GameError('not_active')
+    now = time.time()
+    if now - room.get('last_host_nudge', 0) < 1.0:
+        raise GameError('slow_down', 429)
+    if target_id == 'all':
+        targets = list(room['players'].values())
+    else:
+        t = room['players'].get(target_id)
+        targets = [t] if t else []
+    if not targets:
+        raise GameError('bad_target')
+    kind = kind if kind in NUDGE_KINDS else 'horn'
+    room['last_host_nudge'] = now
+    for t in targets:
+        inbox = [m for m in t.get('inbox', []) if now - m['t'] < 60][-9:]
+        inbox.append({'id': secrets.token_hex(4), 'from': '', 'host': True, 'kind': kind, 't': now})
+        t['inbox'] = inbox
+    event(room, 'ev_host_nudge', target='*' if target_id == 'all' else targets[0]['name'])
+    return {'sent': len(targets)}
+
+
 def host_emoji(room, emoji):
     """Emoji do organizador: aparece grande no celular de todos e no telão."""
     if emoji not in HOST_EMOJIS:

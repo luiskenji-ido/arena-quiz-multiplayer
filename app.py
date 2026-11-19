@@ -20,7 +20,7 @@ import quiz_templates
 from game import GameError
 
 app = Flask(__name__)
-APP_VERSION = '1.4.1'
+APP_VERSION = '1.5.0'
 STATIC_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'static')
 app.config['JSON_AS_ASCII'] = False
 app.config['MAX_CONTENT_LENGTH'] = 1024 * 1024
@@ -268,6 +268,8 @@ def api_host_action(code, action):
             return game.host_power(room, b.get('power'), b)
         elif action == 'hostemoji':
             return game.host_emoji(room, b.get('emoji'))
+        elif action == 'hostnudge':
+            return game.host_nudge(room, b.get('target'), b.get('kind'))
         else:
             game.host_action(room, action, b.get('pid') or b.get('rid'))
         return {'ok': True}
@@ -401,7 +403,7 @@ def api_react():
 def version():
     """Mostra qual versão está no ar (útil para conferir se a atualização chegou ao servidor)."""
     resp = jsonify(version=APP_VERSION, presence_timeout=game.PRESENCE_TIMEOUT, static_updated=_static_stamp(),
-                   features=['arsenal', 'scope', 'presence', 'nudge_always_visible'])
+                   features=['arsenal', 'scope', 'presence', 'nudge_always_visible', 'host_nudge'])
     resp.headers['Cache-Control'] = 'no-store'
     return resp
 

@@ -226,6 +226,7 @@ function renderArsenal(force) {
   const sig = [ST.phase, ST.qi, arena, poll, players.join(','), LANG].join('|');
   if (!force && sig === arsSig) return;
   arsSig = sig;
+  const keepN = (document.getElementById('arsNudgeT') || {}).value;
   const keepT = (document.getElementById('arsTarget') || {}).value, keepG = (document.getElementById('arsGiveT') || {}).value, keepP = (document.getElementById('arsGiveP') || {}).value;
   document.getElementById('arsTitle').textContent = t('host_arsenal_title');
   const btn = (meta, onclick, disabled) => `<button ${disabled ? 'disabled' : ''} onclick="${onclick}" class="pw btn ${PW_STYLE[meta.c] || PW_STYLE.amber}" style="padding:.7rem .3rem"><i class="fa-solid ${meta.icon}"></i><span>${t('ha_' + meta.k)}</span></button>`;
@@ -236,6 +237,10 @@ function renderArsenal(force) {
       <div class="grid grid-cols-3 sm:grid-cols-6 gap-2">${HOST_ALL_META.map(mt => btn(mt, `useHostPower('${mt.k}')`, !open || (poll && mt.k !== 'all_time'))).join('')}</div>
       ${open ? '' : `<p class="text-[11px] text-amber-300">${t('ha_only_open')}</p>`}
       <div id="arsFx" class="hidden rounded-xl bg-slate-900 border border-amber-400/50 p-3 flex items-center gap-4"></div></div>
+    <div class="space-y-2"><div class="text-[11px] font-esports uppercase text-purple-300">${t('ha_nudge')}</div>
+      <div class="flex flex-wrap items-center gap-2"><select id="arsNudgeT" class="bg-slate-950 border border-slate-700 rounded-lg px-2 py-1.5 text-white text-sm" ${players.length ? '' : 'disabled'}><option value="all">${t('ha_everyone')}</option>${opts}</select>
+        ${Object.keys(NUDGE_META).map(k => `<button ${players.length ? '' : 'disabled'} onclick="hostNudge('${k}')" class="btn px-3 py-2 rounded-lg border border-amber-500/60 bg-amber-500/15 text-amber-200 font-esports text-[11px] font-bold">${NUDGE_META[k]} ${t('nudge_' + k)}</button>`).join('')}</div>
+      <p class="text-[11px] text-slate-400">${t('ha_nudge_d')}</p></div>
     <div class="space-y-2 ${arena ? '' : 'opacity-50'}"><div class="text-[11px] font-esports uppercase text-purple-300">${t('ha_target')}</div>
       <div class="flex flex-wrap items-center gap-2"><select id="arsTarget" class="bg-slate-950 border border-slate-700 rounded-lg px-2 py-1.5 text-white text-sm" ${arena ? '' : 'disabled'}>${opts}</select>
         ${HOST_TARGET_META.map(mt => `<button ${arena && players.length ? '' : 'disabled'} onclick="useHostPower('${mt.k}', { target: document.getElementById('arsTarget').value })" class="btn px-3 py-2 rounded-lg border font-esports text-[11px] font-bold ${PW_STYLE[mt.c]}"><i class="fa-solid ${mt.icon}"></i> ${t('ha_' + mt.k)}</button>`).join('')}</div></div>
@@ -246,9 +251,17 @@ function renderArsenal(force) {
       ${arena ? '' : `<p class="text-[11px] text-slate-400">${t('ha_arena_only')}</p>`}</div>
     <div class="space-y-2"><div class="text-[11px] font-esports uppercase text-purple-300">${t('host_emojis')}</div>
       <div class="flex flex-wrap gap-1.5">${HOST_EMOJIS.map(e => `<button class="react-btn" onclick="sendHostEmoji('${e}')">${e === 'HAHAHA' ? '<b class="hd-ha">HAHAHA</b>' : e}</button>`).join('')}</div></div>`;
+  if (keepN && document.querySelector(`#arsNudgeT option[value="${keepN}"]`)) document.getElementById('arsNudgeT').value = keepN;
   if (keepT && document.querySelector(`#arsTarget option[value="${keepT}"]`)) document.getElementById('arsTarget').value = keepT;
   if (keepG && document.querySelector(`#arsGiveT option[value="${keepG}"]`)) document.getElementById('arsGiveT').value = keepG;
   if (keepP) document.getElementById('arsGiveP').value = keepP;
+}
+async function hostNudge(kind) {
+  const sel = document.getElementById('arsNudgeT');
+  const r = await api(`/api/host/${H.code}/hostnudge`, { token: H.token, target: sel ? sel.value : 'all', kind });
+  if (r.ok) { beep('power'); toast(t('ha_nudge_sent', { n: r.data.sent }), true); }
+  else if (r.data.error !== 'slow_down') toast(errText(r.data.error), false);
+  poll();
 }
 let hpBusy = false;
 async function useHostPower(power, extra) {

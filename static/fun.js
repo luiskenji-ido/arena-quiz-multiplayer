@@ -63,7 +63,7 @@ function handleInbox(inbox) {
     if (navigator.vibrate) navigator.vibrate([400, 120, 400, 120, 600]);
     const o = document.createElement('div');
     o.className = 'nudge-flash';
-    o.innerHTML = `<div class="nudge-box"><div class="text-6xl">${NUDGE_META[m.kind] || '📢'}</div><div class="text-2xl font-black mt-2">${esc(t('nudge_got', { name: m.from }))}</div></div>`;
+    o.innerHTML = `<div class="nudge-box"><div class="text-6xl">${NUDGE_META[m.kind] || '📢'}</div><div class="text-2xl font-black mt-2">${esc(t('nudge_got', { name: m.host ? t('host_label') : m.from }))}</div></div>`;
     document.body.appendChild(o); document.body.classList.add('shake');
     setTimeout(() => { o.remove(); document.body.classList.remove('shake'); }, 1800);
   });

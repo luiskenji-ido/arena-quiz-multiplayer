@@ -8,7 +8,7 @@ build({
   kind: 'PRD – Product Requirements Document',
   title: 'Arena Quiz Multiplayer',
   subtitle: 'Requisitos de produto da plataforma de quiz ao vivo para eventos, salas de aula e treinamentos',
-  version: '1.4', date: '19/11/2026', status: 'Ajuste do chamar atenção e do botão Sair',
+  version: '1.5', date: '19/11/2026', status: 'Atualizado com o chamar atenção do organizador',
   blocks: [
     ['h1', '1. Controle do documento'],
     ['table', { title: 'Histórico de versões', widths: [1, 2, 5], header: ['Versão', 'Data', 'Descrição'], rows: [
@@ -16,7 +16,8 @@ build({
       ['1.1', '14/11/2026', 'Arsenal e emojis do organizador (RF-39 a RF-43): efeitos para todos, poderes contra um participante, dar cargas e emojis enviados a todos os celulares.'],
       ['1.2', '14/11/2026', 'Escopo da partida (RF-44 a RF-46): o organizador define quantas perguntas do quiz usar (ex.: 90 de 120), na sequência ou sorteadas, com estimativa de duração.'],
       ['1.3', '16/11/2026', 'Sessão, saída e expiração (RF-47 a RF-50): botão Sair para participante e organizador e desconexão automática após 5 minutos sem conexão.'],
-      ['1.4', '19/11/2026', 'Chamar atenção (RF-32): o botão passa a ficar sempre visível, esmaecido e com aviso quando não há rival conectado. O botão Sair foi movido para o canto esquerdo, junto aos outros controles, para não cobrir botões do jogo.']] }],
+      ['1.4', '19/11/2026', 'Chamar atenção (RF-32): o botão passa a ficar sempre visível, esmaecido e com aviso quando não há rival conectado. O botão Sair foi movido para o canto esquerdo, junto aos outros controles, para não cobrir botões do jogo.'],
+      ['1.5', '19/11/2026', 'Chamar atenção do organizador (RF-51): som alto no celular de um participante ou de todos, pelo Arsenal.']] }],
     ['table', { title: 'Documentos relacionados', widths: [2, 5], header: ['Documento', 'Conteúdo'], rows: [
       ['PTD – Product Technical Document', 'Visão técnica da solução: arquitetura, componentes, segurança e implantação.'],
       ['DTD – Detail Technical Document', 'Detalhamento: modelo de dados, API, máquina de estados, algoritmos e códigos de erro.'],
@@ -143,6 +144,7 @@ build({
       RF('RF-40', 'Dado da sorte (D6) e Carta surpresa com animação na tela do organizador.', 'S', 'Dado: 1 = +5 s, 2 = +10 s, 3 = some 1 errada, 4 = +15 s, 5 = escudo de sequência, 6 = somem 2 erradas + dobro. Carta: Mentoria, Seguro (2ª chance, 1 vez por participante), All-In 3x ou Tempo Extra (+20 s).'),
       RF('RF-41', 'Poderes contra um participante: Armadilha, Bloqueio e Lacre.', 'S', 'Só no modo Arena; o organizador escolhe o alvo numa lista.'),
       RF('RF-42', 'Dar +1 carga de qualquer poder a um participante ou a todos.', 'S', 'Só no modo Arena; o celular mostra o aviso e o contador de cargas atualiza.'),
+      RF('RF-51', 'Chamar atenção pelo organizador.', 'S', 'No Arsenal, escolher um participante (ou Todos) e o som (buzina, susto ou sirene): toca alto no celular, vibra e mostra "Organizador chamou sua atenção!". Sem limite de usos (1 por segundo); vale nos modos Arena e Clássico; não vale no pódio.'),
       RF('RF-43', 'Emojis do organizador para todos os participantes.', 'M', '20 emojis (inclui HAHAHA, 👋, ⏰, 💪, 🏆); aparecem grandes no celular com "🎤 Organizador" e no telão; limite de 1 a cada 0,35 s.')] }],
     ['img', '17_arsenal_organizador.png', 'Arsenal e emojis do organizador'],
 

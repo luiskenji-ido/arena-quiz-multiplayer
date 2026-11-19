@@ -6,7 +6,7 @@ build({
   kind: 'PTD – Product Technical Document',
   title: 'Arena Quiz Multiplayer',
   subtitle: 'Visão técnica da solução: arquitetura, componentes, sincronização, segurança, implantação e qualidade',
-  version: '1.4', date: '19/11/2026', status: 'Ajuste do chamar atenção e do botão Sair',
+  version: '1.5', date: '19/11/2026', status: 'Atualizado com o chamar atenção do organizador',
   blocks: [
     ['h1', '1. Objetivo do documento'],
     ['p', 'Este documento descreve **como** o Arena Quiz Multiplayer foi construído, no nível de produto. É para quem vai manter, hospedar ou evoluir a plataforma. Os requisitos de negócio estão no PRD, e os detalhes de implementação (campos, rotas, algoritmos) estão no DTD.'],
@@ -108,6 +108,7 @@ build({
       '**Tempo extra** (+15 s, dado e carta) aumenta `q.end` e `q.duration`; o relógio de todos se ajusta no próximo polling.',
       '**Alvo e cargas** reutilizam os mesmos campos dos poderes dos jogadores (`blocked_next`, `sealed`, `trap`, `powers`) e por isso só valem no Arena.',
       '**Emojis**: lista branca `HOST_EMOJIS`, limite de 1 a cada 0,35 s; cada item vai para `room.broadcasts` (celulares, via `me.broadcasts` dos últimos 10 s) e para `room.reactions` (telão, marcado `host: true`). O celular usa um conjunto de ids já vistos para tocar cada emoji uma única vez.',
+      '**Chamar atenção do organizador** (`hostnudge`): usa a mesma caixa de entrada (`inbox`) do chamar atenção dos jogadores, com `host: true`; o celular mostra "Organizador" como remetente e toca o som localmente. Alvo é um participante ou `all`; limite de 1 por segundo e sem limite de usos.',
       '**Avisos**: cada ação gera um evento `ev_host_*`; o celular mostra como aviso 🎤 os eventos mais novos que o último visto.']],
 
     ['h2', '7.2 Sessão, saída e expiração (presença)'],
@@ -164,7 +165,7 @@ build({
 
     ['h1', '11. Qualidade e testes'],
     ['table', { title: 'Suítes de teste', widths: [2, 2, 4], header: ['Suíte', 'Ferramenta', 'Cobertura'], rows: [
-      ['tests/test_game.py', 'pytest', '52 testes: pontuação, autenticação, tempo, pausa, placar oculto, poderes, enquete, Clássico, por vez, salas públicas, avanço automático, chamar atenção, reações, temas, arsenal e emojis do organizador.'],
+      ['tests/test_game.py', 'pytest', '56 testes: pontuação, autenticação, tempo, pausa, placar oculto, poderes, enquete, Clássico, por vez, salas públicas, avanço automático, chamar atenção, reações, temas, arsenal e emojis do organizador.'],
       ['tests/e2e.js', 'Playwright', 'Partida Arena com 2 celulares, dado, cartas, bloqueio e roubo.'],
       ['tests/e2e2.js', 'Playwright', 'Criação de quiz: JSON, CSV, texto rápido, editor e templates.'],
       ['tests/e2e3.js', 'Playwright', 'Clássico corporativo, pausa, placar, finalizar, reiniciar e troca de modo.'],
@@ -174,7 +175,8 @@ build({
       ['tests/e2e7.js', 'Playwright', 'Arsenal e emojis do organizador nos modos Arena e Clássico.'],
       ['tests/e2e8.js', 'Playwright', 'Escopo da partida: 90 de 120 perguntas, sorteio, reinício e modo Clássico.'],
       ['tests/e2e9.js', 'Playwright', 'Botão Sair, expiração por 5 minutos sem conexão e sala encerrada pelo organizador.'],
-      ['tests/e2e10.js', 'Playwright', 'Chamar atenção nos modos Arena e Clássico, inclusive quando o único rival sai por inatividade.']] }],
+      ['tests/e2e10.js', 'Playwright', 'Chamar atenção nos modos Arena e Clássico, inclusive quando o único rival sai por inatividade.'],
+      ['tests/e2e11.js', 'Playwright', 'Chamar atenção do organizador (um participante e todos) nos modos Arena e Clássico.']] }],
     ['code', 'pip install pytest\npytest -q tests\nQUIZ_DB=/tmp/e2e.db PORT=5055 python app.py   # em outro terminal\nnode tests/e2e.js'],
 
     ['h1', '12. Limitações conhecidas e evolução'],

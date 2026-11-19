@@ -114,6 +114,7 @@ Na parte de baixo da tela do apresentador (Arena e Clássico) fica uma barra flu
     +5 s, +10 s, some 1 errada, +15 s, escudo de sequência, ou some 2 erradas + dobro) e **Carta surpresa**
     (Mentoria, Seguro 2ª chance, All-In 3x ou Tempo Extra +20 s). Valem no Arena e no Clássico.
   * **Contra um participante** (Arena): Armadilha, Bloqueio ou Lacre.
+  * **Chamar atenção** (Arena e Clássico): escolha um participante (ou **Todos**) e o som (Buzina, Susto ou Sirene). O som toca alto no celular, que vibra e mostra "Organizador chamou sua atenção!". Sem limite de usos.
   * **Dar cargas** (Arena): +1 de qualquer poder para um participante ou para todos.
 * Cada ação aparece como aviso 🎤 nos celulares e no feed de eventos.
 

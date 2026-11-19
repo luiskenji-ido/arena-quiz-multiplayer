@@ -84,7 +84,7 @@
   helpHTML = function () {
     if (typeof ST !== 'undefined' && ST && ST.settings && ST.settings.mode === 'classic') {
       const li = k => `<li>${t(k)}</li>`;
-      return `<div class="panel border border-amber-500/30 text-sm text-slate-300 space-y-2"><h4 class="font-esports text-sm font-bold text-amber-300">${t('help_classic_title')}</h4><ul class="list-disc list-inside space-y-1">${['help_classic_1', 'help_classic_2', 'help_classic_3', 'help_classic_4', 'help_classic_5', 'help_classic_6', 'help_classic_7', 'help_classic_8'].map(li).join('')}</ul></div>`;
+      return `<div class="panel border border-amber-500/30 text-sm text-slate-300 space-y-2"><h4 class="font-esports text-sm font-bold text-amber-300">${t('help_classic_title')}</h4><ul class="list-disc list-inside space-y-1">${['help_classic_1', 'help_classic_2', 'help_classic_3', 'help_classic_4', 'help_classic_5', 'help_classic_6', 'help_classic_7', 'help_classic_8', 'help_classic_9'].map(li).join('')}</ul></div>`;
     }
     return baseHelp();
   };
@@ -439,6 +439,25 @@ function turnResultText(q) {
     pt: { nudge_need_more: "Precisa de outro participante conectado na sala para chamar a atenção." },
     en: { nudge_need_more: "You need another connected participant in the room to get their attention." },
     es: { nudge_need_more: "Necesitas otro participante conectado en la sala para llamar su atención." }
+  };
+  for (const l in X) Object.assign(I18N[l], X[l]);
+})();
+
+/* Chamar atenção do organizador */
+(function () {
+  const X = {
+    pt: { ha_nudge: "Chamar atenção (som alto no celular)", ha_nudge_d: "Toca a buzina, o susto ou a sirene no celular do participante escolhido (ou de todos). Sem limite de usos.",
+          ha_nudge_sent: "Chamada enviada para {n} participante(s)!", ev_host_nudge: "🎤📢 O organizador chamou a atenção de {target}!",
+          help_s5_l5: "<strong>Chamar atenção:</strong> o organizador toca buzina, susto ou sirene no celular de um participante ou de todos, sem limite de usos.",
+          help_classic_9: "O organizador também pode <strong>chamar a atenção</strong> de um participante (ou de todos) com som alto no celular." },
+    en: { ha_nudge: "Get attention (loud sound on the phone)", ha_nudge_d: "Plays the horn, scare or siren on the chosen participant's phone (or everyone's). Unlimited uses.",
+          ha_nudge_sent: "Alert sent to {n} participant(s)!", ev_host_nudge: "🎤📢 The organizer called {target}'s attention!",
+          help_s5_l5: "<strong>Get attention:</strong> the organizer plays a horn, scare or siren on one participant's phone or everyone's, with unlimited uses.",
+          help_classic_9: "The organizer can also <strong>get attention</strong> from one participant (or everyone) with a loud sound on their phone." },
+    es: { ha_nudge: "Llamar la atención (sonido fuerte en el móvil)", ha_nudge_d: "Reproduce la bocina, el susto o la sirena en el móvil del participante elegido (o de todos). Sin límite de usos.",
+          ha_nudge_sent: "¡Llamado enviado a {n} participante(s)!", ev_host_nudge: "🎤📢 ¡El organizador llamó la atención de {target}!",
+          help_s5_l5: "<strong>Llamar la atención:</strong> el organizador reproduce bocina, susto o sirena en el móvil de un participante o de todos, sin límite de usos.",
+          help_classic_9: "El organizador también puede <strong>llamar la atención</strong> de un participante (o de todos) con un sonido fuerte en su móvil." }
   };
   for (const l in X) Object.assign(I18N[l], X[l]);
 })();

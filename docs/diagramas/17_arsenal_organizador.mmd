@@ -17,6 +17,10 @@ sequenceDiagram
   else lobby / revelação
     S-->>O: 400 not_open
   end
+  O->>S: POST hostnudge {target: pid|all, kind: horn|scare|siren}
+  S->>S: limite 1 por segundo, sem limite de usos
+  S-->>P: polling: me.inbox traz a chamada (host: true)
+  P->>P: som alto + vibração + "Organizador chamou sua atenção!"
   O->>S: POST hostpower {power: trap|block|seal, target}
   O->>S: POST hostpower {power: give, give: block, target: all}
   S->>S: só Arena: aplica no alvo / +1 carga

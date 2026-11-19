@@ -47,7 +47,7 @@ A aplicação foi pensada para rodar em hospedagens simples, como o **PythonAnyw
 | **Controles do apresentador** | Pausar, retomar, encerrar, próxima, avanço automático (3 a 60 s), finalizar, reiniciar, placar ao vivo, só entre perguntas ou só no final. |
 | **Sessão e saída** | Botão **Sair** para participantes e organizador. Quem fica 5 minutos sem conexão é desconectado, e a sala é encerrada se o organizador some por 5 minutos. |
 | **Escopo da partida** | O organizador escolhe quantas perguntas do quiz usar (ex.: 90 de 120), na sequência ou sorteadas, com estimativa de duração e de perguntas por jogador. |
-| **🧰 Arsenal do organizador** | Efeitos para todos (50/50 geral, dobro, dica, +15 s, Dado da sorte, Carta surpresa), poderes contra um participante e envio de cargas. |
+| **🧰 Arsenal do organizador** | Efeitos para todos (50/50 geral, dobro, dica, +15 s, Dado da sorte, Carta surpresa), poderes contra um participante, envio de cargas e **chamar atenção** com som alto no celular de um participante ou de todos. |
 | **Interação** | Emojis do organizador no celular de todos, reações dos participantes no telão, "chamar atenção" com som alto e música de tensão. |
 | **Salas** | Privadas (só com código/QR) ou públicas (pedido de entrada aprovado pelo organizador). Até 60 participantes por sala. |
 | **Criação de quiz** | Templates prontos (corporativos e de diversão), importação JSON/CSV, texto rápido, editor visual e prompt pronto para IA. Enquetes sem resposta certa. |
@@ -95,7 +95,7 @@ Mais diagramas (sequência, estados, dados, implantação) estão em [`docs/diag
 | Estilo | **Tailwind CSS** (CDN), CSS próprio | Layout, temas e acessibilidade |
 | Ícones e fontes | **Font Awesome 6**, **Google Fonts** (Inter, Orbitron) | Ícones e tipografia |
 | Áudio | **Web Audio API** | Sons e música de tensão gerados em tempo real, sem arquivos de áudio |
-| Testes | **pytest**, **Playwright** | 52 testes de regras e 10 roteiros de navegador |
+| Testes | **pytest**, **Playwright** | 56 testes de regras e 11 roteiros de navegador |
 | Documentação | **Mermaid**, **docx** (Node.js) | Diagramas e geração dos documentos PRD, PTD e DTD |
 | Hospedagem | **PythonAnywhere** (ou qualquer servidor WSGI) | Publicação |
 
@@ -129,7 +129,7 @@ arena-quiz-multiplayer/
 │   └── themes.css, showthemes.css, inclusion.css, kids.css   # Temas
 ├── tests/
 │   ├── test_game.py          # Testes de regras (pytest)
-│   ├── e2e.js … e2e10.js     # Roteiros de navegador (Playwright)
+│   ├── e2e.js … e2e11.js     # Roteiros de navegador (Playwright)
 │   └── fixtures/             # Quizzes de exemplo (JSON e CSV)
 └── docs/
     ├── MANUAL.md             # Manual completo de uso

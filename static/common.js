@@ -246,7 +246,7 @@ function helpHTML() {
    <div class="panel border border-amber-500/30"><h4 class="font-esports text-sm font-bold text-amber-300 mb-1">${t('help_s2')}</h4><p class="text-xs text-slate-400 mb-2">${t('help_s2_d')}</p><ul class="space-y-1.5 text-[12px]">${pw.map(k => `<li class="bg-slate-950/60 p-2 rounded-lg border border-slate-800">${t('help_' + k)}</li>`).join('')}</ul></div>
    <div class="panel border border-slate-800"><h4 class="font-esports text-sm font-bold text-emerald-300 mb-2">${t('help_s3')}</h4><ul class="list-disc list-inside space-y-1">${['help_s3_l1','help_s3_l2'].map(li).join('')}</ul></div>
    <div class="panel border border-slate-800"><h4 class="font-esports text-sm font-bold text-purple-300 mb-2">${t('help_s4')}</h4><ul class="list-disc list-inside space-y-1">${['help_s4_l1','help_s4_l2','help_s4_l3'].map(li).join('')}</ul></div>
-   <div class="panel border border-amber-500/30"><h4 class="font-esports text-sm font-bold text-amber-300 mb-2">${t('help_s5')}</h4><ul class="list-disc list-inside space-y-1">${['help_s5_l1','help_s5_l2','help_s5_l3','help_s5_l4'].map(li).join('')}</ul></div>
+   <div class="panel border border-amber-500/30"><h4 class="font-esports text-sm font-bold text-amber-300 mb-2">${t('help_s5')}</h4><ul class="list-disc list-inside space-y-1">${['help_s5_l1','help_s5_l2','help_s5_l3','help_s5_l4','help_s5_l5'].map(li).join('')}</ul></div>
   </div>`;
 }
 function openHelp() {
