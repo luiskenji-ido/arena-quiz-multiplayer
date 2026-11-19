@@ -256,13 +256,14 @@ function render() {
   if (ph === 'finished') {
     document.getElementById('finalPlace').textContent = ST.my_rank ? t('your_place', { n: ST.my_rank }) : '';
   }
-  if (q) renderQuestion(q);
-  renderNotices();
-  renderPowers();
+  // cada parte é desenhada de forma independente: se uma falhar, as outras (ex.: chamar atenção) continuam aparecendo
+  safe(renderFun);
+  if (q) safe(() => renderQuestion(q));
+  safe(renderNotices);
+  safe(renderPowers);
   show('pausedBar', !!(q && q.paused && ph === 'open'));
-  renderBoard();
-  renderFeed();
-  renderFun();
+  safe(renderBoard);
+  safe(renderFeed);
 
   if (ST.qi !== lastQi && ph === 'open') {
     closeAllModals(); lastStatus = '';

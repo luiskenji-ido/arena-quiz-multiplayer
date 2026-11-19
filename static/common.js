@@ -279,3 +279,17 @@ function langSelectHTML() {
   return `<select id="langSelect" onchange="setLang(this.value)" class="bg-slate-900 border border-slate-700 rounded-lg px-2 py-1 text-xs text-slate-200"><option value="pt">🇧🇷 PT</option><option value="en">🇺🇸 EN</option><option value="es">🇪🇸 ES</option></select>`;
 }
 function fmt(n) { return Number(n).toLocaleString(); }
+
+
+// Executa uma parte da tela sem derrubar o resto se ela falhar. Com ?debug=1 na URL o erro aparece numa faixa vermelha (para diagnóstico no celular).
+function safe(fn) {
+  try { return fn(); } catch (e) { console.error(e); debugBar(e); }
+}
+function debugBar(e) {
+  if (!/[?&]debug=1/.test(location.search)) return;
+  let d = document.getElementById('dbgBar');
+  if (!d) { d = document.createElement('div'); d.id = 'dbgBar'; d.style.cssText = 'position:fixed;left:0;right:0;top:0;z-index:99999;background:#b91c1c;color:#fff;font:11px/1.3 monospace;padding:4px 8px;white-space:pre-wrap;max-height:30vh;overflow:auto'; document.body.appendChild(d); }
+  d.textContent += '\n' + (e && (e.stack || e.message) || e).toString().split('\n').slice(0, 3).join(' | ');
+}
+window.addEventListener('error', ev => debugBar(ev.error || ev.message));
+window.addEventListener('unhandledrejection', ev => debugBar(ev.reason));

@@ -120,6 +120,12 @@ build({
       '**Fechar o navegador não encerra na hora:** a página não avisa o servidor ao fechar, para que recarregar ou perder o sinal por instantes não derrube ninguém. A janela de 5 minutos é configurável pela variável `PRESENCE_TIMEOUT` (segundos).',
       'Salas encerradas são apagadas do banco depois de 1 hora; as demais, após 24 h sem uso.']],
 
+    ['h2', '7.3 Versão e cache dos arquivos estáticos'],
+    ['bullets', [
+      'Todo arquivo de `/static` é servido com `?v=<data de modificação>`. Depois de um `git pull`, o navegador e o celular baixam os arquivos novos e nunca misturam um JavaScript antigo (do cache) com uma página nova.',
+      '`GET /version` informa a versão no ar, o prazo de presença e a data dos arquivos estáticos; serve para conferir se a atualização chegou ao servidor (PythonAnywhere).',
+      'Cada parte da tela do celular é desenhada de forma independente (`safe()`): se uma falhar, as outras continuam. Com `?debug=1` na URL, o erro aparece numa faixa vermelha para diagnóstico.']],
+
     ['h1', '8. Interface, temas e acessibilidade'],
     ['p', 'A tela é escolhida pelo modo da sala: `/play` entrega a versão Arena ou Clássico conforme a sala, e o telão troca de página sozinho se o organizador mudar o modo. Os temas são aplicados por atributos no elemento raiz (`data-theme`, `data-variant`) e por classes (`show-theme`, `show-dark`, `show-light`). Nos temas de auditório, inclusão e infantil, a pergunta no telão é desenhada como um **palco** em tela cheia por `renderStage()`.'],
     ['img', '15_temas.png', 'Temas, tons e acessibilidade'],

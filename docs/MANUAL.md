@@ -81,6 +81,10 @@ Durante o jogo aparece a barra de controles:
 * **Configurar Jogo** continua disponível: tempo, pontos, placar e poderes podem mudar com o jogo rolando;
   modo, idioma, cargas e quiz só no lobby.
 
+### 🔎 Conferir a versão no ar
+Abra `https://SEU_USUARIO.pythonanywhere.com/version`: mostra a versão instalada. Depois de atualizar o servidor (`git pull` e **Reload**), a versão muda.
+Para diagnosticar uma tela do celular, abra o link com `&debug=1` no fim (ex.: `/play?code=ABCD&debug=1`): qualquer erro aparece numa faixa vermelha.
+
 ### 🚪 Sair e expiração da conexão
 * **Participante:** o botão **Sair** (canto inferior esquerdo do celular, ao lado dos botões de som, acessibilidade e tela cheia) pede confirmação, tira você da sala na hora e volta à página inicial.
   Durante a partida os seus pontos são perdidos; no pódio, o ranking final é mantido.

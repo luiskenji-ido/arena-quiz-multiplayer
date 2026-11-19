@@ -755,3 +755,14 @@ def test_leave_at_podium_keeps_final_ranking(client):
     _ago(code, b['pid'], 9999)
     set_room(code, lambda r: r.__setitem__('host_seen', time.time() - 9999))
     assert state(client, code, ht=ht)['phase'] == 'finished'        # no pódio ninguém expira
+
+
+# ---------------- Versão e cache dos arquivos estáticos ----------------
+def test_version_endpoint_and_static_files_are_versioned(client):
+    import re
+    v = client.get('/version').get_json()
+    assert v['version'] and v['presence_timeout'] == game.PRESENCE_TIMEOUT and 'nudge_always_visible' in v['features']
+    assert client.get('/version').headers['Cache-Control'] == 'no-store'
+    for page in ('/play', '/host', '/host/classic', '/'):
+        html = client.get(page).get_data(as_text=True)
+        assert re.search(r'/static/\w+\.(js|css)\?v=\d+', html), page            # ?v=<data>: o celular nunca usa JS antigo do cache

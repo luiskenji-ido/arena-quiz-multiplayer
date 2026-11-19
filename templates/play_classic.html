@@ -179,7 +179,7 @@ function render() {
   document.body.classList.toggle('purple', ph !== 'open' || picked);
 
   if (ph === 'lobby') document.getElementById('lobQuiz').textContent = ST.quiz_title || '';
-  renderFun();
+  safe(renderFun);
 
   if (ph === 'open' && !picked) {
     document.getElementById('qMeta').textContent = t('corp_question_n', { n: ST.qi + 1, total: ST.total }) + (q.poll ? ' · ' + t('poll_badge') : '');

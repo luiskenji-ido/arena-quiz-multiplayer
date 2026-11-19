@@ -137,6 +137,7 @@ build({
       ['POST', '/api/nudge', '{code, pid, token, target, kind}', '{left}'],
       ['POST', '/api/react', '{code, pid, token, emoji}', '{}'],
       ['POST', '/api/leave', '{code, pid, token}', '{ok: true}'],
+      ['GET', '/version', '—', '{version, presence_timeout, static_updated, features}'],
       ['GET', '/api/public', '—', 'Lista de salas públicas {id, name, quiz_title, mode, lang, players, phase, total}'],
       ['POST', '/api/public/<pub_id>/request', '{name}', '{rid, secret}'],
       ['GET', '/api/public/<pub_id>/request/<rid>', '?secret=', '{status, name, code?, pid?, token?}'],

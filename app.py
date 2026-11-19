@@ -13,19 +13,42 @@ import time
 
 import qrcode
 import qrcode.image.svg
-from flask import Flask, Response, jsonify, redirect, render_template, request
+from flask import Flask, Response, jsonify, redirect, render_template, request, url_for
 
 import game
 import quiz_templates
 from game import GameError
 
 app = Flask(__name__)
+APP_VERSION = '1.4.1'
+STATIC_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'static')
 app.config['JSON_AS_ASCII'] = False
 app.config['MAX_CONTENT_LENGTH'] = 1024 * 1024
 
 DB_PATH = os.environ.get('QUIZ_DB', os.path.join(os.path.dirname(os.path.abspath(__file__)), 'rooms.sqlite3'))
 HOST_PASSWORD = os.environ.get('HOST_PASSWORD', '')       # opcional: protege a criação de salas
 ROOM_TTL = 60 * 60 * 24                                    # salas somem após 24h sem uso
+
+
+def _static_stamp():
+    """Data da última alteração dos arquivos estáticos (muda a cada git pull/atualização)."""
+    try:
+        return int(max(os.stat(os.path.join(STATIC_DIR, f)).st_mtime for f in os.listdir(STATIC_DIR)))
+    except (OSError, ValueError):
+        return 0
+
+
+@app.context_processor
+def static_versioning():
+    """Todo arquivo de /static ganha ?v=<data>: o navegador/celular nunca mistura JS antigo (do cache) com página nova."""
+    def versioned_url_for(endpoint, **values):
+        if endpoint == 'static' and 'filename' in values:
+            try:
+                values['v'] = int(os.stat(os.path.join(STATIC_DIR, values['filename'])).st_mtime)
+            except OSError:
+                pass
+        return url_for(endpoint, **values)
+    return dict(url_for=versioned_url_for, APP_VERSION=APP_VERSION)
 
 
 # --------------------------------------------------------------------------
@@ -372,6 +395,15 @@ def api_react():
         game.get_player(room, b.get('pid'), b.get('token'))
         return game.react(room, b['pid'], b.get('emoji'))
     return jsonify(with_room(b.get('code'), fn))
+
+
+@app.get('/version')
+def version():
+    """Mostra qual versão está no ar (útil para conferir se a atualização chegou ao servidor)."""
+    resp = jsonify(version=APP_VERSION, presence_timeout=game.PRESENCE_TIMEOUT, static_updated=_static_stamp(),
+                   features=['arsenal', 'scope', 'presence', 'nudge_always_visible'])
+    resp.headers['Cache-Control'] = 'no-store'
+    return resp
 
 
 @app.get('/healthz')
