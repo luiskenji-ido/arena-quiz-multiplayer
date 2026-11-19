@@ -6,7 +6,7 @@ build({
   kind: 'PTD – Product Technical Document',
   title: 'Arena Quiz Multiplayer',
   subtitle: 'Visão técnica da solução: arquitetura, componentes, sincronização, segurança, implantação e qualidade',
-  version: '1.3', date: '16/11/2026', status: 'Atualizado com saída e expiração de sessão',
+  version: '1.4', date: '19/11/2026', status: 'Ajuste do chamar atenção e do botão Sair',
   blocks: [
     ['h1', '1. Objetivo do documento'],
     ['p', 'Este documento descreve **como** o Arena Quiz Multiplayer foi construído, no nível de produto. É para quem vai manter, hospedar ou evoluir a plataforma. Os requisitos de negócio estão no PRD, e os detalhes de implementação (campos, rotas, algoritmos) estão no DTD.'],
@@ -167,7 +167,8 @@ build({
       ['tests/e2e6.js', 'Playwright', 'Chamar atenção, reações, música de tensão e temas.'],
       ['tests/e2e7.js', 'Playwright', 'Arsenal e emojis do organizador nos modos Arena e Clássico.'],
       ['tests/e2e8.js', 'Playwright', 'Escopo da partida: 90 de 120 perguntas, sorteio, reinício e modo Clássico.'],
-      ['tests/e2e9.js', 'Playwright', 'Botão Sair, expiração por 5 minutos sem conexão e sala encerrada pelo organizador.']] }],
+      ['tests/e2e9.js', 'Playwright', 'Botão Sair, expiração por 5 minutos sem conexão e sala encerrada pelo organizador.'],
+      ['tests/e2e10.js', 'Playwright', 'Chamar atenção nos modos Arena e Clássico, inclusive quando o único rival sai por inatividade.']] }],
     ['code', 'pip install pytest\npytest -q tests\nQUIZ_DB=/tmp/e2e.db PORT=5055 python app.py   # em outro terminal\nnode tests/e2e.js'],
 
     ['h1', '12. Limitações conhecidas e evolução'],

@@ -95,7 +95,7 @@ Mais diagramas (sequência, estados, dados, implantação) estão em [`docs/diag
 | Estilo | **Tailwind CSS** (CDN), CSS próprio | Layout, temas e acessibilidade |
 | Ícones e fontes | **Font Awesome 6**, **Google Fonts** (Inter, Orbitron) | Ícones e tipografia |
 | Áudio | **Web Audio API** | Sons e música de tensão gerados em tempo real, sem arquivos de áudio |
-| Testes | **pytest**, **Playwright** | 52 testes de regras e 9 roteiros de navegador |
+| Testes | **pytest**, **Playwright** | 52 testes de regras e 10 roteiros de navegador |
 | Documentação | **Mermaid**, **docx** (Node.js) | Diagramas e geração dos documentos PRD, PTD e DTD |
 | Hospedagem | **PythonAnywhere** (ou qualquer servidor WSGI) | Publicação |
 
@@ -129,7 +129,7 @@ arena-quiz-multiplayer/
 │   └── themes.css, showthemes.css, inclusion.css, kids.css   # Temas
 ├── tests/
 │   ├── test_game.py          # Testes de regras (pytest)
-│   ├── e2e.js … e2e9.js      # Roteiros de navegador (Playwright)
+│   ├── e2e.js … e2e10.js     # Roteiros de navegador (Playwright)
 │   └── fixtures/             # Quizzes de exemplo (JSON e CSV)
 └── docs/
     ├── MANUAL.md             # Manual completo de uso

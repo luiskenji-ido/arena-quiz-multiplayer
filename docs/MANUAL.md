@@ -32,7 +32,7 @@ usados por qualquer um, mesmo fora da vez; quem não responde a tempo perde o co
 **dar a vez** a outra pessoa pelo ícone 👆 no placar (antes de alguém responder).
 
 ## Interação e aparência (Configurar Jogo → Interação e aparência)
-* **📢 Chamar atenção**: no celular, o jogador escolhe um rival e um som (Buzina, Susto ou Sirene). O celular do rival
+* **📢 Chamar atenção**: no celular, o jogador escolhe um rival e um som (Buzina, Susto ou Sirene). O botão fica esmaecido, com um aviso, quando não há outro participante conectado (quem fica 5 minutos sem conexão sai da sala). O celular do rival
   toca alto, vibra e pisca a tela com "Fulano chamou sua atenção!". Padrão: 2 usos por jogador por partida (0 desliga).
 * **😀 Reações**: barra de emojis no celular (😀 😂 🤣 HAHAHA 😍 👏 🔥 😮 😱 😡 🤬 😭 🤯 🎉). Elas sobem flutuando na
   tela do organizador, com o nome de quem mandou. Pode ser desligado.
@@ -82,7 +82,7 @@ Durante o jogo aparece a barra de controles:
   modo, idioma, cargas e quiz só no lobby.
 
 ### 🚪 Sair e expiração da conexão
-* **Participante:** o botão **Sair** (canto inferior direito do celular) pede confirmação, tira você da sala na hora e volta à página inicial.
+* **Participante:** o botão **Sair** (canto inferior esquerdo do celular, ao lado dos botões de som, acessibilidade e tela cheia) pede confirmação, tira você da sala na hora e volta à página inicial.
   Durante a partida os seus pontos são perdidos; no pódio, o ranking final é mantido.
 * **Organizador:** o botão **Sair** da barra inferior encerra a sala para todos. Os participantes veem "A sala foi encerrada".
 * **Fechou o navegador?** Você tem **5 minutos** para voltar (mesmo link ou código) e continuar de onde parou.
@@ -202,7 +202,7 @@ templates/         index (entrada), host + play (Arena), host_classic + play_cla
 static/            common.js e i18n_extra.js (idiomas, manual), host_core.js (controles do apresentador),
                    fun.js (sons, chamar atenção, reações, temas, palco, acessibilidade), themes.css, showthemes.css, inclusion.css e kids.css,
                    quizkit.js (criação de quiz), style.css (Arena), corp.css (Clássico)
-tests/             test_game.py (pytest), e2e.js ... e2e9.js (Playwright), fixtures/
+tests/             test_game.py (pytest), e2e.js ... e2e10.js (Playwright), fixtures/
 ```
 
 ## Testes

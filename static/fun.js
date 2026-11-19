@@ -363,8 +363,9 @@ function mountLeaveButton() {
   if (document.getElementById('leaveBtn') || typeof leaveRoom !== 'function') return;
   const b = document.createElement('button');
   b.id = 'leaveBtn';
-  b.className = 'fixed bottom-3 right-3 z-[70] h-10 px-3 rounded-full bg-slate-900/90 border border-slate-600 text-slate-100 text-xs font-bold shadow-lg';
-  b.style.right = '.75rem';
+  // fica na mesma fileira dos outros botões do canto esquerdo (som, acessível, tela cheia), longe dos botões do jogo
+  b.className = 'fixed bottom-3 z-[70] h-10 px-3 rounded-full bg-slate-900/90 border border-slate-600 text-slate-100 text-xs font-bold shadow-lg';
+  b.style.left = (document.fullscreenEnabled || document.webkitFullscreenEnabled) ? '9.25rem' : '6.25rem';
   b.innerHTML = '<i class="fa-solid fa-right-from-bracket"></i> <span data-i18n="btn_leave"></span>';
   b.querySelector('span').textContent = t('btn_leave');
   b.onclick = () => leaveRoom();

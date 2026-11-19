@@ -6,7 +6,7 @@ build({
   kind: 'DTD – Detail Technical Document',
   title: 'Arena Quiz Multiplayer',
   subtitle: 'Detalhamento técnico: estrutura de código, modelo de dados, API, máquina de estados, algoritmos, front-end e testes',
-  version: '1.3', date: '16/11/2026', status: 'Atualizado com saída e expiração de sessão',
+  version: '1.4', date: '19/11/2026', status: 'Ajuste do chamar atenção e do botão Sair',
   blocks: [
     ['h1', '1. Introdução'],
     ['p', 'Este documento é a referência detalhada de implementação do Arena Quiz Multiplayer (protótipo v9). Ele complementa o PRD (o que o produto faz) e o PTD (visão técnica). Os nomes de campos, rotas e funções correspondem ao código-fonte.'],
@@ -367,7 +367,7 @@ build({
       ['Arsenal do organizador', 'host_arsenal_all_players, host_shield_for_everyone_once_each, host_target_and_give_charges, host_arsenal_classic_mode, host_emoji_broadcast'],
       ['Presença e saída', 'idle_player_is_dropped_after_5_min_and_unblocks_round, polling_keeps_the_session_alive, host_gone_for_5_min_closes_room, host_back_within_5_min_keeps_room, host_logout_ends_room_for_everyone, player_leave_removes_immediately_and_turn_moves_on, leave_at_podium_keeps_final_ranking'],
       ['Escopo da partida', 'scope_first_n_questions, scope_random_pick_and_restart_restores_bank, scope_limit_bigger_than_quiz_and_all, scope_cannot_change_during_game']] }],
-    ['p', 'Roteiros de navegador (Playwright): e2e.js (partida Arena), e2e2.js (criação de quiz), e2e3.js (Clássico e controles), e2e4.js (sala pública e avanço automático), e2e5.js (por vez), e2e6.js (interações e temas), e2e7.js (arsenal e emojis do organizador), e2e8.js (escopo da partida), e2e9.js (saída e expiração de sessão).'],
+    ['p', 'Roteiros de navegador (Playwright): e2e.js (partida Arena), e2e2.js (criação de quiz), e2e3.js (Clássico e controles), e2e4.js (sala pública e avanço automático), e2e5.js (por vez), e2e6.js (interações e temas), e2e7.js (arsenal e emojis do organizador), e2e8.js (escopo da partida), e2e9.js (saída e expiração de sessão), e2e10.js (chamar atenção).'],
     ['note', 'Os diagramas deste documento são gerados a partir dos arquivos .mmd em docs/diagramas. Para atualizar, edite o .mmd e gere o PNG novamente; para regenerar os documentos, rode `node docs/gerador/prd.js`, `ptd.js` e `dtd.js`.']
   ]
 }, path.join(__dirname, '..', 'DTD_Arena_Quiz_Multiplayer.docx'));

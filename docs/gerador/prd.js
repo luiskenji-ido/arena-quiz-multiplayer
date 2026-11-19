@@ -8,14 +8,15 @@ build({
   kind: 'PRD – Product Requirements Document',
   title: 'Arena Quiz Multiplayer',
   subtitle: 'Requisitos de produto da plataforma de quiz ao vivo para eventos, salas de aula e treinamentos',
-  version: '1.3', date: '16/11/2026', status: 'Atualizado com saída e expiração de sessão',
+  version: '1.4', date: '19/11/2026', status: 'Ajuste do chamar atenção e do botão Sair',
   blocks: [
     ['h1', '1. Controle do documento'],
     ['table', { title: 'Histórico de versões', widths: [1, 2, 5], header: ['Versão', 'Data', 'Descrição'], rows: [
       ['1.0', '14/11/2026', 'Primeira versão consolidada a partir das entregas v1 a v9 do protótipo (Arena, Clássico, salas públicas, modo por vez, interações, temas e acessibilidade).'],
       ['1.1', '14/11/2026', 'Arsenal e emojis do organizador (RF-39 a RF-43): efeitos para todos, poderes contra um participante, dar cargas e emojis enviados a todos os celulares.'],
       ['1.2', '14/11/2026', 'Escopo da partida (RF-44 a RF-46): o organizador define quantas perguntas do quiz usar (ex.: 90 de 120), na sequência ou sorteadas, com estimativa de duração.'],
-      ['1.3', '16/11/2026', 'Sessão, saída e expiração (RF-47 a RF-50): botão Sair para participante e organizador e desconexão automática após 5 minutos sem conexão.']] }],
+      ['1.3', '16/11/2026', 'Sessão, saída e expiração (RF-47 a RF-50): botão Sair para participante e organizador e desconexão automática após 5 minutos sem conexão.'],
+      ['1.4', '19/11/2026', 'Chamar atenção (RF-32): o botão passa a ficar sempre visível, esmaecido e com aviso quando não há rival conectado. O botão Sair foi movido para o canto esquerdo, junto aos outros controles, para não cobrir botões do jogo.']] }],
     ['table', { title: 'Documentos relacionados', widths: [2, 5], header: ['Documento', 'Conteúdo'], rows: [
       ['PTD – Product Technical Document', 'Visão técnica da solução: arquitetura, componentes, segurança e implantação.'],
       ['DTD – Detail Technical Document', 'Detalhamento: modelo de dados, API, máquina de estados, algoritmos e códigos de erro.'],
@@ -126,7 +127,7 @@ build({
 
     ['h2', '5.6 Interação, aparência e acessibilidade'],
     ['table', { title: 'Requisitos de interação e aparência', widths: [1, 5, 1, 4], header: ['ID', 'Requisito', 'Prior.', 'Critério de aceite'], rows: [
-      RF('RF-32', 'Chamar atenção de um rival.', 'S', 'Som alto (buzina, susto ou sirene), vibração e tela piscando no celular do alvo; padrão 2 usos.'),
+      RF('RF-32', 'Chamar atenção de um rival.', 'S', 'Som alto (buzina, susto ou sirene), vibração e tela piscando no celular do alvo; padrão 2 usos. Sem outro participante conectado, o botão continua visível, esmaecido, e ao tocar explica o motivo.'),
       RF('RF-33', 'Reações com emoji no telão.', 'S', 'Lista fixa de emojis; flutuam com o nome do jogador; limite de 1 a cada 0,8 s.'),
       RF('RF-34', 'Música de tensão no fim do tempo.', 'C', 'Toca nos últimos 5/10/15/20 s; para na pausa; botão de mudo por aparelho.'),
       RF('RF-35', 'Temas visuais com 3 tons.', 'S', '16 temas em 4 grupos; palco em tela cheia no telão para temas de auditório, inclusão e infantil.'),

@@ -148,7 +148,7 @@ async function poll() {
   try {
     const r = await api(`/api/state/${CODE}?pid=${ME.pid}&token=${encodeURIComponent(ME.token)}`);
     if (!r.ok) {
-      if (r.status === 404 || r.status === 403 || r.status === 410) { store(KEY, null); document.body.innerHTML = `<div class="fb neutral"><div class="big">${t(r.status === 410 ? 'room_closed' : r.status === 403 ? 'session_ended' : 'room_gone')}</div><a href="/" class="cbtn light">OK</a></div>`; }
+      if (r.status === 404 || r.status === 403 || r.status === 410) { store(KEY, null); window.__gone = true; document.body.innerHTML = `<div class="fb neutral"><div class="big">${t(r.status === 410 ? 'room_closed' : r.status === 403 ? 'session_ended' : 'room_gone')}</div><a href="/" class="cbtn light">OK</a></div>`; }
       return;
     }
     ST = r.data; offset = ST.now - Date.now() / 1000;
@@ -247,6 +247,7 @@ function rankText() {
   return t('cl_rank', { n: pos }) + (diff > 0 ? ' · ' + t('corp_behind', { pts: fmt(diff), name: above.name }) : '');
 }
 function tick() {
+  if (window.__gone) return;               // sessão encerrada: a tela já foi trocada pelo aviso
   const el = document.getElementById('topTimer');
   const nx = document.getElementById('resNext');
   if (nx) { const q = ST && ST.question; nx.textContent = ST && ST.phase === 'reveal' && q && q.next_at ? t('next_q_in', { s: Math.max(0, Math.ceil(q.next_at - nowS())) }) : ''; }
@@ -260,16 +261,20 @@ function tick() {
 function renderFun() {
   const s = ST.settings, me = ST.me, live = ST.phase !== 'finished';
   const nb = document.getElementById('nudgeBtn');
-  nb.classList.toggle('hidden', !live || !s.nudge_limit || ST.targets.length < 2);
+  const few = ST.targets.length < 2;                        // sem rival na sala (ex.: todos os outros ficaram 5 min offline)
+  nb.classList.toggle('hidden', !live || !s.nudge_limit);   // continua visível, para não parecer que "sumiu"
+  nb.classList.toggle('opacity-50', few);
+  nb.title = few ? t('nudge_need_more') : '';
   nb.disabled = me.nudges_left <= 0;
   document.getElementById('nudgeLeft').textContent = me.nudges_left;
   const rb = document.getElementById('reactBar');
   rb.classList.toggle('hidden', !s.reactions_on);
   if (!rb.innerHTML) rb.innerHTML = reactionBarHTML('sendReact');
-  show('funBox', (live && s.nudge_limit > 0 && ST.targets.length > 1) || s.reactions_on);
+  show('funBox', (live && s.nudge_limit > 0) || s.reactions_on);
 }
 function doNudge() {
   if (!ST || ST.me.nudges_left <= 0) return;
+  if (ST.targets.length < 2) { toast(t('nudge_need_more'), false); return; }
   openNudge(ST.targets, ST.me.id, ST.me.nudges_left, async (target, kind) => {
     const r = await api('/api/nudge', { code: CODE, pid: ME.pid, token: ME.token, target, kind });
     const tg = ST.targets.find(x => x.id === target);

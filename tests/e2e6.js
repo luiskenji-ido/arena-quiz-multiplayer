@@ -17,7 +17,7 @@ const B = 'http://localhost:5055';
   await ana.waitForFunction(() => document.documentElement.dataset.theme === 'neon_pink');
   console.log('phone theme:', await ana.evaluate(() => document.documentElement.dataset.theme), '| sound toggle:', !!(await ana.$('#soundToggle')));
   // chamar atenção: Ana -> Beto (som Susto)
-  await ana.waitForSelector('#nudgeBtn:not(.hidden)');
+  await ana.waitForSelector('#nudgeBtn:not(.hidden)'); await ana.waitForFunction(() => ST.targets.length >= 2);   // espera o rival aparecer
   console.log('nudge button:', (await ana.textContent('#nudgeBtn')).trim());
   await ana.evaluate(() => { window.__sounds = []; }); await beto.evaluate(() => { const o = loudSound; window.__sounds = []; loudSound = k => { window.__sounds.push(k); o(k); }; });
   await ana.click('#nudgeBtn'); await ana.waitForSelector('#nudgeModal:not(.hidden)');

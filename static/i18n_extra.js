@@ -432,3 +432,13 @@ function turnResultText(q) {
   };
   for (const l in X) Object.assign(I18N[l], X[l]);
 })();
+
+/* Chamar atenção: aviso quando não há rival na sala */
+(function () {
+  const X = {
+    pt: { nudge_need_more: "Precisa de outro participante conectado na sala para chamar a atenção." },
+    en: { nudge_need_more: "You need another connected participant in the room to get their attention." },
+    es: { nudge_need_more: "Necesitas otro participante conectado en la sala para llamar su atención." }
+  };
+  for (const l in X) Object.assign(I18N[l], X[l]);
+})();
