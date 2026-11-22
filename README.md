@@ -95,7 +95,7 @@ Mais diagramas (sequência, estados, dados, implantação) estão em [`docs/diag
 | Estilo | **Tailwind CSS** (CDN), CSS próprio | Layout, temas e acessibilidade |
 | Ícones e fontes | **Font Awesome 6**, **Google Fonts** (Inter, Orbitron) | Ícones e tipografia |
 | Áudio | **Web Audio API** | Sons e música de tensão gerados em tempo real, sem arquivos de áudio |
-| Testes | **pytest**, **Playwright** | 56 testes de regras e 11 roteiros de navegador |
+| Testes | **pytest**, **Playwright** | 59 testes de regras e 12 roteiros de navegador |
 | Documentação | **Mermaid**, **docx** (Node.js) | Diagramas e geração dos documentos PRD, PTD e DTD |
 | Hospedagem | **PythonAnywhere** (ou qualquer servidor WSGI) | Publicação |
 
@@ -129,7 +129,7 @@ arena-quiz-multiplayer/
 │   └── themes.css, showthemes.css, inclusion.css, kids.css   # Temas
 ├── tests/
 │   ├── test_game.py          # Testes de regras (pytest)
-│   ├── e2e.js … e2e11.js     # Roteiros de navegador (Playwright)
+│   ├── e2e.js … e2e12.js     # Roteiros de navegador (Playwright)
 │   └── fixtures/             # Quizzes de exemplo (JSON e CSV)
 └── docs/
     ├── MANUAL.md             # Manual completo de uso
@@ -249,7 +249,7 @@ A especificação completa, com entradas, saídas e códigos de erro, está no *
 ]
 ```
 
-Campos opcionais: `topic`, `reference`, `hint`, `explanation`, `time` (5 a 300 s), `image` (URL http/https) e `poll` (enquete). CSV e texto rápido também são aceitos (veja o [Manual](docs/MANUAL.md#formas-de-criar-o-quiz-botão-carregar-quiz)).
+Campos opcionais: `topic`, `reference`, `hint`, `explanation`, `image` (URL http/https) e `poll` (enquete). O campo `time` (5 a 300 s) é **ignorado por padrão**: quem manda no tempo é a plataforma (Configurar Jogo → tempo por pergunta). Só vale se o organizador ligar **Respeitar o tempo de cada pergunta do quiz**. CSV e texto rápido também são aceitos (veja o [Manual](docs/MANUAL.md#formas-de-criar-o-quiz-botão-carregar-quiz)).
 
 ## 🧪 Testes
 

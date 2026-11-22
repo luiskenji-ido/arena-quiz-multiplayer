@@ -20,7 +20,7 @@ import quiz_templates
 from game import GameError
 
 app = Flask(__name__)
-APP_VERSION = '1.5.0'
+APP_VERSION = '1.5.1'
 STATIC_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'static')
 app.config['JSON_AS_ASCII'] = False
 app.config['MAX_CONTENT_LENGTH'] = 1024 * 1024
@@ -403,7 +403,7 @@ def api_react():
 def version():
     """Mostra qual versão está no ar (útil para conferir se a atualização chegou ao servidor)."""
     resp = jsonify(version=APP_VERSION, presence_timeout=game.PRESENCE_TIMEOUT, static_updated=_static_stamp(),
-                   features=['arsenal', 'scope', 'presence', 'nudge_always_visible', 'host_nudge'])
+                   features=['arsenal', 'scope', 'presence', 'nudge_always_visible', 'host_nudge', 'platform_timer'])
     resp.headers['Cache-Control'] = 'no-store'
     return resp
 

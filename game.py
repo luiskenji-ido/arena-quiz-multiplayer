@@ -106,6 +106,8 @@ def normalize_settings(raw, base=None):
     theme = raw.get('theme', s.get('theme', 'auto'))
     s['theme'] = theme if theme in THEMES else 'auto'
     s['theme_variant'] = num('theme_variant', 0, 2, 0)                     # 3 tons de cor por tema
+    ts = raw.get('time_source', s.get('time_source', 'platform'))
+    s['time_source'] = ts if ts in ('platform', 'quiz') else 'platform'    # quem manda no tempo: a plataforma (padrão) ou o campo time do quiz
     s['q_limit'] = num('q_limit', 0, 200, 0)                               # escopo: quantas perguntas usar (0 = todas)
     pick = raw.get('q_pick', s.get('q_pick', 'first'))
     s['q_pick'] = pick if pick in ('first', 'random') else 'first'         # na sequência do quiz ou sorteadas
@@ -113,7 +115,7 @@ def normalize_settings(raw, base=None):
 
 
 # Configurações que podem mudar com o jogo em andamento (o resto só no lobby)
-LIVE_SETTINGS = ('timer', 'board_mode', 'powers_on', 'thresholds', 'progressive', 'close_on_first',
+LIVE_SETTINGS = ('timer', 'time_source', 'board_mode', 'powers_on', 'thresholds', 'progressive', 'close_on_first',
                  'classic_points', 'base_xp', 'multiplier', 'visibility', 'room_name', 'auto_next', 'auto_delay', 'answer_order',
                  'nudge_limit', 'reactions_on', 'tension_music', 'tension_secs', 'theme', 'theme_variant')
 
@@ -446,6 +448,15 @@ def bank_size(room):
     return len(room.get('bank') or room['questions'])
 
 
+def question_seconds(room, quest):
+    """Tempo de resposta da pergunta. Por padrão manda o tempo da plataforma (Configurar Jogo);
+    o campo "time" do quiz só vale se o organizador escolher respeitar o tempo do arquivo."""
+    s = room['settings']
+    if s.get('time_source') == 'quiz' and quest.get('time'):
+        return quest['time']
+    return s['timer']
+
+
 def game_total(room):
     """Perguntas desta partida: no lobby, as que serão usadas; depois, as separadas no início."""
     if room['phase'] != 'lobby':
@@ -556,7 +567,7 @@ def start_question(room):
         room['q'] = None
         return
     now = time.time()
-    duration = room['questions'][room['qi']].get('time') or room['settings']['timer']
+    duration = question_seconds(room, room['questions'][room['qi']])
     turns = room['settings'].get('answer_order') == 'turns'
     for p in room['players'].values():
         if turns:                                 # por vez: o bloqueio espera a vez do alvo (ver _next_turn)
@@ -1107,8 +1118,7 @@ def _question_view(room, pid=None):
         ta = q['answers'].get(turn['id'])
         if ta:
             out['turn_pick'] = ta['idx']
-    if quest.get('time'):
-        out['duration'] = quest['time']
+    out['duration'] = q.get('duration') or question_seconds(room, quest)   # a barra de tempo usa a duração real (inclui +15 s do organizador)
     if quest.get('image'):
         out['image'] = quest['image']
     if quest.get('poll'):

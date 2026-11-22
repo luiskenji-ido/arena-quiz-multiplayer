@@ -6,7 +6,7 @@ build({
   kind: 'PTD – Product Technical Document',
   title: 'Arena Quiz Multiplayer',
   subtitle: 'Visão técnica da solução: arquitetura, componentes, sincronização, segurança, implantação e qualidade',
-  version: '1.5', date: '19/11/2026', status: 'Atualizado com o chamar atenção do organizador',
+  version: '1.6', date: '22/11/2026', status: 'Tempo de resposta controlado pela plataforma',
   blocks: [
     ['h1', '1. Objetivo do documento'],
     ['p', 'Este documento descreve **como** o Arena Quiz Multiplayer foi construído, no nível de produto. É para quem vai manter, hospedar ou evoluir a plataforma. Os requisitos de negócio estão no PRD, e os detalhes de implementação (campos, rotas, algoritmos) estão no DTD.'],
@@ -83,6 +83,8 @@ build({
     ['h2', '6.2 Poderes'],
     ['p', 'Os poderes valem só no modo Arena. Cada um tem meta de desbloqueio, cargas por partida, limite de 1 uso por pergunta e pode ser ligado ou desligado pelo organizador. Poderes próprios exigem pergunta aberta e que o jogador ainda não tenha respondido, e no modo por vez exigem que seja a vez dele. Poderes de ataque funcionam durante a pergunta e no resultado.'],
     ['img', '08_poderes.png', 'Poderes'],
+    ['h2', '6.2.1 Tempo de resposta'],
+    ['p', 'A duração de cada pergunta é calculada por `question_seconds()`: por padrão usa `settings.timer`, definido pelo organizador. O campo `time` do quiz só é usado se `settings.time_source = quiz` (opção "Respeitar o tempo de cada pergunta do quiz"). A duração real fica em `q.duration` e é a que a visão envia aos celulares, de modo que a barra de tempo também reflete os +15 s do organizador. Alterar o tempo durante o jogo vale a partir da próxima pergunta.'],
     ['h2', '6.3 Escopo da partida'],
     ['p', 'O quiz carregado funciona como um **banco**. As configurações `q_limit` (0 = todas, ou 1 a 200) e `q_pick` (`first` ou `random`) só podem mudar no lobby. Ao iniciar (`start`), `_build_round()` guarda o quiz completo em `room.bank` e coloca em `room.questions` apenas as perguntas da partida; assim todo o restante do motor (tempo, respostas, placar, pódio) continua igual. Ao reiniciar (`restart`), `_restore_bank()` devolve o quiz completo, e um novo sorteio acontece no próximo início.'],
     ['img', '18_escopo_partida.png', 'Escopo da partida'],
@@ -165,7 +167,7 @@ build({
 
     ['h1', '11. Qualidade e testes'],
     ['table', { title: 'Suítes de teste', widths: [2, 2, 4], header: ['Suíte', 'Ferramenta', 'Cobertura'], rows: [
-      ['tests/test_game.py', 'pytest', '56 testes: pontuação, autenticação, tempo, pausa, placar oculto, poderes, enquete, Clássico, por vez, salas públicas, avanço automático, chamar atenção, reações, temas, arsenal e emojis do organizador.'],
+      ['tests/test_game.py', 'pytest', '59 testes: pontuação, autenticação, tempo, pausa, placar oculto, poderes, enquete, Clássico, por vez, salas públicas, avanço automático, chamar atenção, reações, temas, arsenal e emojis do organizador.'],
       ['tests/e2e.js', 'Playwright', 'Partida Arena com 2 celulares, dado, cartas, bloqueio e roubo.'],
       ['tests/e2e2.js', 'Playwright', 'Criação de quiz: JSON, CSV, texto rápido, editor e templates.'],
       ['tests/e2e3.js', 'Playwright', 'Clássico corporativo, pausa, placar, finalizar, reiniciar e troca de modo.'],
@@ -176,7 +178,8 @@ build({
       ['tests/e2e8.js', 'Playwright', 'Escopo da partida: 90 de 120 perguntas, sorteio, reinício e modo Clássico.'],
       ['tests/e2e9.js', 'Playwright', 'Botão Sair, expiração por 5 minutos sem conexão e sala encerrada pelo organizador.'],
       ['tests/e2e10.js', 'Playwright', 'Chamar atenção nos modos Arena e Clássico, inclusive quando o único rival sai por inatividade.'],
-      ['tests/e2e11.js', 'Playwright', 'Chamar atenção do organizador (um participante e todos) nos modos Arena e Clássico.']] }],
+      ['tests/e2e11.js', 'Playwright', 'Chamar atenção do organizador (um participante e todos) nos modos Arena e Clássico.'],
+      ['tests/e2e12.js', 'Playwright', 'Tempo da plataforma versus tempo do quiz importado, nos modos Arena e Clássico.']] }],
     ['code', 'pip install pytest\npytest -q tests\nQUIZ_DB=/tmp/e2e.db PORT=5055 python app.py   # em outro terminal\nnode tests/e2e.js'],
 
     ['h1', '12. Limitações conhecidas e evolução'],

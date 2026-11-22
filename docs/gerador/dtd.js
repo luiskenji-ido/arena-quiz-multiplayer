@@ -6,7 +6,7 @@ build({
   kind: 'DTD – Detail Technical Document',
   title: 'Arena Quiz Multiplayer',
   subtitle: 'Detalhamento técnico: estrutura de código, modelo de dados, API, máquina de estados, algoritmos, front-end e testes',
-  version: '1.5', date: '19/11/2026', status: 'Atualizado com o chamar atenção do organizador',
+  version: '1.6', date: '22/11/2026', status: 'Tempo de resposta controlado pela plataforma',
   blocks: [
     ['h1', '1. Introdução'],
     ['p', 'Este documento é a referência detalhada de implementação do Arena Quiz Multiplayer (protótipo v9). Ele complementa o PRD (o que o produto faz) e o PTD (visão técnica). Os nomes de campos, rotas e funções correspondem ao código-fonte.'],
@@ -56,7 +56,8 @@ build({
     ['table', { title: 'Configurações, limites e padrões', widths: [2, 2, 1, 1, 4], header: ['Campo', 'Valores', 'Padrão', 'Ao vivo*', 'Descrição'], rows: [
       ['mode', 'arena | classic', 'arena', 'não', 'Modo de jogo.'],
       ['answer_order', 'speed | turns', 'speed', 'sim', 'O mais rápido ou por vez.'],
-      ['timer', '5–300 s', '30', 'sim', 'Tempo padrão por pergunta.'],
+      ['timer', '5–300 s', '30', 'sim', 'Tempo de resposta de todas as perguntas (a plataforma manda).'],
+      ['time_source', 'platform | quiz', 'platform', 'sim', 'platform: ignora o campo time do quiz. quiz: perguntas com time próprio usam esse tempo.'],
       ['base_xp', '100–5000', '500', 'sim', 'XP base (Arena).'],
       ['multiplier', '1–5', '2', 'sim', 'Multiplicador de XP (Arena).'],
       ['classic_points', '100–5000', '1000', 'sim', 'Pontos máximos por acerto (Clássico).'],
@@ -368,10 +369,11 @@ build({
       ['Por vez', 'turns_rotate_only_turn_player_answers, turns_block_skips_turn_and_powers_only_on_own_turn, turns_classic_scoring_and_host_set_turn, turn_timeout_resets_streak'],
       ['Interações e temas', 'nudge_limit_and_inbox, reactions_whitelist_rate_limit_and_toggle, theme_and_tension_settings'],
       ['Arsenal do organizador', 'host_arsenal_all_players, host_shield_for_everyone_once_each, host_target_and_give_charges, host_arsenal_classic_mode, host_emoji_broadcast'],
+      ['Tempo de resposta', 'platform_timer_wins_over_quiz_time_by_default, timer_change_applies_to_next_question_and_quiz_time_is_opt_in, progress_bar_duration_includes_host_extra_time'],
       ['Chamar atenção do organizador', 'host_nudge_one_participant_and_everyone, host_nudge_validation_and_limits, host_nudge_works_in_classic_and_empty_room_and_podium'],
       ['Presença e saída', 'idle_player_is_dropped_after_5_min_and_unblocks_round, polling_keeps_the_session_alive, host_gone_for_5_min_closes_room, host_back_within_5_min_keeps_room, host_logout_ends_room_for_everyone, player_leave_removes_immediately_and_turn_moves_on, leave_at_podium_keeps_final_ranking'],
       ['Escopo da partida', 'scope_first_n_questions, scope_random_pick_and_restart_restores_bank, scope_limit_bigger_than_quiz_and_all, scope_cannot_change_during_game']] }],
-    ['p', 'Roteiros de navegador (Playwright): e2e.js (partida Arena), e2e2.js (criação de quiz), e2e3.js (Clássico e controles), e2e4.js (sala pública e avanço automático), e2e5.js (por vez), e2e6.js (interações e temas), e2e7.js (arsenal e emojis do organizador), e2e8.js (escopo da partida), e2e9.js (saída e expiração de sessão), e2e10.js (chamar atenção), e2e11.js (chamar atenção do organizador).'],
+    ['p', 'Roteiros de navegador (Playwright): e2e.js (partida Arena), e2e2.js (criação de quiz), e2e3.js (Clássico e controles), e2e4.js (sala pública e avanço automático), e2e5.js (por vez), e2e6.js (interações e temas), e2e7.js (arsenal e emojis do organizador), e2e8.js (escopo da partida), e2e9.js (saída e expiração de sessão), e2e10.js (chamar atenção), e2e11.js (chamar atenção do organizador), e2e12.js (tempo de resposta).'],
     ['note', 'Os diagramas deste documento são gerados a partir dos arquivos .mmd em docs/diagramas. Para atualizar, edite o .mmd e gere o PNG novamente; para regenerar os documentos, rode `node docs/gerador/prd.js`, `ptd.js` e `dtd.js`.']
   ]
 }, path.join(__dirname, '..', 'DTD_Arena_Quiz_Multiplayer.docx'));

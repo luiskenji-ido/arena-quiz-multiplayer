@@ -261,7 +261,7 @@ def test_classic_streak_bonus_and_no_powers(client):
 def test_per_question_time_image_and_title(client):
     quiz = [{'question': 'q1?', 'options': ['a', 'b'], 'correct': 0, 'time': 12, 'image': 'https://x.test/i.png'},
             {'question': 'q2?', 'options': ['a', 'b'], 'correct': 1, 'time': 3, 'image': 'javascript:alert(1)'}]
-    r = client.post('/api/room', json={'quiz': quiz, 'quiz_title': 'Meu quiz'}).get_json()
+    r = client.post('/api/room', json={'quiz': quiz, 'quiz_title': 'Meu quiz', 'settings': {'timer': 45, 'time_source': 'quiz'}}).get_json()
     code, ht = r['code'], r['host_token']
     lob = state(client, code, ht=ht)
     assert lob['quiz_title'] == 'Meu quiz' and len(lob['quiz']) == 2
@@ -269,7 +269,7 @@ def test_per_question_time_image_and_title(client):
     j = client.post('/api/join', json={'code': code, 'name': 'Zé'}).get_json()
     host(client, code, ht, 'start')
     q = state(client, code, j)['question']
-    assert round(q['end'] - q['start']) == 12 and q['image'].startswith('https://')
+    assert round(q['end'] - q['start']) == 12 and q['image'].startswith('https://')   # opção "respeitar o tempo do quiz" ligada
 
 
 def test_templates_api_and_apply(client):
@@ -806,3 +806,41 @@ def test_host_nudge_works_in_classic_and_empty_room_and_podium(client):
     host(client, code, ht, 'start'); host(client, code, ht, 'finish')
     time.sleep(1.05)
     assert _hostnudge(client, code, ht, 'all').status_code == 400                   # no pódio não
+
+
+# ---------------- O tempo é da plataforma (o "time" do arquivo só vale se o organizador quiser) ----------------
+def _timed_quiz(n=3, t=30):
+    return [{'question': f'Q{i}?', 'options': ['a', 'b'], 'correct': 0, 'time': t} for i in range(n)]
+
+
+def test_platform_timer_wins_over_quiz_time_by_default(client):
+    r = client.post('/api/room', json={'quiz': _timed_quiz(), 'settings': {'timer': 75}}).get_json()
+    code, ht = r['code'], r['host_token']
+    j = client.post('/api/join', json={'code': code, 'name': 'Ana'}).get_json()
+    assert state(client, code, ht=ht)['settings']['time_source'] == 'platform'
+    host(client, code, ht, 'start')
+    q = state(client, code, j)['question']
+    assert round(q['end'] - q['start']) == 75 and q['duration'] == 75           # o "time": 30 do arquivo é ignorado
+
+
+def test_timer_change_applies_to_next_question_and_quiz_time_is_opt_in(client):
+    r = client.post('/api/room', json={'quiz': _timed_quiz(), 'settings': {'timer': 20}}).get_json()
+    code, ht = r['code'], r['host_token']
+    j = client.post('/api/join', json={'code': code, 'name': 'Ana'}).get_json()
+    host(client, code, ht, 'start')
+    assert state(client, code, j)['question']['duration'] == 20
+    host(client, code, ht, 'settings', settings={'timer': 90})                  # muda com o jogo rolando
+    host(client, code, ht, 'close'); host(client, code, ht, 'next')
+    assert state(client, code, j)['question']['duration'] == 90                 # próxima pergunta já usa o novo tempo
+    host(client, code, ht, 'settings', settings={'time_source': 'quiz'})
+    host(client, code, ht, 'close'); host(client, code, ht, 'next')
+    assert state(client, code, j)['question']['duration'] == 30                 # agora respeita o tempo do arquivo
+    host(client, code, ht, 'settings', settings={'time_source': 'invalido'})
+    assert state(client, code, ht=ht)['settings']['time_source'] == 'platform'
+
+
+def test_progress_bar_duration_includes_host_extra_time(client):
+    code, ht, (a,) = mk(client, 1, timer=40)
+    host(client, code, ht, 'start')
+    client.post(f'/api/host/{code}/hostpower', json={'token': ht, 'power': 'all_time'})        # +15 s do organizador
+    assert state(client, code, a)['question']['duration'] == 55                 # a barra de tempo usa a duração real

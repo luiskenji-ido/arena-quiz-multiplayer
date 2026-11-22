@@ -106,7 +106,7 @@ function cfgMode(m) {
 function openConfig() {
   if (!ST) return;
   const s = ST.settings, lobby = ST.phase === 'lobby';
-  sTimer.value = s.timer; sBase.value = s.base_xp; sMult.value = s.multiplier; sCharges.value = s.charges; sClassic.value = s.classic_points;
+  sTimeQuiz.checked = s.time_source === 'quiz'; sTimer.value = s.timer; sBase.value = s.base_xp; sMult.value = s.multiplier; sCharges.value = s.charges; sClassic.value = s.classic_points;
   sProg.checked = s.progressive; sClose.checked = s.close_on_first; sLang.value = s.lang;
   document.querySelectorAll('input[name=sBoard]').forEach(r => { r.checked = r.value === s.board_mode; });
   document.querySelectorAll('input[name=sVis]').forEach(r => { r.checked = r.value === (s.visibility || 'private'); });
@@ -137,7 +137,7 @@ async function applySettings() {
   const vis = document.querySelector('input[name=sVis]:checked');
   const order = document.querySelector('input[name=sOrder]:checked');
   const body = { token: H.token, settings: {
-    mode: cfgModeSel, timer: +sTimer.value, base_xp: +sBase.value, multiplier: +sMult.value, charges: +sCharges.value,
+    mode: cfgModeSel, timer: +sTimer.value, time_source: sTimeQuiz.checked ? 'quiz' : 'platform', base_xp: +sBase.value, multiplier: +sMult.value, charges: +sCharges.value,
     classic_points: +sClassic.value, progressive: sProg.checked, close_on_first: sClose.checked, lang: sLang.value,
     board_mode: board ? board.value : 'live', powers_on, thresholds,
     answer_order: order ? order.value : 'speed',
@@ -314,7 +314,7 @@ function scopeInit(s) {
   r.max = bank; n.max = bank;
   r.value = n.value = lim && lim < bank ? lim : bank;
   document.querySelectorAll('input[name=sPick]').forEach(x => { x.checked = x.value === (s.q_pick || 'first'); });
-  document.querySelectorAll('input[name=sOrder], input[name=sPick], #sTimer, #sAuto, #sAutoDelay').forEach(x => { x.onchange = () => scopeSync(); });
+  document.querySelectorAll('input[name=sOrder], input[name=sPick], #sTimer, #sTimeQuiz, #sAuto, #sAutoDelay').forEach(x => { x.onchange = () => scopeSync(); });
   scopeSync();
 }
 function scopeSync(src) {
@@ -329,7 +329,8 @@ function scopeSync(src) {
   // estimativa: tempo de cada pergunta + ~8 s de resultado (ou o tempo do avanço automático)
   const quiz = (ST && ST.quiz) || [], timer = +document.getElementById('sTimer').value || 30;
   const reveal = document.getElementById('sAuto').checked ? (+document.getElementById('sAutoDelay').value || 8) : 8;
-  const avg = quiz.length ? quiz.reduce((a, x) => a + (x.time || timer), 0) / quiz.length : timer;
+  const useQuizTime = document.getElementById('sTimeQuiz').checked;          // só conta o tempo do arquivo se o organizador escolheu respeitá-lo
+  const avg = quiz.length ? quiz.reduce((a, x) => a + ((useQuizTime && x.time) || timer), 0) / quiz.length : timer;
   const mins = Math.max(1, Math.round(q * (avg + reveal) / 60));
   document.getElementById('scopeBadge').textContent = t('scope_badge', { n: q }) + (turns ? ' ' + t('scope_per_player', { n: Math.max(1, Math.round(q / players)) }) : '');
   document.getElementById('scopeInfo').textContent = t('scope_info', { n: q, total: bank, min: mins });

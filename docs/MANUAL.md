@@ -85,6 +85,12 @@ Durante o jogo aparece a barra de controles:
 Abra `https://SEU_USUARIO.pythonanywhere.com/version`: mostra a versão instalada. Depois de atualizar o servidor (`git pull` e **Reload**), a versão muda.
 Para diagnosticar uma tela do celular, abra o link com `&debug=1` no fim (ex.: `/play?code=ABCD&debug=1`): qualquer erro aparece numa faixa vermelha.
 
+### ⏱️ Tempo de resposta
+Em **Configurar Jogo → Tempo por pergunta**, o organizador define os segundos de todas as perguntas e pode mudar **com o jogo rolando** (vale a partir da próxima pergunta).
+* Mesmo que o arquivo do quiz traga um campo `time` (por exemplo, `"time": 30` gerado por IA), a **plataforma manda**: o tempo do arquivo é ignorado.
+* Para respeitar o tempo individual de cada pergunta do arquivo, ligue **Respeitar o tempo de cada pergunta do quiz**. As perguntas sem tempo próprio continuam usando o tempo da plataforma.
+* O prompt de IA do app já não pede o campo `time`.
+
 ### 🚪 Sair e expiração da conexão
 * **Participante:** o botão **Sair** (canto inferior esquerdo do celular, ao lado dos botões de som, acessibilidade e tela cheia) pede confirmação, tira você da sala na hora e volta à página inicial.
   Durante a partida os seus pontos são perdidos; no pódio, o ranking final é mantido.
@@ -193,7 +199,7 @@ Notas:
   }
 ]
 ```
-Campos opcionais: `poll` (enquete, sem `correct`), `hint` (sem ele a dica mostra a `reference`), `time` (segundos, 5 a 300, sobrescreve o tempo padrão) e `image` (URL http/https).
+Campos opcionais: `poll` (enquete, sem `correct`), `hint` (sem ele a dica mostra a `reference`), `image` (URL http/https) e `time` (segundos, 5 a 300). **O `time` é ignorado por padrão**: o tempo de resposta é o definido na plataforma (Configurar Jogo). Ele só vale se o organizador ligar **Respeitar o tempo de cada pergunta do quiz**.
 O botão **Copiar prompt para IA** gera um prompt pronto.
 
 ## Estrutura

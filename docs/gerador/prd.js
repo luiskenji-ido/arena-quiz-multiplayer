@@ -8,7 +8,7 @@ build({
   kind: 'PRD – Product Requirements Document',
   title: 'Arena Quiz Multiplayer',
   subtitle: 'Requisitos de produto da plataforma de quiz ao vivo para eventos, salas de aula e treinamentos',
-  version: '1.5', date: '19/11/2026', status: 'Atualizado com o chamar atenção do organizador',
+  version: '1.6', date: '22/11/2026', status: 'Tempo de resposta controlado pela plataforma',
   blocks: [
     ['h1', '1. Controle do documento'],
     ['table', { title: 'Histórico de versões', widths: [1, 2, 5], header: ['Versão', 'Data', 'Descrição'], rows: [
@@ -17,7 +17,8 @@ build({
       ['1.2', '14/11/2026', 'Escopo da partida (RF-44 a RF-46): o organizador define quantas perguntas do quiz usar (ex.: 90 de 120), na sequência ou sorteadas, com estimativa de duração.'],
       ['1.3', '16/11/2026', 'Sessão, saída e expiração (RF-47 a RF-50): botão Sair para participante e organizador e desconexão automática após 5 minutos sem conexão.'],
       ['1.4', '19/11/2026', 'Chamar atenção (RF-32): o botão passa a ficar sempre visível, esmaecido e com aviso quando não há rival conectado. O botão Sair foi movido para o canto esquerdo, junto aos outros controles, para não cobrir botões do jogo.'],
-      ['1.5', '19/11/2026', 'Chamar atenção do organizador (RF-51): som alto no celular de um participante ou de todos, pelo Arsenal.']] }],
+      ['1.5', '19/11/2026', 'Chamar atenção do organizador (RF-51): som alto no celular de um participante ou de todos, pelo Arsenal.'],
+      ['1.6', '22/11/2026', 'Tempo de resposta controlado pela plataforma (RF-52): o campo time do quiz importado deixa de sobrescrever o tempo definido pelo organizador.']] }],
     ['table', { title: 'Documentos relacionados', widths: [2, 5], header: ['Documento', 'Conteúdo'], rows: [
       ['PTD – Product Technical Document', 'Visão técnica da solução: arquitetura, componentes, segurança e implantação.'],
       ['DTD – Detail Technical Document', 'Detalhamento: modelo de dados, API, máquina de estados, algoritmos e códigos de erro.'],
@@ -121,6 +122,7 @@ build({
       RF('RF-26', 'Templates prontos (PT/EN/ES).', 'M', 'Corporativos: Segurança da Informação, Gestão & Comunicação, Atendimento, Onboarding editável, Pesquisa de clima. Diversão: Conhecimentos Gerais, Tecnologia, Ciência, Geografia, Games.'),
       RF('RF-27', 'Importar arquivo JSON ou CSV.', 'M', 'Arrastar e soltar; prévia; modelos para download; CSV com "," ou ";".'),
       RF('RF-28', 'Texto rápido.', 'S', 'Blocos separados por linha em branco; "*" marca a correta; ">" é a explicação.'),
+      RF('RF-52', 'O tempo de resposta é controlado pela plataforma.', 'M', 'O organizador define o tempo em Configurar Jogo e pode alterá-lo durante o jogo (vale na próxima pergunta). O campo time de um quiz importado é ignorado por padrão; só vale se o organizador ligar "Respeitar o tempo de cada pergunta do quiz". O prompt de IA do app não pede mais o campo time.'),
       RF('RF-29', 'Editor visual com rascunhos.', 'S', '2 a 6 alternativas, dica, explicação, tempo, imagem, enquete; salvar no navegador; exportar JSON.'),
       RF('RF-30', 'Prompt pronto para IA.', 'S', 'Copiar prompt e colar o JSON gerado.'),
       RF('RF-31', 'Validação com mensagens claras.', 'M', 'Erros indicam o número da pergunta e o problema.')] }],

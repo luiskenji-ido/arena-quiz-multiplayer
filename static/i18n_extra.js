@@ -461,3 +461,16 @@ function turnResultText(q) {
   };
   for (const l in X) Object.assign(I18N[l], X[l]);
 })();
+
+/* Tempo de resposta: a plataforma manda (padrão) */
+(function () {
+  const X = {
+    pt: { lbl_time_quiz: "Respeitar o tempo de cada pergunta do quiz", lbl_time_quiz_d: "Desligado (padrão): todas as perguntas usam o tempo definido acima, mesmo que o arquivo traga um campo de tempo. Ligado: perguntas com tempo próprio usam esse tempo.",
+          ed_time: "Tempo em segundos (só vale se “Respeitar o tempo…” estiver ligado)" },
+    en: { lbl_time_quiz: "Respect each question's own time from the quiz", lbl_time_quiz_d: "Off (default): every question uses the time set above, even if the file has a time field. On: questions with their own time use it.",
+          ed_time: "Time in seconds (only used if “Respect each question's own time” is on)" },
+    es: { lbl_time_quiz: "Respetar el tiempo propio de cada pregunta del quiz", lbl_time_quiz_d: "Apagado (por defecto): todas las preguntas usan el tiempo definido arriba, aunque el archivo traiga un campo de tiempo. Encendido: las preguntas con tiempo propio lo usan.",
+          ed_time: "Tiempo en segundos (solo vale si “Respetar el tiempo propio…” está encendido)" }
+  };
+  for (const l in X) Object.assign(I18N[l], X[l]);
+})();
